@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // 制御されます。アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
 [assembly: AssemblyTitle("NpoiWrapper")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Emulates Office.Interop.Excel")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Developers")]
 [assembly: AssemblyProduct("NpoiWrapper")]
-[assembly: AssemblyCopyright("Copyright ©  2023")]
+[assembly: AssemblyCopyright("Copyright ©  2023 Developers A. Tomita")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
