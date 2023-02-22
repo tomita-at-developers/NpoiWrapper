@@ -150,11 +150,12 @@ namespace Developers.NpoiWrapper
             get
             {
                 int RetVal = 0;
-                for (int AIdx = 0; AIdx < RawAddressList.CountRanges(); AIdx++)
+                //RawAddressListではEntireの場合にアドレスが-1となり、Cells数が正しく評価されない
+                //それゆえここではSafeAddressListを使用している
+                for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
                 {
-                    CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(AIdx);
+                    CellRangeAddress RawAddress = SafeAddressList.GetCellRangeAddress(AIdx);
                     RetVal += RawAddress.NumberOfCells;
-
                 }
                 return RetVal;
             }
@@ -207,7 +208,8 @@ namespace Developers.NpoiWrapper
                     //生アドレス取得
                     CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(AIdx);
                     //列を全域に拡張しリストに追加
-                    RangeAddressList.AddCellRangeAddress(RawAddress.FirstRow, RawAddress.LastRow, -1, -1);
+                    RangeAddressList.AddCellRangeAddress(
+                        new CellRangeAddress(RawAddress.FirstRow, RawAddress.LastRow, -1, -1));
                 }
                 //Rangeクラスインスタンス生成
                 return new Range(ParentSheet, RangeAddressList);
@@ -228,9 +230,10 @@ namespace Developers.NpoiWrapper
                     //生アドレス取得
                     CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(AIdx);
                     //行を全域に拡張しリストに追加
-                    RangeAddressList.AddCellRangeAddress(-1, -1, RawAddress.FirstColumn, RawAddress.LastColumn);
-                    //Rangeクラスインスタンス生成
+                    RangeAddressList.AddCellRangeAddress(
+                        new CellRangeAddress(-1, -1, RawAddress.FirstColumn, RawAddress.LastColumn));
                 }
+                //Rangeクラスインスタンス生成
                 return new Range(ParentSheet, RangeAddressList);
             }
         }
@@ -812,7 +815,7 @@ namespace Developers.NpoiWrapper
             CellRangeAddressList RetVal = new CellRangeAddressList();
             for (int i = 0; i < RangeAddressList.CountRanges(); i++)
             {
-                CellRangeAddress Address = RangeAddressList.GetCellRangeAddress(i);
+                CellRangeAddress Address = RangeAddressList.GetCellRangeAddress(i).Copy();
                 //-1の場合は仕様上の最大、最小値を利用する
                 if (Address.FirstRow == -1)
                 {
