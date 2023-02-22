@@ -16,7 +16,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Worksheet
     {
-        public Range Cells { get; } 
+        public Cells Cells { get; } 
         public Range Range { get; }
         internal Workbook ParentBook { get; private set; }
         internal ISheet PoiSheet { get; private set; }
@@ -41,9 +41,9 @@ namespace Developers.NpoiWrapper
                 MaxRowIndex = NPOI.SS.SpreadsheetVersion.EXCEL97.MaxRows - 1;
             }
             //Cells, Rangeの初期値をセット
-            //インデクスを省略した場合はこの値が取得される
-            Cells = new Range(this, CellRangeAddress.ValueOf("$:$"));
-            Range = new Range(this, CellRangeAddress.ValueOf("$:$"));
+            //インデクスを省略した場合はこの値が取得される(シート全域)
+            Cells = new Cells(this, new CellRangeAddressList(-1, -1, -1, -1));
+            Range = new Range(this, new CellRangeAddressList(-1, -1, -1, -1));
         }
 
         /// <summary>
@@ -69,7 +69,6 @@ namespace Developers.NpoiWrapper
         {
             ParentBook.PoiBook.RemoveSheetAt(
                 ParentBook.PoiBook.GetSheetIndex(PoiSheet.SheetName));
-
         }
 
         /// <summary>

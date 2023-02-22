@@ -58,13 +58,32 @@ namespace Developers.NpoiWrapper.Util
         }
 
         /// <summary>
+        /// CellRangeAddressListの全アドレスを統合し論理和的な唯一つのアドレスを持つリストを生成する
+        /// </summary>
+        /// <param name="RangeAddressList">処理対象のCellRangeAddressList</param>
+        /// <returns>CellRangeAddressList</returns>
+        static internal CellRangeAddressList GetMergedAddressList(CellRangeAddressList RangeAddressList)
+        {
+            List<int> Row = new List<int>();
+            List<int> Column= new List<int>();
+            foreach (CellRangeAddress adr in RangeAddressList.CellRangeAddresses)
+            {
+                Row.Add(adr.FirstRow);
+                Row.Add(adr.LastRow);
+                Column.Add(adr.FirstColumn);
+                Column.Add(adr.LastColumn);
+            }
+            return new CellRangeAddressList(Row.Min(), Row.Max(), Column.Min(), Column.Max());
+        }
+
+        /// <summary>
         /// 二次元配列の生成
         /// </summary>
         /// <param name="ElementType">要素の型</param>
         /// <param name="Lengths">要素数配列{一次元長, 二次元長}</param>
         /// <param name="ColumnCount">開始インデクス{一次元開始値, 二次元開始値}</param>
         /// <returns></returns>
-        static private dynamic CreateArrayInstance(Type ElementType, int[] Lengths, int[] LowerBounds)
+        static internal dynamic CreateArrayInstance(Type ElementType, int[] Lengths, int[] LowerBounds)
         {
             dynamic dataArray = (object[,])Array.CreateInstance(ElementType, Lengths, LowerBounds);
             return dataArray;

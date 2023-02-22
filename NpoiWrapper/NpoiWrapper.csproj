@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Areas.cs" />
+    <Compile Include="Cells.cs" />
     <Compile Include="Uitl\CellValue.cs" />
     <Compile Include="Uitl\Util.cs" />
     <Compile Include="NpoiWrapper.cs" />

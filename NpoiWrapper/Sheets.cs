@@ -29,7 +29,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheetAt(Index));
+                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheetAt(Index - 1));
             }
         }
 
