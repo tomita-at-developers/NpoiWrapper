@@ -7,6 +7,7 @@ using NPOI.HSSF.UserModel;
 
 namespace Developers.NpoiWrapper
 {
+    using Range = _Range;
 
     /// <summary>
     /// Worksheetクラス
@@ -142,10 +143,10 @@ namespace Developers.NpoiWrapper
         {
             PoiSheet.ProtectSheet(Password);
             //XSSFならロック解除できるのでやっておく
-            if (PoiSheet is XSSFSheet)
+            if (PoiSheet is XSSFSheet xssfSheet)
             {
-                ((XSSFSheet)PoiSheet).LockAutoFilter(false);
-                ((XSSFSheet)PoiSheet).LockSort(false);
+                xssfSheet.LockAutoFilter(false);
+                xssfSheet.LockSort(false);
             }
             else
             {

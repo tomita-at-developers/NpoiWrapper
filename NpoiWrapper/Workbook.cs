@@ -6,9 +6,6 @@ using System.IO;
 using Developers.NpoiWrapper.Configuration;
 using Developers.NpoiWrapper.Configuration.Model;
 using System.Collections.Generic;
-using NPOI.XWPF.UserModel;
-using System.Net.Sockets;
-using SixLabors.Fonts;
 
 namespace Developers.NpoiWrapper
 {
@@ -24,7 +21,9 @@ namespace Developers.NpoiWrapper
         public string FileName { get; private set; } = string.Empty;
         internal Dictionary<string, ICellStyle> CellStyles { get; private set; } = new Dictionary<string, ICellStyle>();
         internal Dictionary<string, PageSetup> PageSetups { get; private set; } = new Dictionary<string, PageSetup>();
-        internal IFont Font = null;
+        internal IFont Font { get; private set; } = null;
+        public Sheets Worksheets { get; private set; }
+
         /// <summary>
         /// 新規ファイルを作成する
         /// </summary>
@@ -54,6 +53,8 @@ namespace Developers.NpoiWrapper
             PoiBook.CreateSheet();
             //この時点でファイル名は未定義
             FileName = string.Empty;
+            //Worksheetsの初期化
+            Worksheets = new Worksheets(this);
         }
 
         /// <summary>
@@ -67,17 +68,8 @@ namespace Developers.NpoiWrapper
             PoiBook = WorkbookFactory.Create(Stream);
             //ファイル名を保存
             this.FileName = FileName;
-        }
-
-        /// <summary>
-        /// Sheetsの取得(Excel.Interopをエミュレート)
-        /// </summary>
-        public Sheets Sheets
-        {
-            get
-            {
-                return new Sheets(this);
-            }
+            //Worksheetsの初期化
+            Worksheets = new Worksheets(this);
         }
 
         /// <summary>

@@ -2,6 +2,8 @@
 
 namespace Developers.NpoiWrapper
 {
+    using Range = _Range;
+
     /// <summary>
     /// Areasクラス
     /// Microsoft.Office.Interop.Excel.Areasをエミュレート
@@ -11,7 +13,7 @@ namespace Developers.NpoiWrapper
     public class Areas
     {
         private Worksheet ParentSheet { get; set; }
-        private CellRangeAddressList RangeAddressList { get; set; }
+        private CellRangeAddressList RawAddressList { get; set; }
 
         /// <summary>
         /// コンストラクタ
@@ -21,7 +23,7 @@ namespace Developers.NpoiWrapper
         internal Areas(Worksheet ParentSheet, CellRangeAddressList RangeAddressList)
         {
             this.ParentSheet = ParentSheet;
-            this.RangeAddressList = RangeAddressList;
+            this.RawAddressList = RangeAddressList;
         }
 
         /// <summary>
@@ -34,7 +36,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 CellRangeAddressList AddressList = new CellRangeAddressList();
-                AddressList.AddCellRangeAddress(RangeAddressList.GetCellRangeAddress(index - 1));
+                AddressList.AddCellRangeAddress(RawAddressList.GetCellRangeAddress(index - 1).Copy());
                 return new Range(ParentSheet, AddressList);
             }
         }
@@ -46,7 +48,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return RangeAddressList.CountRanges();
+                return RawAddressList.CountRanges();
             }
         }
     }

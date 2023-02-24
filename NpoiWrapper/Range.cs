@@ -6,39 +6,122 @@ using System;
 using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
 using Developers.NpoiWrapper.Util;
-using System.Runtime.InteropServices.WindowsRuntime;
-using NPOI.HSSF.Util;
-using NPOI.SS.Formula.Functions;
-using System.Xml.Schema;
+using System.Collections;
 
 namespace Developers.NpoiWrapper
 {
+    using Range = _Range;
 
     public enum XlCellType
     {
         xlCellTypeLastCell
     }
+
     /// <summary>
     /// Rangeクラス
     /// WorksheetクラスのCells, Rangeプロパティにアクセスすると本クラスのインデクサでコンストラクトされる
     /// ユーザからは直接コンストラクトさせないのでコンストラクタはinternalにしている
     /// </summary>
-    public class Range
+    public class _Range : IEnumerable, IEnumerator
     {
+        internal enum RangeType
+        {
+            Default,
+            Rows,
+            Columns
+        }
+
         internal Worksheet ParentSheet { get; private set; }
+        internal CellRangeAddress RelativeTo { get; private set; }
         internal CellRangeAddressList RawAddressList { get; private set; }
         internal CellRangeAddressList SafeAddressList { get; private set; }
+        private RangeType CountAs { get; set; } = RangeType.Default;
+        private int EnumRowOfs { get; set; } = 0;
+        private int EnumColumnOfs { get; set; } = -1;
 
         /// <summary>
         /// コンスラクタ
         /// </summary>
         /// <param name="ParentSheet">親シートクラス</param>
         /// <param name="RangeAddressList">CellRangeAddressListインスタンス</param>
-        internal Range(Worksheet ParentSheet, CellRangeAddressList RangeAddressList)
+        internal _Range(
+            Worksheet ParentSheet,
+            CellRangeAddressList RangeAddressList,
+            CellRangeAddress RelativeTo = null,
+            RangeType CountAs = RangeType.Default)
         {
             this.ParentSheet = ParentSheet;
-            RawAddressList = RangeAddressList;
-            SafeAddressList = GetSafeCellRangeAddressList(RawAddressList);
+            this.RawAddressList = RangeAddressList;
+            this.CountAs = CountAs;
+            this.RelativeTo = RelativeTo;
+            //基準アドレスがある場合はアドレス再計算(/Range.Cellsとして生成される場合)
+            if (this.RelativeTo != null)
+            {
+                this.RawAddressList = GetAbsoluteRangeAddressList(RangeAddressList, RelativeTo);
+            }
+            this.SafeAddressList = GetSafeCellRangeAddressList(RawAddressList);
+        }
+
+        /// <summary>
+        /// GetEnumeratorの実装
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator GetEnumerator()
+        {
+            return (IEnumerator)this;
+        }
+        /// <summary>
+        /// IEnumerator.MoveNextの実装
+        /// </summary>
+        /// <returns></returns>
+        public bool MoveNext()
+        {
+            bool RetVal = false;
+            CellRangeAddress Adr = SafeAddressList.GetCellRangeAddress(0);
+            //次にカラムがない場合は次の行の先頭カラムへ
+            EnumColumnOfs += 1;
+            if (Adr.FirstColumn + EnumColumnOfs > Adr.LastColumn)
+            {
+                EnumRowOfs += 1;
+                EnumColumnOfs = 0;
+                //まだ行があればture
+                if (Adr.FirstRow + EnumRowOfs <= Adr.LastRow)
+                {
+                    RetVal = true;
+                }
+            }
+            //次にカラムがあれば行を維持し次のカラムへ
+            else
+            {
+                EnumColumnOfs += 0;
+                RetVal = true;
+
+            }
+            return RetVal;
+        }
+        /// <summary>
+        /// IEnumerator.Current実装
+        /// </summary>
+        public object Current
+        {
+            get
+            {
+                CellRangeAddress Adr = SafeAddressList.GetCellRangeAddress(0);
+                return new Range(
+                    ParentSheet,
+                    new CellRangeAddressList(
+                        Adr.FirstRow + EnumRowOfs, Adr.FirstRow + EnumRowOfs,
+                        Adr.FirstColumn + EnumColumnOfs, Adr.FirstColumn + EnumColumnOfs),
+                    RelativeTo);
+            }
+        }
+        /// <summary>
+        /// IEnumerator.Resetの実装
+        /// </summary>
+        public void Reset()
+        {
+            EnumRowOfs = 0;
+            EnumColumnOfs = -1;
         }
 
         /// <summary>
@@ -137,25 +220,41 @@ namespace Developers.NpoiWrapper
                     throw new ArgumentException("Type of Cell1 must be Cells or string.");
                 }
                 //Rangeクラスインスタンス生成
-                return new Range(ParentSheet, AddressList);
+                return new Range(ParentSheet, AddressList, RelativeTo);
             }
         }
 
         /// <summary>
         /// Count
-        /// このRageに含まれるCellの数
+        /// このRageに含まれるセル、行、列の数
         /// </summary>
         public int Count
         {
             get
             {
                 int RetVal = 0;
-                //RawAddressListではEntireの場合にアドレスが-1となり、Cells数が正しく評価されない
-                //それゆえここではSafeAddressListを使用している
-                for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
+                //行数をカウント
+                if (CountAs == RangeType.Rows)
                 {
-                    CellRangeAddress RawAddress = SafeAddressList.GetCellRangeAddress(AIdx);
-                    RetVal += RawAddress.NumberOfCells;
+                    CellRangeAddress RawAddress = SafeAddressList.GetCellRangeAddress(0);
+                    RetVal = RawAddress.LastRow - RawAddress.FirstRow + 1;
+                }
+                //列数をカウント
+                else if (CountAs == RangeType.Columns)
+                {
+                    CellRangeAddress RawAddress = SafeAddressList.GetCellRangeAddress(0);
+                    RetVal = RawAddress.LastColumn - RawAddress.FirstColumn + 1;
+                }
+                //セル数をカウント
+                else
+                {
+                    //RawAddressListではEntireの場合にアドレスが-1となり、Cells数が正しく評価されない
+                    //それゆえここではSafeAddressListを使用している
+                    for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
+                    {
+                        CellRangeAddress RawAddress = SafeAddressList.GetCellRangeAddress(AIdx);
+                        RetVal += RawAddress.NumberOfCells;
+                    }
                 }
                 return RetVal;
             }
@@ -195,6 +294,38 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
+        /// Cells
+        /// このRangeを起点としたサプRangeとしてのCells
+        /// </summary>
+        public Cells Cells
+        {
+            get
+            {
+                //このRangeの先頭アドレスを起点としたCellsを生成
+                return new Cells(
+                    ParentSheet,
+                    new CellRangeAddressList(-1, -1, -1, -1),
+                    RawAddressList.GetCellRangeAddress(0));
+            }
+        }
+
+        /// <summary>
+        /// Rangee
+        /// このRangeを起点としたサプRangeとしてのRange
+        /// </summary>
+        public Range Range
+        {
+            get
+            {
+                //このRangeの先頭アドレスを起点としたRangeを生成
+                return new Range(
+                    ParentSheet,
+                    new CellRangeAddressList(-1, -1, -1, -1),
+                    RawAddressList.GetCellRangeAddress(0));
+            }
+        }
+
+        /// <summary>
         /// 現在のRangeに含まれる行の全体(全カラム)
         /// </summary>
         public Range EntireRow
@@ -202,17 +333,17 @@ namespace Developers.NpoiWrapper
             get
             {
                 //全レンジを処理
-                CellRangeAddressList RangeAddressList = new CellRangeAddressList();
+                CellRangeAddressList AddressList = new CellRangeAddressList();
                 for (int AIdx = 0; AIdx < RawAddressList.CountRanges(); AIdx++)
                 {
                     //生アドレス取得
-                    CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(AIdx);
+                    CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(AIdx).Copy();
                     //列を全域に拡張しリストに追加
-                    RangeAddressList.AddCellRangeAddress(
+                    AddressList.AddCellRangeAddress(
                         new CellRangeAddress(RawAddress.FirstRow, RawAddress.LastRow, -1, -1));
                 }
                 //Rangeクラスインスタンス生成
-                return new Range(ParentSheet, RangeAddressList);
+                return new Range(ParentSheet, AddressList);
             }
         }
 
@@ -224,17 +355,69 @@ namespace Developers.NpoiWrapper
             get
             {
                 //全レンジを処理
-                CellRangeAddressList RangeAddressList = new CellRangeAddressList();
+                CellRangeAddressList AddressList = new CellRangeAddressList();
                 for (int AIdx = 0; AIdx < RawAddressList.CountRanges(); AIdx++)
                 {
                     //生アドレス取得
-                    CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(AIdx);
+                    CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(AIdx).Copy();
                     //行を全域に拡張しリストに追加
-                    RangeAddressList.AddCellRangeAddress(
+                    AddressList.AddCellRangeAddress(
                         new CellRangeAddress(-1, -1, RawAddress.FirstColumn, RawAddress.LastColumn));
                 }
                 //Rangeクラスインスタンス生成
-                return new Range(ParentSheet, RangeAddressList);
+                return new Range(ParentSheet, AddressList);
+            }
+        }
+
+        /// <summary>
+        /// 先頭アドレスの先頭行インデックス取得(１開始)
+        /// </summary>
+        public int Row
+        {
+            get
+            {
+                return SafeAddressList.GetCellRangeAddress(0).FirstRow + 1;
+            }
+        }
+
+        /// <summary>
+        /// 先頭アドレスのRangeを生成(RangeType.Rows)
+        /// </summary>
+        public Range Rows
+        {
+            get
+            {
+                //先頭アドレスのみ切り出し
+                CellRangeAddressList AddressList = new CellRangeAddressList();
+                AddressList.AddCellRangeAddress(RawAddressList.GetCellRangeAddress(0).Copy());
+                //Rangeクラスインスタンス生成
+                return new Range(ParentSheet, AddressList, RelativeTo, RangeType.Rows);
+            }
+        }
+
+        /// <summary>
+        /// 先頭アドレスの先頭列インデックス取得(１開始)
+        /// </summary>
+        public int Column
+        {
+            get
+            {
+                return SafeAddressList.GetCellRangeAddress(0).FirstColumn + 1;
+            }
+        }
+
+        /// <summary>
+        /// 先頭アドレスのRangeを生成(RangeType.Columns)
+        /// </summary>
+        public Range Columns
+        {
+            get
+            {
+                //先頭アドレスのみ切り出し
+                CellRangeAddressList AddressList = new CellRangeAddressList();
+                AddressList.AddCellRangeAddress(RawAddressList.GetCellRangeAddress(0).Copy());
+                //Rangeクラスインスタンス生成
+                return new Range(ParentSheet, AddressList, RelativeTo, RangeType.Columns);
             }
         }
 
@@ -805,31 +988,66 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
+        /// 絶対アドレスを生成する
+        /// </summary>
+        /// <param name="RangeAddressList">評価対象Rangeアドレスリスト</param>
+        /// <param name="RelativeTo">評価基準アドレス</param>
+        /// <returns>絶対アドレスリスト</returns>
+        private CellRangeAddressList GetAbsoluteRangeAddressList(CellRangeAddressList　RangeAddressList, CellRangeAddress RelativeTo)
+        {
+            CellRangeAddressList RetVal = new CellRangeAddressList();
+            for (int i = 0; i < RangeAddressList.CountRanges(); i++)
+            {
+                CellRangeAddress Address = RangeAddressList.GetCellRangeAddress(i).Copy();
+                //実アドレスならば絶対アドレス計算
+                if (Address.FirstRow >= 0)
+                {
+                        Address.FirstRow += RelativeTo.FirstRow >= 0 ? RelativeTo.FirstRow : 0;
+                }
+                if (Address.LastRow >= 0)
+                {
+                    Address.LastRow += RelativeTo.FirstRow >= 0 ? RelativeTo.FirstRow : 0;
+                }
+                if (Address.FirstColumn >= 0)
+                {
+                    Address.FirstColumn += RelativeTo.FirstColumn >= 0 ? RelativeTo.FirstColumn : 0;
+                }
+                if (Address.LastColumn >= 0)
+                {
+                    Address.LastColumn += RelativeTo.FirstColumn >= 0 ? RelativeTo.FirstColumn : 0;
+                }
+                RetVal.AddCellRangeAddress(Address);
+            }
+            return RetVal;
+
+        }
+
+        /// <summary>
         /// 最大最小を考慮したアドレスを生成する
         /// とはいえ最大値の場合、メモリ不足の例外が発生する可能性が高い
         /// </summary>
         /// <param name="RangeAddress">評価対象Rangeアドレス</param>
-        /// <returns>評価済Rangeアドレス</returns>
+        /// <returns>評価済Rangeアドレスリスト</returns>
         private CellRangeAddressList GetSafeCellRangeAddressList(CellRangeAddressList RangeAddressList)
         {
             CellRangeAddressList RetVal = new CellRangeAddressList();
             for (int i = 0; i < RangeAddressList.CountRanges(); i++)
             {
                 CellRangeAddress Address = RangeAddressList.GetCellRangeAddress(i).Copy();
-                //-1の場合は仕様上の最大、最小値を利用する
-                if (Address.FirstRow == -1)
+                //0未満(-1)の場合は仕様上の最大、最小値を利用する
+                if (Address.FirstRow < 0)
                 {
                     Address.FirstRow = 0;
                 }
-                if (Address.LastRow == -1)
+                if (Address.LastRow < 0)
                 {
                     Address.LastRow = ParentSheet.MaxRowIndex;
                 }
-                if (Address.FirstColumn == -1)
+                if (Address.FirstColumn < 0)
                 {
                     Address.FirstColumn = 0;
                 }
-                if (Address.LastColumn == -1)
+                if (Address.LastColumn < 0)
                 {
                     Address.LastColumn = ParentSheet.MaxColumnIndex;
                 }

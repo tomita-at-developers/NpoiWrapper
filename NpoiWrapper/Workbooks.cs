@@ -1,9 +1,5 @@
-﻿using NPOI.SS.Formula.Eval;
-using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Developers.NpoiWrapper
 {
@@ -13,8 +9,11 @@ namespace Developers.NpoiWrapper
     /// NpoiWrapperクラスのプロパティとしてのみコンストラクトされる
     /// ユーザからは直接コンストラクトさせないのでコンストラクタはinternalにしている
     /// </summary>
-    public class Workbooks
+    public class Workbooks : IEnumerable, IEnumerator
     {
+        internal List<Workbook> Books { get; private set; } = new List<Workbook>();
+        protected int EnumBookIndex { get; set; } = -1;
+
         /// <summary>
         /// コンストラクタ
         /// NoiWrapperのプロパティとしてのみコンストラクトされる
@@ -25,13 +24,55 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
+        /// GetEnumeratorの実装
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator GetEnumerator()
+        {
+            return (IEnumerator)this;
+        }
+        /// <summary>
+        /// IEnumerator.MoveNextの実装
+        /// </summary>
+        /// <returns></returns>
+        public bool MoveNext()
+        {
+            bool RetVal = false;
+            EnumBookIndex += 1;
+            if (EnumBookIndex < Books.Count)
+            {
+                RetVal = true;
+            }
+            return RetVal;
+        }
+        /// <summary>
+        /// IEnumerator.Current実装
+        /// </summary>
+        public object Current
+        {
+            get
+            {
+                return Books[EnumBookIndex];
+            }
+        }
+        /// <summary>
+        /// IEnumerator.Resetの実装
+        /// </summary>
+        public void Reset()
+        {
+            EnumBookIndex = -1;
+        }
+
+        /// <summary>
         /// 新規Excelブックの追加
         /// </summary>
         /// <param name="Excel97_2003">Excel97-2003形式で作成する場合true(省略時Excel2007以降形式)</param>
         /// <returns>Workbookクラスインスタンス</returns>
         public Workbook Add(bool Excel97_2003 = false)
         {
-            return new Workbook(Excel97_2003);
+            Workbook Book = new Workbook(Excel97_2003);
+            Books.Add(Book);
+            return Book;
         }
 
         /// <summary>
@@ -41,7 +82,22 @@ namespace Developers.NpoiWrapper
         /// <returns>Workbookクラスインスタンス</returns>
         public Workbook Open(string FileNanme)
         {
-            return new Workbook(FileNanme);
+            Workbook Book = new Workbook(FileNanme);
+            Books.Add(Book);
+            return Book;
+        }
+
+        /// <summary>
+        /// インデクサ
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public Workbook this[int index]
+        {
+            get
+            {
+                return Books[index];
+            }
         }
     }
 }

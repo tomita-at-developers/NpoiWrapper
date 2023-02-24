@@ -7,11 +7,12 @@
     <ProjectGuid>{BCB1F36D-3BF3-46C1-B75D-1D48F9821204}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NpoiWrapper</RootNamespace>
+    <RootNamespace>Developers.NpoiWrapper</RootNamespace>
     <AssemblyName>NpoiWrapper</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Areas.cs" />
     <Compile Include="Cells.cs" />
+    <Compile Include="Sheets.cs" />
     <Compile Include="Uitl\CellValue.cs" />
     <Compile Include="Uitl\Util.cs" />
     <Compile Include="NpoiWrapper.cs" />
@@ -54,7 +56,7 @@
     <Compile Include="Configuration\Model\Font.cs" />
     <Compile Include="Configuration\Model\PageSetup.cs" />
     <Compile Include="Range.cs" />
-    <Compile Include="Sheets.cs" />
+    <Compile Include="Worksheets.cs" />
     <Compile Include="Worksheet.cs" />
     <Compile Include="Workbook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
