@@ -70,25 +70,17 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsBold);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
-                if (CommonProp is bool SafeProp)
-                {
-                    RetVal = SafeProp;
-                }
-                return RetVal;
+                return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Bold));
             }
             set
             {
                 if (value is bool SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsBold);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
-                        new CellStyleParam(PropName, SafeValue)
+                        new CellStyleParam(StyleName.Font.Bold, SafeValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -99,31 +91,22 @@ namespace Developers.NpoiWrapper
             }
         }
 
-        //object Color { get; set; }
-
+        //object ColorIndex { get; set; }
         public object ColorIndex
         {
             get
             {
-                object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.Color);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
-                if (CommonProp is short SafeProp)
-                {
-                    RetVal = SafeProp;
-                }
-                return RetVal;
+                return (short?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.ColorIndex));
             }
             set
             {
                 if (value is short SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.Color);
                     List<CellStyleParam> Params = new List<CellStyleParam >
                     {
-                        new CellStyleParam(PropName, SafeValue)
+                        new CellStyleParam(StyleName.Font.ColorIndex, SafeValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -137,25 +120,18 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
                 string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsItalic);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
-                if (CommonProp is bool SafeProp)
-                {
-                    RetVal = SafeProp;
-                }
-                return RetVal;
+                return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Italic));
             }
             set
             {
                 if (value is bool SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsItalic);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     { 
-                        new CellStyleParam(PropName, SafeValue)
+                        new CellStyleParam(StyleName.Font.Italic, SafeValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -169,25 +145,17 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontName);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
-                if (CommonProp is string SafeProp)
-                {
-                    RetVal = SafeProp;
-                }
-                return RetVal;
+                return (string)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Name));
             }
             set
             {
                 if (value is string SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontName);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
-                        new CellStyleParam(PropName, SafeValue)
+                        new CellStyleParam(StyleName.Font.Name, SafeValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -201,15 +169,8 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontHeightInPoints);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
-                if (CommonProp is double SafeProp)
-                {
-                    RetVal = SafeProp;
-                }
-                return RetVal;
+                return (double?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Size));
             }
             set
             {
@@ -227,11 +188,10 @@ namespace Developers.NpoiWrapper
                     throw new ArgumentException("Font.Size");
                 }
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontHeightInPoints);
                 List<CellStyleParam> Params = new List<CellStyleParam>
-                    {
-                        new CellStyleParam(PropName, SafeValue)
-                    };
+                {
+                    new CellStyleParam(StyleName.Font.Size, SafeValue)
+                };
                 StyleManger.UpdateProperties(Params);
             }
         }
@@ -239,25 +199,17 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsStrikeout);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
-                if (CommonProp is bool SafeProp)
-                {
-                    RetVal = SafeProp;
-                }
-                return RetVal;
+                return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Strikethrough));
             }
             set
             {
                 if (value is bool SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsStrikeout);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
-                        new CellStyleParam(PropName, SafeValue)
+                        new CellStyleParam(StyleName.Font.Strikethrough, SafeValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -271,7 +223,7 @@ namespace Developers.NpoiWrapper
         { 
             get
             {
-                object RetVal = DBNull.Value;
+                object RetVal = null;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
                 string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.TypeOffset);
                 object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
@@ -293,18 +245,12 @@ namespace Developers.NpoiWrapper
                 if (value is bool SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.TypeOffset);
-                    //変更初期値
-                    FontSuperScript PropValue = FontSuperScript.None;
-                    //今回TrueならいずれにせよFontSuperScript.Sub
-                    if (SafeValue)
+                    //変更初期値(true;FontSuperScript.Sub)
+                    FontSuperScript PropValue = FontSuperScript.Sub;
+                    //False指定の場合は現状によって判断
+                    if (SafeValue == false)
                     {
-                        PropValue = FontSuperScript.Sub;
-                    }
-                    //今回Falseは現状によって判断
-                    else
-                    {
-                        object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
+                        object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.TypeOffset));
                         //現状が特定できるとき
                         if (CommonProp is FontSuperScript)
                         {
@@ -332,7 +278,7 @@ namespace Developers.NpoiWrapper
                     }
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
-                        new CellStyleParam(PropName, PropValue)
+                        new CellStyleParam(StyleName.Font.TypeOffset, PropValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -348,8 +294,7 @@ namespace Developers.NpoiWrapper
             {
                 object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.TypeOffset);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
+                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.TypeOffset));
                 if (CommonProp is FontSuperScript)
                 {
                     if (CommonProp.Equals(FontSuperScript.Super))
@@ -368,18 +313,12 @@ namespace Developers.NpoiWrapper
                 if (value is bool SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.TypeOffset);
-                    //変更初期値
-                    FontSuperScript PropValue = FontSuperScript.None;
-                    //今回TrueならいずれにせよFontSuperScript.Super
-                    if (SafeValue)
+                    //変更初期値(true:FontSuperScript.Super)
+                    FontSuperScript PropValue = FontSuperScript.Super;
+                    //False指定の場合は現状によって判断
+                    if (SafeValue == false)
                     {
-                        PropValue = FontSuperScript.Super;
-                    }
-                    //今回Falseは現状によって判断
-                    else
-                    {
-                        object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
+                        object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.TypeOffset));
                         //現状が特定できるとき
                         if (CommonProp is FontSuperScript)
                         {
@@ -408,7 +347,7 @@ namespace Developers.NpoiWrapper
                     }
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
-                        new CellStyleParam(PropName, PropValue)
+                        new CellStyleParam(StyleName.Font.TypeOffset, PropValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -422,25 +361,17 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.Underline);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
-                if (CommonProp is FontUnderlineType SafeProp)
-                {
-                    RetVal = GetXlUnderlineStyle(SafeProp);
-                }
-                return RetVal;
+                return (FontUnderlineType?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Underline));
             }
             set
             {
                 if (value is XlUnderlineStyle SafeValue)
                 {
                     RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
-                    string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.Underline);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
-                        new CellStyleParam(PropName, GetFontUnderlineType(SafeValue))
+                        new CellStyleParam(StyleName.Font.Underline, (FontUnderlineType)SafeValue)
                     };
                     StyleManger.UpdateProperties(Params);
                 }
@@ -449,15 +380,6 @@ namespace Developers.NpoiWrapper
                     throw new ArgumentException("Font.Italic");
                 }
             }
-        }
-
-        private FontUnderlineType GetFontUnderlineType(XlUnderlineStyle Underline)
-        {
-            return (FontUnderlineType)Underline;
-        }
-        private XlUnderlineStyle GetXlUnderlineStyle(FontUnderlineType Underline)
-        {
-            return (XlUnderlineStyle)Underline;
         }
     }
 }

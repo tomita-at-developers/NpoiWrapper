@@ -172,13 +172,10 @@ namespace Developers.NpoiWrapper.Styles
                         //現在のスタイルを取得
                         ICellStyle CurrentStyle = GetCellStyle(RowIndex, ColumnIndex, DefaultStyle);
                         short CurrentIndex = CurrentStyle.Index;
-                        //適用するIndex
-                        short IndexToApply = -1;
                         //Excel語のパラメータをPOI語に翻訳する。
-                        List<Properties.CellStyleParam> CellParams
-                            = GetParams(Address, RowIndex, ColumnIndex, Params, CurrentStyle);
+                        List<Properties.CellStyleParam> CellParams = GetParams(Address, RowIndex, ColumnIndex, Params, CurrentStyle);
                         //同じIndexとパラメータの実施履歴がなければ変更処理を実施
-                        IndexToApply = History.Query(CurrentIndex, CellParams);
+                        short IndexToApply = History.Query(CurrentIndex, CellParams);
                         if (IndexToApply == Utils.CellStyleUpdateHistory.None)
                         {
                             //PoiCellStyleの生成

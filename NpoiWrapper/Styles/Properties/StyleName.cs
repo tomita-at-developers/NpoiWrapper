@@ -10,7 +10,12 @@ namespace Developers.NpoiWrapper.Styles.Properties
         public static readonly string Locked = NameOf<PoiCellStyle>.FullName(n => n.IsLocked);
         public static readonly string WrapText = NameOf<PoiCellStyle>.FullName(n => n.WrapText);
         public static readonly string NumberFormat = NameOf<PoiCellStyle>.FullName(n => n.DataFormatString);
-
+        public static class Interior
+        {
+            public static readonly string ColorIndex = NameOf<PoiCellStyle>.FullName(n => n.FillBackgroundColor);
+            public static readonly string Pattern = NameOf<PoiCellStyle>.FullName(n => n.FillPattern);
+            public static readonly string PatternColorIndex = NameOf<PoiCellStyle>.FullName(n => n.FillForegroundColor);
+        }
         public static class XlsBorder
         {
             public static readonly string LineStyle = NameOf<Border>.FullName(nameof(Border), n => n.LineStyle);
@@ -48,12 +53,12 @@ namespace Developers.NpoiWrapper.Styles.Properties
         }
         public static class Font
         {
-            public static readonly string IsBold = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsBold);
-            public static readonly string Color = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.Color);
-            public static readonly string IsItalic = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsItalic);
-            public static readonly string FontName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontName);
-            public static readonly string FontHeightInPoints = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontHeightInPoints);
-            public static readonly string IsStrikeout = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsStrikeout);
+            public static readonly string Bold = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsBold);
+            public static readonly string ColorIndex = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.Color);
+            public static readonly string Italic = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsItalic);
+            public static readonly string Name = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontName);
+            public static readonly string Size = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.FontHeightInPoints);
+            public static readonly string Strikethrough = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsStrikeout);
             public static readonly string TypeOffset = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.TypeOffset);
             public static readonly string Underline = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.Underline);
         }

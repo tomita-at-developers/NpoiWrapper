@@ -2,6 +2,7 @@
 using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
+using static Developers.NpoiWrapper.Styles.Properties.StyleName;
 
 namespace Developers.NpoiWrapper.Styles
 {
@@ -26,6 +27,11 @@ namespace Developers.NpoiWrapper.Styles
         /// Bordersクラスインスタンス
         /// </summary>
         private Borders _Borders = null;
+
+        /// <summary>
+        /// Interiorクラスインスタンス
+        /// </summary>
+        private Interior _Interior = null;
 
         /// <summary>
         /// コンストラクタ
@@ -57,6 +63,17 @@ namespace Developers.NpoiWrapper.Styles
                 return _Borders;
             }
         }
+
+        public Interior Interior
+        {
+            get
+            {
+                //最初にアクセスされたときにインスタンス化する
+                if (_Interior == null) { _Interior = new Interior(base.PoiSheet, base.SafeRangeAddressList); }
+                return _Interior;
+            }
+        }
+
         /// <summary>
         /// HorizontalAlignment
         /// XlHAlignはNPOI.SS.UserModel.HorizontalAlignmentの値で定義しており同義。
@@ -151,7 +168,7 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (bool)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.Locked));
+                return (bool?)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.Locked));
             }
             set
             {
@@ -175,7 +192,7 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (bool)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.WrapText));
+                return (bool?)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.WrapText));
             }
             set
             {
