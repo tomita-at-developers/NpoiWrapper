@@ -1,66 +1,328 @@
-﻿using NPOI.SS.UserModel;
+﻿using Developers.NpoiWrapper.Styles;
+using Developers.NpoiWrapper.Utils;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using NPOI.XSSF.UserModel;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using NPOI.HSSF.UserModel;
-using NPOI.XSSF.UserModel;
-using Developers.NpoiWrapper.Util;
-using System.Collections;
 
 namespace Developers.NpoiWrapper
 {
-    using Range = _Range;
-
-    public enum XlCellType
-    {
-        xlCellTypeLastCell
-    }
+    // Range interface in Interop.Excel is shown below...
+    //  public interface Range
+    //  {
+    //      Application Application { get; }
+    //      XlCreator Creator { get; }
+    //      object Parent { get; }
+    //      object AddIndent { get; set; }
+    //      string Address { get; }
+    //      string AddressLocal { get; }
+    //      Areas Areas { get; }
+    //      Borders Borders { get; }
+    //      Range Cells { get; }
+    //      Characters Characters { get; }
+    //      int Column { get; }
+    //      Range Columns { get; }
+    //      object ColumnWidth { get; set; }
+    //      int Count { get; }
+    //      Range CurrentArray { get; }
+    //      Range CurrentRegion { get; }
+    //      object this[[Optional] object RowIndex, [Optional] object ColumnIndex] { get; set; }
+    //      Range Dependents { get; }
+    //      Range DirectDependents { get; }
+    //      Range DirectPrecedents { get; }
+    //      Range End { get; }
+    //      Range EntireColumn { get; }
+    //      Range EntireRow { get; }
+    //      Font Font { get; }
+    //      object Formula { get; set; }
+    //      object FormulaArray { get; set; }
+    //      XlFormulaLabel FormulaLabel { get; set; }
+    //      object FormulaHidden { get; set; }
+    //      object FormulaLocal { get; set; }
+    //      object FormulaR1C1 { get; set; }
+    //      object FormulaR1C1Local { get; set; }
+    //      object HasArray { get; }
+    //      object HasFormula { get; }
+    //      object Height { get; }
+    //      object Hidden { get; set; }
+    //      object HorizontalAlignment { get; set; }
+    //      object IndentLevel { get; set; }
+    //      Interior Interior { get; }
+    //      object Item { get; set; }
+    //      object Left { get; }
+    //      int ListHeaderRows { get; }
+    //      XlLocationInTable LocationInTable { get; }
+    //      object Locked { get; set; }
+    //      Range MergeArea { get; }
+    //      object MergeCells { get; set; }
+    //      object Name { get; set; }
+    //      Range Next { get; }
+    //      object NumberFormat { get; set; }
+    //      object NumberFormatLocal { get; set; }
+    //      Range Offset { get; }
+    //      object Orientation { get; set; }
+    //      object OutlineLevel { get; set; }
+    //      int PageBreak { get; set; }
+    //      PivotField PivotField { get; }
+    //      PivotItem PivotItem { get; }
+    //      PivotTable PivotTable { get; }
+    //      Range Precedents { get; }
+    //      object PrefixCharacter { get; }
+    //      Range Previous { get; }
+    //      QueryTable QueryTable { get; }
+    //      Range Range { get; }
+    //      Range Resize { get; }
+    //      int Row { get; }
+    //      object RowHeight { get; set; }
+    //      Range Rows { get; }
+    //      object ShowDetail { get; set; }
+    //      object ShrinkToFit { get; set; }
+    //      SoundNote SoundNote { get; }
+    //      object Style { get; set; }
+    //      object Summary { get; }
+    //      object Text { get; }
+    //      object Top { get; }
+    //      object UseStandardHeight { get; set; }
+    //      object UseStandardWidth { get; set; }
+    //      Validation Validation { get; }
+    //      object Value { get; set; }
+    //      object Value2 { get; set; }
+    //      object VerticalAlignment { get; set; }
+    //      object Width { get; }
+    //      Worksheet Worksheet { get; }
+    //      object WrapText { get; set; }
+    //      Comment Comment { get; }
+    //      Phonetic Phonetic { get; }
+    //      FormatConditions FormatConditions { get; }
+    //      int ReadingOrder { get; set; }
+    //      Hyperlinks Hyperlinks { get; }
+    //      Phonetics Phonetics { get; }
+    //      string ID { get; set; }
+    //      PivotCell PivotCell { get; }
+    //      Errors Errors { get; }
+    //      SmartTags SmartTags { get; }
+    //      bool AllowEdit { get; }
+    //      ListObject ListObject { get; }
+    //      XPath XPath { get; }
+    //      Actions ServerActions { get; }
+    //      string MDX { get; }
+    //      object CountLarge { get; }
+    //      object Activate();
+    //      object AdvancedFilter(XlFilterAction Action, [Optional] object CriteriaRange, [Optional] object CopyToRange, [Optional] object Unique);
+    //      object ApplyNames([Optional] object Names, [Optional] object IgnoreRelativeAbsolute, [Optional] object UseRowColumnNames, [Optional] object OmitColumn, [Optional] object OmitRow, XlApplyNamesOrder Order = XlApplyNamesOrder.xlRowThenColumn, [Optional] object AppendLast);
+    //      object ApplyOutlineStyles();
+    //      string AutoComplete(string String);
+    //      object AutoFill(Range Destination, XlAutoFillType Type = XlAutoFillType.xlFillDefault);
+    //      object AutoFilter([Optional] object Field, [Optional] object Criteria1, XlAutoFilterOperator Operator = XlAutoFilterOperator.xlAnd, [Optional] object Criteria2, [Optional] object VisibleDropDown);
+    //      object AutoFit();
+    //      object AutoFormat(XlRangeAutoFormat Format = XlRangeAutoFormat.xlRangeAutoFormatClassic1, [Optional] object Number, [Optional] object Font, [Optional] object Alignment, [Optional] object Border, [Optional] object Pattern, [Optional] object Width);
+    //      object AutoOutline();
+    //      object BorderAround([Optional] object LineStyle, XlBorderWeight Weight = XlBorderWeight.xlThin, XlColorIndex ColorIndex = XlColorIndex.xlColorIndexAutomatic, [Optional] object Color);
+    //      object Calculate();
+    //      object CheckSpelling([Optional] object CustomDictionary, [Optional] object IgnoreUppercase, [Optional] object AlwaysSuggest, [Optional] object SpellLang);
+    //      object Clear();
+    //      object ClearContents();
+    //      object ClearFormats();
+    //      object ClearNotes();
+    //      object ClearOutline();
+    //      Range ColumnDifferences(object Comparison);
+    //      object Consolidate([Optional] object Sources, [Optional] object Function, [Optional] object TopRow, [Optional] object LeftColumn, [Optional] object CreateLinks);
+    //      object Copy([Optional] object Destination);
+    //      int CopyFromRecordset(object Data, [Optional] object MaxRows, [Optional] object MaxColumns);
+    //      object CopyPicture(XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, XlCopyPictureFormat Format = XlCopyPictureFormat.xlPicture);
+    //      object CreateNames([Optional] object Top, [Optional] object Left, [Optional] object Bottom, [Optional] object Right);
+    //      object CreatePublisher([Optional] object Edition, XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, [Optional] object ContainsPICT, [Optional] object ContainsBIFF, [Optional] object ContainsRTF, [Optional] object ContainsVALU);
+    //      object Cut([Optional] object Destination);
+    //      object DataSeries([Optional] object Rowcol, XlDataSeriesType Type = XlDataSeriesType.xlDataSeriesLinear, XlDataSeriesDate Date = XlDataSeriesDate.xlDay, [Optional] object Step, [Optional] object Stop, [Optional] object Trend);
+    //      object Delete([Optional] object Shift);
+    //      object DialogBox();
+    //      object EditionOptions(XlEditionType Type, XlEditionOptionsOption Option, [Optional] object Name, [Optional] object Reference, XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, XlPictureAppearance ChartSize = XlPictureAppearance.xlScreen, [Optional] object Format);
+    //      object FillDown();
+    //      object FillLeft();
+    //      object FillRight();
+    //      object FillUp();
+    //      Range Find(object What, [Optional] object After, [Optional] object LookIn, [Optional] object LookAt, [Optional] object SearchOrder, XlSearchDirection SearchDirection = XlSearchDirection.xlNext, [Optional] object MatchCase, [Optional] object MatchByte, [Optional] object SearchFormat);
+    //      Range FindNext([Optional] object After);
+    //      Range FindPrevious([Optional] object After);
+    //      object FunctionWizard();
+    //      bool GoalSeek(object Goal, Range ChangingCell);
+    //      object Group([Optional] object Start, [Optional] object End, [Optional] object By, [Optional] object Periods);
+    //      void InsertIndent(int InsertAmount);
+    //      object Insert([Optional] object Shift, [Optional] object CopyOrigin);
+    //      object Justify();
+    //      object ListNames();
+    //      void Merge([Optional] object Across);
+    //      void UnMerge();
+    //      object NavigateArrow([Optional] object TowardPrecedent, [Optional] object ArrowNumber, [Optional] object LinkNumber);
+    //      IEnumerator GetEnumerator();
+    //      string NoteText([Optional] object Text, [Optional] object Start, [Optional] object Length);
+    //      object Parse([Optional] object ParseLine, [Optional] object Destination);
+    //      object _PasteSpecial(XlPasteType Paste = XlPasteType.xlPasteAll, XlPasteSpecialOperation Operation = XlPasteSpecialOperation.xlPasteSpecialOperationNone, [Optional] object SkipBlanks, [Optional] object Transpose);
+    //      object _PrintOut([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate);
+    //      object PrintPreview([Optional] object EnableChanges);
+    //      object RemoveSubtotal();
+    //      bool Replace(object What, object Replacement, [Optional] object LookAt, [Optional] object SearchOrder, [Optional] object MatchCase, [Optional] object MatchByte, [Optional] object SearchFormat, [Optional] object ReplaceFormat);
+    //      Range RowDifferences(object Comparison);
+    //      object Run([Optional] object Arg1, [Optional] object Arg2, [Optional] object Arg3, [Optional] object Arg4, [Optional] object Arg5, [Optional] object Arg6, [Optional] object Arg7, [Optional] object Arg8, [Optional] object Arg9, [Optional] object Arg10, [Optional] object Arg11, [Optional] object Arg12, [Optional] object Arg13, [Optional] object Arg14, [Optional] object Arg15, [Optional] object Arg16, [Optional] object Arg17, [Optional] object Arg18, [Optional] object Arg19, [Optional] object Arg20, [Optional] object Arg21, [Optional] object Arg22, [Optional] object Arg23, [Optional] object Arg24, [Optional] object Arg25, [Optional] object Arg26, [Optional] object Arg27, [Optional] object Arg28, [Optional] object Arg29, [Optional] object Arg30);
+    //      object Select();
+    //      object Show();
+    //      object ShowDependents([Optional] object Remove);
+    //      object ShowErrors();
+    //      object ShowPrecedents([Optional] object Remove);
+    //      object Sort([Optional] object Key1, XlSortOrder Order1 = XlSortOrder.xlAscending, [Optional] object Key2, [Optional] object Type, XlSortOrder Order2 = XlSortOrder.xlAscending, [Optional] object Key3, XlSortOrder Order3 = XlSortOrder.xlAscending, XlYesNoGuess Header = XlYesNoGuess.xlNo, [Optional] object OrderCustom, [Optional] object MatchCase, XlSortOrientation Orientation = XlSortOrientation.xlSortRows, XlSortMethod SortMethod = XlSortMethod.xlPinYin, XlSortDataOption DataOption1 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption2 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption3 = XlSortDataOption.xlSortNormal);
+    //      object SortSpecial(XlSortMethod SortMethod = XlSortMethod.xlPinYin, [Optional] object Key1, XlSortOrder Order1 = XlSortOrder.xlAscending, [Optional] object Type, [Optional] object Key2, XlSortOrder Order2 = XlSortOrder.xlAscending, [Optional] object Key3, XlSortOrder Order3 = XlSortOrder.xlAscending, XlYesNoGuess Header = XlYesNoGuess.xlNo, [Optional] object OrderCustom, [Optional] object MatchCase, XlSortOrientation Orientation = XlSortOrientation.xlSortRows, XlSortDataOption DataOption1 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption2 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption3 = XlSortDataOption.xlSortNormal);
+    //      Range SpecialCells(XlCellType Type, [Optional] object Value);
+    //      object SubscribeTo(string Edition, XlSubscribeToFormat Format = XlSubscribeToFormat.xlSubscribeToText);
+    //      object Subtotal(int GroupBy, XlConsolidationFunction Function, object TotalList, [Optional] object Replace, [Optional] object PageBreaks, XlSummaryRow SummaryBelowData = XlSummaryRow.xlSummaryBelow);
+    //      object Table([Optional] object RowInput, [Optional] object ColumnInput);
+    //      object TextToColumns([Optional] object Destination, XlTextParsingType DataType = XlTextParsingType.xlDelimited, XlTextQualifier TextQualifier = XlTextQualifier.xlTextQualifierDoubleQuote, [Optional] object ConsecutiveDelimiter, [Optional] object Tab, [Optional] object Semicolon, [Optional] object Comma, [Optional] object Space, [Optional] object Other, [Optional] object OtherChar, [Optional] object FieldInfo, [Optional] object DecimalSeparator, [Optional] object ThousandsSeparator, [Optional] object TrailingMinusNumbers);
+    //      object Ungroup();
+    //      Comment AddComment([Optional] object Text);
+    //      void ClearComments();
+    //      void SetPhonetic();
+    //      object PrintOut([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate, [Optional] object PrToFileName);
+    //      void Dirty();
+    //      void Speak([Optional] object SpeakDirection, [Optional] object SpeakFormulas);
+    //      object PasteSpecial(XlPasteType Paste = XlPasteType.xlPasteAll, XlPasteSpecialOperation Operation = XlPasteSpecialOperation.xlPasteSpecialOperationNone, [Optional] object SkipBlanks, [Optional] object Transpose);
+    //      void RemoveDuplicates([Optional] object Columns, XlYesNoGuess Header = XlYesNoGuess.xlNo);
+    //      object PrintOutEx([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate, [Optional] object PrToFileName);
+    //      void ExportAsFixedFormat(XlFixedFormatType Type, [Optional] object Filename, [Optional] object Quality, [Optional] object IncludeDocProperties, [Optional] object IgnorePrintAreas, [Optional] object From, [Optional] object To, [Optional] object OpenAfterPublish, [Optional] object FixedFormatExtClassPtr);
+    //      object CalculateRowMajorOrder();
+    //  }
 
     /// <summary>
     /// Rangeクラス
     /// WorksheetクラスのCells, Rangeプロパティにアクセスすると本クラスのインデクサでコンストラクトされる
     /// ユーザからは直接コンストラクトさせないのでコンストラクタはinternalにしている
     /// </summary>
-    public class _Range : IEnumerable, IEnumerator
+    public class Range : IEnumerable, IEnumerator
     {
-        internal enum RangeType
+        /// <summary>
+        /// Countプロパティが示す値の種別(セル数、行数、列数)
+        /// </summary>
+        internal enum CountType
         {
             Default,
             Rows,
             Columns
         }
 
-        internal Worksheet ParentSheet { get; private set; }
-        internal CellRangeAddress RelativeTo { get; private set; }
-        internal CellRangeAddressList RawAddressList { get; private set; }
-        internal CellRangeAddressList SafeAddressList { get; private set; }
-        private RangeType CountAs { get; set; } = RangeType.Default;
+        #region "private properties"
+
+        private static readonly log4net.ILog Logger
+            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
+        /// <summary>
+        /// 親Worksheetクラス
+        /// </summary>
+        protected Worksheet ParentSheet { get; }
+        /// <summary>
+        /// Rangeアドレス(-1を含む)
+        /// </summary>
+        protected CellRangeAddressList RawAddressList { get; }
+        /// <summary>
+        /// Rangeアドレス(-1を含まないのでforで安全にアクセスできる)
+        /// </summary>
+        private CellRangeAddressList SafeAddressList { get; }
+        /// <summary>
+        /// 相対アドレスの基点アドレス
+        /// </summary>
+        protected CellRangeAddress RelativeTo { get; }
+        /// <summary>
+        /// Countプロパティが示す値の種別(セル数、行数、列数)
+        /// </summary>
+        private CountType CountAs { get; } = CountType.Default;
+        /// <summary>
+        /// ICellStyleが持つスタイル情報の管理
+        /// </summary>
+        private RangeStyleManager _StyleManager = null;
+        /// <summary>
+        /// スタイル情報管理クラスインスタンスへのアクセサ
+        /// </summary>
+        private RangeStyleManager StyleManager
+        {
+            get 
+            {
+                //最初にアクセスされたときにインスタンス化する
+                if (_StyleManager == null) { _StyleManager = new RangeStyleManager(this.ParentSheet.PoiSheet, this.SafeAddressList); }
+                return _StyleManager;
+            }
+        }
+        /// <summary>
+        /// IEnumerator用行インデクス
+        /// </summary>
         private int EnumRowOfs { get; set; } = 0;
+        /// <summary>
+        /// IEnumerator用列インデクス
+        /// </summary>
         private int EnumColumnOfs { get; set; } = -1;
+
+        #endregion
+
+        #region "constructors"
 
         /// <summary>
         /// コンスラクタ
         /// </summary>
         /// <param name="ParentSheet">親シートクラス</param>
         /// <param name="RangeAddressList">CellRangeAddressListインスタンス</param>
-        internal _Range(
-            Worksheet ParentSheet,
-            CellRangeAddressList RangeAddressList,
-            CellRangeAddress RelativeTo = null,
-            RangeType CountAs = RangeType.Default)
+        internal Range(Worksheet ParentSheet, CellRangeAddressList RangeAddressList)
         {
+            Logger.Debug(
+                "ShhetName[" + ParentSheet.Name + "] " +
+                RangeUtil.CellRangeAddressListToString(RangeAddressList));
+
             this.ParentSheet = ParentSheet;
             this.RawAddressList = RangeAddressList;
-            this.CountAs = CountAs;
-            this.RelativeTo = RelativeTo;
-            //基準アドレスがある場合はアドレス再計算(/Range.Cellsとして生成される場合)
-            if (this.RelativeTo != null)
-            {
-                this.RawAddressList = GetAbsoluteRangeAddressList(RangeAddressList, RelativeTo);
-            }
-            this.SafeAddressList = GetSafeCellRangeAddressList(RawAddressList);
+            //アドレスに含まれる[-1]を実インデックスに変換し、安全にアクセス可能とする
+            this.SafeAddressList = RangeUtil.CreateSafeCellRangeAddressList(
+                                        this.RawAddressList, this.ParentSheet.ParentBook.PoiBook.SpreadsheetVersion);
         }
+
+        /// <summary>
+        /// コンストラクタ(Range.Range, Range.Cellsを生成する場合に使用｡)
+        /// Rangeクラス内でしか利用しないのでprivateとしている。
+        /// </summary>
+        /// <param name="ParentSheet"></param>
+        /// <param name="RangeAddressList">相対表現のアドレスリスト</param>
+        /// <param name="RelativeTo">基点アドレス</param>
+        internal Range(
+                    Worksheet ParentSheet, CellRangeAddressList RangeAddressList,
+                    CellRangeAddress RelativeTo)
+                    : this(ParentSheet, RangeAddressList)
+        {
+            //追加パラメータ保存
+            this.RelativeTo = RelativeTo;
+            //RawAddressListのアドレス再作成(基点アドレスを加算し絶対アドレスに変換)
+            this.RawAddressList = RangeUtil.CreateAbsoluteCellRangeAddressList(this.RawAddressList, RelativeTo);
+            //SafeAddressList再作成
+            this.SafeAddressList = RangeUtil.CreateSafeCellRangeAddressList(
+                                        this.RawAddressList, this.ParentSheet.ParentBook.PoiBook.SpreadsheetVersion);
+        }
+
+        /// <summary>
+        /// コンストラクタ(Range.Rows, Range.Columnsを生成する場合に使用｡)
+        /// </summary>
+        /// <param name="ParentSheet"></param>
+        /// <param name="RangeAddressList">相対表現のアドレスリスト</param>
+        /// <param name="RelativeTo">基点アドレス</param>
+        /// <param name="CountAs"></param>
+        internal Range(
+                    Worksheet ParentSheet, CellRangeAddressList RangeAddressList, CellRangeAddress RelativeTo,
+                    CountType CountAs)
+                    : this(ParentSheet, RangeAddressList, RelativeTo)
+        {
+            //追加パラメータ保存
+            this.CountAs = CountAs;
+        }
+
+        #endregion
+
+        #region "IEnumrator implementation"
 
         /// <summary>
         /// GetEnumeratorの実装
@@ -68,6 +330,7 @@ namespace Developers.NpoiWrapper
         /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
+            Reset();
             return (IEnumerator)this;
         }
         /// <summary>
@@ -124,6 +387,10 @@ namespace Developers.NpoiWrapper
             EnumColumnOfs = -1;
         }
 
+        #endregion
+
+        #region "emulated public properties"
+
         /// <summary>
         /// インデクサー
         /// </summary>
@@ -169,7 +436,7 @@ namespace Developers.NpoiWrapper
                         throw new ArgumentException("In case type of Cell1 is Cells, Type of Cell2 must be Cells.");
                     }
                     //アドレスの統合
-                    AddressList = Uitl.GetMergedAddressList(AddressList);
+                    AddressList = RangeUtil.CreateMergedAddressList(AddressList);
                 }
                 //Cell1がStringの場合(A1形式)
                 else if (Cell1 is string adr1)
@@ -211,7 +478,7 @@ namespace Developers.NpoiWrapper
                             }
                         }
                         //アドレスの統合
-                        AddressList = Uitl.GetMergedAddressList(AddressList);
+                        AddressList = RangeUtil.CreateMergedAddressList(AddressList);
                     }
                 }
                 //Cellsでもstringでもなければ例外スロー
@@ -234,13 +501,13 @@ namespace Developers.NpoiWrapper
             {
                 int RetVal = 0;
                 //行数をカウント
-                if (CountAs == RangeType.Rows)
+                if (CountAs == CountType.Rows)
                 {
                     CellRangeAddress RawAddress = SafeAddressList.GetCellRangeAddress(0);
                     RetVal = RawAddress.LastRow - RawAddress.FirstRow + 1;
                 }
                 //列数をカウント
-                else if (CountAs == RangeType.Columns)
+                else if (CountAs == CountType.Columns)
                 {
                     CellRangeAddress RawAddress = SafeAddressList.GetCellRangeAddress(0);
                     RetVal = RawAddress.LastColumn - RawAddress.FirstColumn + 1;
@@ -310,10 +577,12 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// Rangee
-        /// このRangeを起点としたサプRangeとしてのRange
+        /// RelativeRange
+        /// Interop.ExcelのRange.Rangeプロパティ。
+        /// 現在のRangeの始点を起点("A1")としたRangeが取得できる。
+        /// クラス名と同じ名前にできないのでRelativeRangeに改名している。
         /// </summary>
-        public Range Range
+        public Range RelativeRange
         {
             get
             {
@@ -391,7 +660,7 @@ namespace Developers.NpoiWrapper
                 CellRangeAddressList AddressList = new CellRangeAddressList();
                 AddressList.AddCellRangeAddress(RawAddressList.GetCellRangeAddress(0).Copy());
                 //Rangeクラスインスタンス生成
-                return new Range(ParentSheet, AddressList, RelativeTo, RangeType.Rows);
+                return new Range(ParentSheet, AddressList, RelativeTo, CountType.Rows);
             }
         }
 
@@ -417,7 +686,7 @@ namespace Developers.NpoiWrapper
                 CellRangeAddressList AddressList = new CellRangeAddressList();
                 AddressList.AddCellRangeAddress(RawAddressList.GetCellRangeAddress(0).Copy());
                 //Rangeクラスインスタンス生成
-                return new Range(ParentSheet, AddressList, RelativeTo, RangeType.Columns);
+                return new Range(ParentSheet, AddressList, RelativeTo, CountType.Columns);
             }
         }
 
@@ -431,7 +700,7 @@ namespace Developers.NpoiWrapper
                 //Office.Interop.Excelにならい先頭アドレスのみ参照
                 CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
                 //値リストの確保
-                object[,] Values = CreateCellArray(
+                object[,] Values = RangeUtil.CreateCellArray(
                     SafeAddress.LastRow - SafeAddress.FirstRow + 1, SafeAddress.LastColumn - SafeAddress.FirstColumn + 1);
                 //行ループ
                 for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
@@ -651,7 +920,8 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Rangeの行高さ合計(単位はPoint)
         /// </summary>
-        public object Height 
+        
+        public object Height
         {
             //Rangeに含まれる行の高さ合計値
             get
@@ -680,6 +950,7 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Range各行の高さ(単位はPoint)
         /// </summary>
+        
         public object RowHeight
         {
             get
@@ -736,6 +1007,7 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Rangeの列幅合計(単位は文字幅の1/20を1とする値であり、Pointではない)
         /// </summary>
+        
         public object Width
         {
             //Rangeに含まれる列の幅合計値
@@ -755,6 +1027,7 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Range各列の幅(単位は文字幅の1/20を1とする値であり、Pointではない)
         /// </summary>
+        
         public object ColumnWidth
         {
             get
@@ -795,12 +1068,79 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+        /// <summary>
+        /// 罫線情報
+        /// </summary>
+        public Borders Borders { get { return StyleManager.Borders; } }
+
+        /// <summary>
+        /// 文字フォント情報
+        /// </summary>
+        public Font Font { get { return StyleManager.Font; } }
+
+        /// <summary>
+        /// 文字位置(水平方向)
+        /// </summary>
+        public object HorizontalAlignment
+        {
+            get { return StyleManager.HorizontalAlignment; }
+            set { StyleManager.HorizontalAlignment = value; }
+        }
+
+        /// <summary>
+        /// 文字位置(垂直方向)
+        /// </summary>
+        public object VerticalAlignment
+        {
+            get { return StyleManager.VerticalAlignment; }
+            set { StyleManager.VerticalAlignment = value; }
+        }
+
+        /// <summary>
+        /// 文字書式
+        /// </summary>
+        public object NumberFormat
+        {
+            get { return StyleManager.NumberFormat; }
+            set { StyleManager.NumberFormat = value; }
+        }
+
+        /// <summary>
+        /// 文字書式(本来はLocaleを反映するが現在未サポートにつきNumberFormatと同じ)
+        /// </summary>
+        public object NumberFormatLocal
+        {
+            get { return StyleManager.NumberFormatLocal; }
+            set { StyleManager.NumberFormatLocal = value; }
+        }
+
+        /// <summary>
+        /// セルの保護
+        /// </summary>
+        public object Locked
+        {
+            get { return StyleManager.Locked; }
+            set { StyleManager.Locked = value; }
+        }
+
+        /// <summary>
+        /// 文字列の折り返し
+        /// </summary>
+        public object WrapText
+        {
+            get { return StyleManager.WrapText; }
+            set { StyleManager.WrapText = value; }
+        }
+
+        #endregion
+
+        #region "emulated public methods"
 
         /// <summary>
         /// セルのコメントを生成する
         /// </summary>
         /// <param name="CommentText">コメント文字列</param>
-        public void AddComment(string CommentText)
+        public void AddComment(string CommentText = "")
         {
             //Office.Interop.Excelにならい非連続Rangeの全てに適用
             for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
@@ -839,6 +1179,98 @@ namespace Developers.NpoiWrapper
 
             }
         }
+
+        /// <summary>
+        /// 列幅の自動調整
+        /// </summary>
+        public void Autofit()
+        {
+            //Office.Interop.Excelにならい非連続Rangeの全てに適用
+            for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
+            {
+                //アドレス取得
+                CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
+                //列幅自動調整ループ
+                for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
+                {
+                    //スッピンのAutoSizeでは独自書式(例えば通貨)の幅が少し足りない。
+                    //"\"や"､"の増分が考慮されていないような感じ。
+                    //ある程度救済するため、一律28%増の処理を行う
+                    ParentSheet.PoiSheet.AutoSizeColumn(CIdx);
+                    ParentSheet.PoiSheet.SetColumnWidth(
+                        CIdx, ParentSheet.PoiSheet.GetColumnWidth(CIdx) * 128 / 100);
+                    //処理対象の行が大量の場合に効果があるらしいが、弊害もありそうなのでやめておく。
+                    //GC.Collect();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 囲み罫線の設定
+        /// </summary>
+        /// <param name="LineStyle">線の種類</param>
+        /// <param name="Weight">線の太さ</param>
+        /// <param name="ColorIndex">カラーパレット上の色インデックス。VBならはともかく、C#だとCastしないと色指定できない。</param>
+        /// <param name="Color">未サポート</param>
+        /// <returns></returns>
+        public object BorderAround(
+                            object LineStyle = null, XlBorderWeight Weight = XlBorderWeight.xlThin,
+                            XlColorIndex ColorIndex = XlColorIndex.xlColorIndexAutomatic, object Color = null)
+        {
+            return StyleManager.BorderAround(LineStyle, Weight, ColorIndex, Color);
+        }
+
+        /// <summary>
+        /// 指定された条件に合致するRangeを取得する
+        /// </summary>
+        /// <param name="Type">指定条件</param>
+        /// <param name="Value">条件パラメータ</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public Range SpecialCells(XlCellType Type = XlCellType.xlCellTypeLastCell, object Value = null)
+        {
+            Range RetVal;
+            int RowIndex = 0;
+            int ColumnIndex = 0;
+            //先頭アドレス取得
+            CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
+            //XlCellType.xlCellTypeLastCellのみ処理
+            if (Type == XlCellType.xlCellTypeLastCell)
+            {
+                int LastRowIndex = SafeAddress.LastRow;
+                //Range最終行から上に向かって検索
+                for (int CIdx = 0; CIdx >= 0; CIdx--)
+                {
+                    //行が存在すれば列をチェック
+                    IRow row = ParentSheet.PoiSheet.GetRow(LastRowIndex + CIdx);
+                    if (row != null)
+                    {
+                        //列が存在するならその列を採用
+                        if (row.PhysicalNumberOfCells > 0)
+                        {
+                            RowIndex = LastRowIndex + CIdx;
+                            ColumnIndex = row.LastCellNum - 1;
+                            break;
+                        }
+                    }
+                }
+                //最終カラムのRangeでリターン
+                RetVal = new Range(
+                    ParentSheet, new CellRangeAddressList(RowIndex, RowIndex, ColumnIndex, ColumnIndex));
+            }
+            else
+            {
+                //ダミーアクセス
+                if (Value == null) { }
+                //例外スロー
+                throw new ArgumentException("SpecialCells supports XlCellType.xlCellTypeLastCell only.");
+            }
+            return RetVal;
+        }
+
+        #endregion
+
+        #region "alternative public methods"
 
         /// <summary>
         /// セルのバリデーションを生成する
@@ -913,161 +1345,7 @@ namespace Developers.NpoiWrapper
             }
         }
 
-        /// <summary>
-        /// 列幅の自動調整
-        /// </summary>
-        public void Autofit()
-        {
-            //Office.Interop.Excelにならい非連続Rangeの全てに適用
-            for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
-            {
-                //アドレス取得
-                CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
-                //列幅自動調整ループ
-                for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
-                {
-                    //スッピンのAutoSizeでは独自書式(例えば通貨)の幅が少し足りない。
-                    //"\"や"､"の増分が考慮されていないような感じ。
-                    //ある程度救済するため、一律28%増の処理を行う
-                    ParentSheet.PoiSheet.AutoSizeColumn(CIdx);
-                    ParentSheet.PoiSheet.SetColumnWidth(
-                        CIdx, ParentSheet.PoiSheet.GetColumnWidth(CIdx) * 128 / 100);
-                    //処理対象の行が大量の場合に必要らしい
-                    GC.Collect();
-                }
-            }
-        }
+        #endregion
 
-        /// <summary>
-        /// 指定された条件に合致するRangeを取得する
-        /// </summary>
-        /// <param name="Type">指定条件</param>
-        /// <param name="Value">条件パラメータ</param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        public Range SpecialCells(XlCellType Type, object Value = null)
-        {
-            Range RetVal;
-            int RowIndex = 0;
-            int ColumnIndex = 0;
-            //先頭アドレス取得
-            CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
-            //XlCellType.xlCellTypeLastCellのみ処理
-            if (Type == XlCellType.xlCellTypeLastCell)
-            {
-                int LastRowIndex = SafeAddress.LastRow;
-                //Range最終行から上に向かって検索
-                for (int CIdx = 0; CIdx >= 0; CIdx--)
-                {
-                    //行が存在すれば列をチェック
-                    IRow row = ParentSheet.PoiSheet.GetRow(LastRowIndex + CIdx);
-                    if (row != null)
-                    {
-                        //列が存在するならその列を採用
-                        if(row.PhysicalNumberOfCells > 0)
-                        {
-                            RowIndex = LastRowIndex + CIdx;
-                            ColumnIndex = row.LastCellNum - 1;
-                            break;
-                        }
-                    }
-                }
-                //最終カラムのRangeでリターン
-                RetVal = new Range(
-                    ParentSheet, new CellRangeAddressList(RowIndex, RowIndex, ColumnIndex, ColumnIndex));
-            }
-            else
-            {
-                //ダミーアクセス
-                if (Value == null) { }
-                //例外スロー
-                throw new ArgumentException("SpecialCells supports XlCellType.xlCellTypeLastCell only.");
-            }
-            return RetVal;
-
-        }
-
-        /// <summary>
-        /// 絶対アドレスを生成する
-        /// </summary>
-        /// <param name="RangeAddressList">評価対象Rangeアドレスリスト</param>
-        /// <param name="RelativeTo">評価基準アドレス</param>
-        /// <returns>絶対アドレスリスト</returns>
-        private CellRangeAddressList GetAbsoluteRangeAddressList(CellRangeAddressList　RangeAddressList, CellRangeAddress RelativeTo)
-        {
-            CellRangeAddressList RetVal = new CellRangeAddressList();
-            for (int i = 0; i < RangeAddressList.CountRanges(); i++)
-            {
-                CellRangeAddress Address = RangeAddressList.GetCellRangeAddress(i).Copy();
-                //実アドレスならば絶対アドレス計算
-                if (Address.FirstRow >= 0)
-                {
-                        Address.FirstRow += RelativeTo.FirstRow >= 0 ? RelativeTo.FirstRow : 0;
-                }
-                if (Address.LastRow >= 0)
-                {
-                    Address.LastRow += RelativeTo.FirstRow >= 0 ? RelativeTo.FirstRow : 0;
-                }
-                if (Address.FirstColumn >= 0)
-                {
-                    Address.FirstColumn += RelativeTo.FirstColumn >= 0 ? RelativeTo.FirstColumn : 0;
-                }
-                if (Address.LastColumn >= 0)
-                {
-                    Address.LastColumn += RelativeTo.FirstColumn >= 0 ? RelativeTo.FirstColumn : 0;
-                }
-                RetVal.AddCellRangeAddress(Address);
-            }
-            return RetVal;
-
-        }
-
-        /// <summary>
-        /// 最大最小を考慮したアドレスを生成する
-        /// とはいえ最大値の場合、メモリ不足の例外が発生する可能性が高い
-        /// </summary>
-        /// <param name="RangeAddress">評価対象Rangeアドレス</param>
-        /// <returns>評価済Rangeアドレスリスト</returns>
-        private CellRangeAddressList GetSafeCellRangeAddressList(CellRangeAddressList RangeAddressList)
-        {
-            CellRangeAddressList RetVal = new CellRangeAddressList();
-            for (int i = 0; i < RangeAddressList.CountRanges(); i++)
-            {
-                CellRangeAddress Address = RangeAddressList.GetCellRangeAddress(i).Copy();
-                //0未満(-1)の場合は仕様上の最大、最小値を利用する
-                if (Address.FirstRow < 0)
-                {
-                    Address.FirstRow = 0;
-                }
-                if (Address.LastRow < 0)
-                {
-                    Address.LastRow = ParentSheet.MaxRowIndex;
-                }
-                if (Address.FirstColumn < 0)
-                {
-                    Address.FirstColumn = 0;
-                }
-                if (Address.LastColumn < 0)
-                {
-                    Address.LastColumn = ParentSheet.MaxColumnIndex;
-                }
-                RetVal.AddCellRangeAddress(Address);
-            }
-            return RetVal;
-        }
-
-        /// <summary>
-        /// object二次元配列の生成(インデックスを１開始にする)
-        /// </summary>
-        /// <param name="RowCount">行数</param>
-        /// <param name="ColumnCount">列数</param>
-        /// <returns>生成された配列</returns>
-        private object[,] CreateCellArray(int RowCount, int ColumnCount)
-        {
-            int[] LowerBoundArray = { 1, 1 };
-            int[] LengthArray = { RowCount, ColumnCount };
-            object[,] dataArray = (object[,])Array.CreateInstance(typeof(object), LengthArray, LowerBoundArray);
-            return dataArray;
-        }
     }
 }

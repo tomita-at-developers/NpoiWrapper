@@ -1,7 +1,7 @@
-﻿using System.Xml.Serialization;
-using NPOI.SS.UserModel;
+﻿using NPOI.SS.UserModel;
+using System.Xml.Serialization;
 
-namespace Developers.NpoiWrapper.Configuration.Model
+namespace Developers.NpoiWrapper.Configurations.Models
 {
     /// <summary>
     /// ページ設定

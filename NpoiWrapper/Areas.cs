@@ -2,7 +2,17 @@
 
 namespace Developers.NpoiWrapper
 {
-    using Range = _Range;
+    // Areas interface in Interop.Excel is shown below...
+    //  public interface Areas
+    //  {
+    //      Application Application { get; }
+    //      XlCreator Creator { get; }
+    //      object Parent { get; }
+    //      int Count { get; }
+    //      Range Item { get; }
+    //      [IndexerName("_Default")]
+    //      Range this[int Index] { get; }
+    //  }
 
     /// <summary>
     /// Areasクラス

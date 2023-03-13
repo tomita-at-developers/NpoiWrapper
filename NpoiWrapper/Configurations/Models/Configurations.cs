@@ -1,8 +1,7 @@
-﻿using NPOI.SS.UserModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Developers.NpoiWrapper.Configuration.Model
+namespace Developers.NpoiWrapper.Configurations.Models
 {
     [XmlRoot("configurations")]
     public class Configurations

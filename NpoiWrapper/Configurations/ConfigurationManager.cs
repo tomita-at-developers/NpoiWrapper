@@ -1,22 +1,19 @@
-﻿using NPOI.SS.UserModel;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Collections.Generic;
-using Developers.NpoiWrapper.Configuration.Model;
 
-namespace Developers.NpoiWrapper.Configuration
+namespace Developers.NpoiWrapper.Configurations
 {
     internal class ConfigurationManager
     {
 
-        public Model.Configurations Configs { get; private set; }
+        public Models.Configurations Configs { get; private set; }
         public ConfigurationManager()
         {
             //設定ファイルの読み込み
-            XmlSerializer Serializer = new XmlSerializer(typeof(Model.Configurations));
+            XmlSerializer Serializer = new XmlSerializer(typeof(Models.Configurations));
             XmlReaderSettings Settings = new XmlReaderSettings()
             {
                 CheckCharacters = false,
@@ -25,7 +22,7 @@ namespace Developers.NpoiWrapper.Configuration
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"NpoiWrapper.config"), Encoding.UTF8))
             using (var xmlReader = XmlReader.Create(Reader, Settings))
             {
-                Configs = (Model.Configurations)Serializer.Deserialize(xmlReader);
+                Configs = (Models.Configurations)Serializer.Deserialize(xmlReader);
             }
         }
     }

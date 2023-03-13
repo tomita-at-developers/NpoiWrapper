@@ -23,9 +23,8 @@ namespace Developers.NpoiWrapper
         protected int EnumSheetIndex { get; set; } = -1;
 
         /// <summary>
-        /// コンストラクタ
+        /// コンストラクタ(全種類のシート)
         /// </summary>
-        /// <param name="ParentWorkbook">親ブックのWorkbookクラスインスタンス</param>
         /// <param name="ParentWorkbook">親ブックのWorkbookクラスインスタンス</param>
         internal Sheets(Workbook ParentWorkbook)
             : this(ParentWorkbook, (SheetType.Worksheet | SheetType.ChartSheet | SheetType.DialogSheet))
@@ -33,10 +32,10 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// コンストラクタ
+        /// コンストラクタ(SheetTypesフラグで指定された種類のシート)
         /// </summary>
         /// <param name="ParentWorkbook">親ブックのWorkbookクラスインスタンス</param>
-        /// <param name="ParentWorkbook">親ブックのWorkbookクラスインスタンス</param>
+        /// <param name="SheetTypes">対象とするシートのタイプ</param>
         internal Sheets(Workbook ParentWorkbook, SheetType SheetTypes)
         {
             ParentBook = ParentWorkbook;
@@ -49,6 +48,7 @@ namespace Developers.NpoiWrapper
         /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
+            Reset();
             return (IEnumerator)this;
         }
         /// <summary>
@@ -72,7 +72,10 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return null;
+                //とりあえずWorksheetを返す
+                return new Worksheet(
+                    ParentBook,
+                    ParentBook.PoiBook.GetSheetAt(GetSheetIndexList(SheetTypes)[EnumSheetIndex]));
             }
         }
         /// <summary>
@@ -88,14 +91,28 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="Index">シートIndex(１開始)</param>
         /// <returns></returns>
-        public virtual dynamic this[int Index] { get { return null; } }
+        public virtual dynamic this[int Index]
+        {
+            get
+            {
+                //とりあえずWorksheetを返す
+                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheetAt(Index - 1));
+            }
+        }
 
         /// <summary>
         /// インデクサ(名前指定)
         /// </summary>
         /// <param name="Index"></param>
         /// <returns></returns>
-        public virtual dynamic this[string Name] { get { return null; } }
+        public virtual dynamic this[string Name]
+        {
+            get
+            {
+                //とりあえずWorksheetを返す
+                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheet(Name));
+            }
+        }
 
         /// <summary>
         /// シート数の取得
@@ -106,6 +123,16 @@ namespace Developers.NpoiWrapper
             {
                 return GetSheetIndexList(SheetTypes).Count;
             }
+        }
+
+        /// <summary>
+        /// シートの追加
+        /// ★常に末尾に追加される。追加位置の指定はできない。
+        /// </summary>
+        /// <returns></returns>
+        public Worksheet Add()
+        {
+            return new Worksheet(ParentBook, ParentBook.PoiBook.CreateSheet());
         }
 
         /// <summary>
@@ -124,8 +151,7 @@ namespace Developers.NpoiWrapper
                 {
                     //ワークシートの選別(ただしHSSFSheetは選別不能！)
                     if (sheet is HSSFSheet
-                        || (sheet is XSSFSheet && !(sheet is XSSFChartSheet))
-                        || (sheet is XSSFSheet && !(sheet is XSSFDialogsheet)))
+                        || (sheet is XSSFSheet && !(sheet is XSSFChartSheet) && !(sheet is XSSFDialogsheet)))
                     {
                         SheetIndex.Add(i);
                     }

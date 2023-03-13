@@ -1,17 +1,11 @@
-﻿using NPOI.SS.Formula;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Developers.NpoiWrapper
+﻿namespace Developers.NpoiWrapper
 {
     /// <summary>
     /// NpoiWrapperクラス
     /// Microsoft.Office.Interop.Excel.Applicationをエミュレート
+    /// Workbooksインスタンスを持つのみのクラス
     /// </summary>
-    public class NpoiWrapper
+    public class NpoiApplication
     {
         /// <summary>
         /// Workbooksクラス

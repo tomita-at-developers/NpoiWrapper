@@ -1,14 +1,9 @@
-﻿using System;
-using NPOI.XSSF.UserModel;
-using NPOI.SS.UserModel;
+﻿using NPOI.SS.UserModel;
 using NPOI.SS.Util;
-using Developers.NpoiWrapper.Configuration.Model;
-using NPOI.HSSF.UserModel;
+using NPOI.XSSF.UserModel;
 
 namespace Developers.NpoiWrapper
 {
-    using Range = _Range;
-
     /// <summary>
     /// Worksheetクラス
     /// Microsoft.Office.Interop.Excel.Workbookをエミュレート
@@ -17,12 +12,13 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Worksheet
     {
+        private static readonly log4net.ILog Logger
+            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
         public Cells Cells { get; } 
         public Range Range { get; }
         internal Workbook ParentBook { get; private set; }
         internal ISheet PoiSheet { get; private set; }
-        internal int MaxRowIndex { get; private set; } = NPOI.SS.SpreadsheetVersion.EXCEL2007.MaxRows - 1;
-        internal int MaxColumnIndex { get; private set; } = NPOI.SS.SpreadsheetVersion.EXCEL2007.MaxColumns - 1;
 
         /// <summary>
         /// コンストラクタ
@@ -31,16 +27,12 @@ namespace Developers.NpoiWrapper
         /// <param name="Sheet">自ISheet</param>
         internal Worksheet(Workbook ParentWorkbook, ISheet Sheet)
         {
+            Logger.Debug("SheetName[" + Sheet.SheetName + "]");
+
             //親クラスの保存
             this.ParentBook = ParentWorkbook;
             //POIシートの保存
             PoiSheet = Sheet;
-            //利用可能な最終インデックス
-            if (PoiSheet is HSSFSheet)
-            {
-                MaxColumnIndex = NPOI.SS.SpreadsheetVersion.EXCEL97.MaxColumns - 1;
-                MaxRowIndex = NPOI.SS.SpreadsheetVersion.EXCEL97.MaxRows - 1;
-            }
             //Cells, Rangeの初期値をセット
             //インデクスを省略した場合はこの値が取得される(シート全域)
             Cells = new Cells(this, new CellRangeAddressList(-1, -1, -1, -1));
@@ -64,12 +56,34 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
+        /// シートIndex
+        /// </summary>
+        public int Index
+        {
+            get
+            {
+                return ParentBook.PoiBook.GetSheetIndex(PoiSheet.SheetName);
+            }
+        }
+
+        /// <summary>
+        /// シートのコピー
+        /// </summary>
+        /// <param name="SheetName"></param>
+        /// <returns></returns>
+        public Worksheet Copy(string SheetName)
+        {
+            ISheet Sheet = PoiSheet.CopySheet(SheetName);
+            return new Worksheet(ParentBook, Sheet);
+        }
+
+        /// <summary>
         /// シートの削除
         /// </summary>
         public void Delete()
         {
-            ParentBook.PoiBook.RemoveSheetAt(
-                ParentBook.PoiBook.GetSheetIndex(PoiSheet.SheetName));
+            int SheetIndex = ParentBook.PoiBook.GetSheetIndex(PoiSheet.SheetName);
+            ParentBook.PoiBook.RemoveSheetAt(SheetIndex);
         }
 
         /// <summary>
@@ -94,7 +108,7 @@ namespace Developers.NpoiWrapper
             //指定された名前の設定が存在すればそれを適用
             if (ParentBook.PageSetups.ContainsKey(StyleName))
             {
-                PageSetup Setup = ParentBook.PageSetups[StyleName];
+                Configurations.Models.PageSetup Setup = ParentBook.PageSetups[StyleName];
                 PoiSheet.PrintSetup.Landscape = Setup.Paper.Landscape;
                 PoiSheet.PrintSetup.PaperSize = (short)Setup.Paper.Size;
                 PoiSheet.PrintSetup.HeaderMargin = Setup.Margins.Header.ValueInInch;

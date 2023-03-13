@@ -29,6 +29,7 @@ namespace Developers.NpoiWrapper
         /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
+            Reset();
             return (IEnumerator)this;
         }
         /// <summary>

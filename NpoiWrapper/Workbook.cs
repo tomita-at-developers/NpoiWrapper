@@ -2,10 +2,9 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
-using System.IO;
-using Developers.NpoiWrapper.Configuration;
-using Developers.NpoiWrapper.Configuration.Model;
 using System.Collections.Generic;
+using System.IO;
+//using Developers.NpoiWrapper.Configurations;
 
 namespace Developers.NpoiWrapper
 {
@@ -20,9 +19,10 @@ namespace Developers.NpoiWrapper
         internal IWorkbook PoiBook {get; private set; }
         public string FileName { get; private set; } = string.Empty;
         internal Dictionary<string, ICellStyle> CellStyles { get; private set; } = new Dictionary<string, ICellStyle>();
-        internal Dictionary<string, PageSetup> PageSetups { get; private set; } = new Dictionary<string, PageSetup>();
+        internal Dictionary<string, Configurations.Models.PageSetup> PageSetups { get; private set; } = new Dictionary<string, Configurations.Models.PageSetup>();
         internal IFont Font { get; private set; } = null;
         public Sheets Worksheets { get; private set; }
+        public Sheets Sheets { get; private set; }
 
         /// <summary>
         /// 新規ファイルを作成する
@@ -53,7 +53,8 @@ namespace Developers.NpoiWrapper
             PoiBook.CreateSheet();
             //この時点でファイル名は未定義
             FileName = string.Empty;
-            //Worksheetsの初期化
+            //Sheets,Worksheetsの初期化
+            Sheets = new Sheets(this);
             Worksheets = new Worksheets(this);
         }
 
@@ -68,7 +69,8 @@ namespace Developers.NpoiWrapper
             PoiBook = WorkbookFactory.Create(Stream);
             //ファイル名を保存
             this.FileName = FileName;
-            //Worksheetsの初期化
+            //Sheets,Worksheetsの初期化
+            Sheets = new Sheets(this);
             Worksheets = new Worksheets(this);
         }
 
@@ -123,7 +125,7 @@ namespace Developers.NpoiWrapper
         private void ApplyConfigs()
         {
             //設定ファイル(NpoiWrapper.config)の読込
-            ConfigurationManager CfgManager = new ConfigurationManager();
+            Configurations.ConfigurationManager CfgManager = new Configurations.ConfigurationManager();
             //フォントの生成
             if (CfgManager.Configs.Font != null)
             {
@@ -132,12 +134,12 @@ namespace Developers.NpoiWrapper
                 Font.FontHeightInPoints = CfgManager.Configs.Font.Size;
             }
             //ページ設定リストの生成
-            foreach (PageSetup ps in CfgManager.Configs.PageSetup ?? new List<PageSetup>())
+            foreach (Configurations.Models.PageSetup ps in CfgManager.Configs.PageSetup ?? new List<Configurations.Models.PageSetup>())
             {
                 PageSetups.Add(ps.Name, ps);
             }
             //セルスタイルリストの生成
-            foreach (CellStyle cs in CfgManager.Configs.CellStyle ?? new List<CellStyle>())
+            foreach (Configurations.Models.CellStyle cs in CfgManager.Configs.CellStyle ?? new List<Configurations.Models.CellStyle>())
             {
                 ICellStyle pcs = PoiBook.CreateCellStyle();
                 pcs.BorderTop = cs.Border.Top;

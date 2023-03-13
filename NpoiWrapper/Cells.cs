@@ -1,10 +1,9 @@
-﻿using NPOI.SS.Util;
+﻿using Developers.NpoiWrapper.Utils;
+using NPOI.SS.Util;
 using System;
 
 namespace Developers.NpoiWrapper
 {
-    using Range = _Range;
-
     /// <summary>
     /// Cellsクラス
     /// インデクサOverrideのためだけにあるクラス
@@ -12,6 +11,9 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Cells : Range
     {
+        private static readonly log4net.ILog Logger
+            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
         /// <summary>
         /// コンスラクタ
         /// </summary>
@@ -21,6 +23,7 @@ namespace Developers.NpoiWrapper
         internal Cells(Worksheet ParentSheet, CellRangeAddressList RangeAddressList, CellRangeAddress RelativeTo = null)
             : base(ParentSheet, RangeAddressList, RelativeTo)
         {
+            Logger.Debug(RangeUtil.CellRangeAddressListToString(RangeAddressList));
             //なにもしない
         }
 
@@ -38,9 +41,17 @@ namespace Developers.NpoiWrapper
                 //インデックスはintであること
                 if (RowIndex is int row && ColumnIndex is int column)
                 {
-                    //RangeAddressを生成
-                    RangeAddressList.AddCellRangeAddress(
-                        new CellRangeAddress(row - 1, row - 1, column - 1, column - 1));
+                    //１から始まるIndexであること
+                    if (row > 0 && column > 0)
+                    {
+                        //RangeAddressを生成
+                        RangeAddressList.AddCellRangeAddress(
+                            new CellRangeAddress(row - 1, row - 1, column - 1, column - 1));
+                    }
+                    else
+                    {
+                        throw new ArgumentException("RowIndex, ColumnIndex should be 1-origined integer.");
+                    }
                 }
                 //上記以外は例外スロー
                 else
@@ -48,7 +59,7 @@ namespace Developers.NpoiWrapper
                     throw new ArgumentException("Type of RowIndex, ColumnIndex should be int.");
                 }
                 //Rangeクラスインスタンス生成
-                return new Range(ParentSheet, RangeAddressList, RelativeTo);
+                return new Range(base.ParentSheet, RangeAddressList, base.RelativeTo);
             }
         }
     }

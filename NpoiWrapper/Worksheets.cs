@@ -1,9 +1,7 @@
 ﻿using NPOI.HSSF.UserModel;
-using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System.Collections.Generic;
-using System.Linq;
-using System.Collections;
 
 namespace Developers.NpoiWrapper
 {
@@ -60,16 +58,6 @@ namespace Developers.NpoiWrapper
             {
                 return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheet(Name));
             }
-        }
-
-        /// <summary>
-        /// シートの追加
-        /// ★常に末尾に追加される。追加位置の指定はできない。
-        /// </summary>
-        /// <returns></returns>
-        public Worksheet Add()
-        {
-            return new Worksheet(ParentBook, ParentBook.PoiBook.CreateSheet());
         }
 
         /// <summary>
