@@ -6,31 +6,37 @@ using System;
 
 namespace Developers.NpoiWrapper
 {
+    //----------------------------------------------------------------------------------------------
     // Border interface in Interop.Excel is shown below...
-    //  public interface Border
-    //  {
-    //      Application Application { get; }
-    //      XlCreator Creator { get; }
-    //      object Parent { get; }
-    //      object Color { get; set; }
-    //      object ColorIndex { get; set; }
-    //      object LineStyle { get; set; }
-    //      object Weight { get; set; }
-    //      object ThemeColor { get; set; }
-    //      object TintAndShade { get; set; }
-    //  }
+    //----------------------------------------------------------------------------------------------
+    //public interface Border
+    //{
+    //    Application Application { get; }
+    //    XlCreator Creator { get; }
+    //    object Parent { get; }
+    //    object Color { get; set; }
+    //    object ColorIndex { get; set; }
+    //    object LineStyle { get; set; }
+    //    object Weight { get; set; }
+    //    object ThemeColor { get; set; }
+    //    object TintAndShade { get; set; }
+    //}
 
     public class Border
     {
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; } 
+
         /// <summary>
         /// ISheetインスタンス
         /// </summary>
-        private ISheet PoiSheet { get; set; }
+        private ISheet PoiSheet { get { return Parent.Parent.PoiSheet; } }
 
         /// <summary>
         /// CellRangeAddressListインスタンス
         /// </summary>
-        private CellRangeAddressList SafeRangeAddressList { get; }
+        private CellRangeAddressList SafeAddressList { get { return this.Parent.SafeAddressList; } }
 
         /// <summary>
         /// 親RangeのSafeAddressList
@@ -45,19 +51,16 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="PoiSheet">ISheetインスタンス</param>
-        /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
+        /// <param name="ParentRanget">Rangeインスタンス</param>
         /// <param name="BordersIndex">XlBordersIndex値</param>
-        public Border(
-            ISheet PoiSheet, CellRangeAddressList SafeAddressList, XlBordersIndex? BordersIndex)
+        public Border(Range ParentRanget, XlBordersIndex? BordersIndex)
         {
             //親Range情報の保存
-            this.PoiSheet = PoiSheet;
-            this.SafeRangeAddressList = SafeAddressList;
+            this.Parent = ParentRanget;
             //Border情報の保存
             this.BordersIndex = BordersIndex;
             //RangeBorderStyle生成
-            BorderStyle = new RangeBorderStyle(this.PoiSheet, this.SafeRangeAddressList, this.BordersIndex);
+            BorderStyle = new RangeBorderStyle(this.PoiSheet, this.SafeAddressList, this.BordersIndex);
         }
 
         /// <summary>

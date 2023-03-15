@@ -3,10 +3,13 @@ using NPOI.SS.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Developers.NpoiWrapper
 {
-    // Border interface in Interop.Excel is shown below...
+    //----------------------------------------------------------------------------------------------
+    // Borders interface in Interop.Excel is shown below...
+    //----------------------------------------------------------------------------------------------
     //  public interface Borders
     //  {
     //      Application Application { get; }
@@ -19,6 +22,7 @@ namespace Developers.NpoiWrapper
     //      object LineStyle { get; set; }
     //      object Value { get; set; }
     //      object Weight { get; set; }
+    //      [IndexerName("_Default")]
     //      Border this[XlBordersIndex Index] { get; }
     //      object ThemeColor { get; set; }
     //      object TintAndShade { get; set; }
@@ -43,20 +47,14 @@ namespace Developers.NpoiWrapper
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-        /// <summary>
-        /// ISheetインスタンス
-        /// </summary>
-        private ISheet PoiSheet { get; }
-
-        /// <summary>
-        /// CellRangeAddressListインスタンス
-        /// </summary>
-        private CellRangeAddressList SafeRangeAddressList { get; }
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; }
 
         /// <summary>
         /// Borderリスト
         /// </summary>
-        private Dictionary<XlBordersIndex, Border> IndexedBorderList { get; } = new Dictionary<XlBordersIndex, Border>();
+        public Dictionary<XlBordersIndex, Border> Item { get; } = new Dictionary<XlBordersIndex, Border>();
 
         /// <summary>
         /// 全てのXlBordersIndexを支配するBorderインスタンス
@@ -65,6 +63,7 @@ namespace Developers.NpoiWrapper
         
         /// <summary>
         /// BorderIndexリスト
+        /// foreachで取得する場合は斜線２種類を除く下記６種類
         /// </summary>
         private List<XlBordersIndex> BoerderIndexList { get; } = new List<XlBordersIndex>()
         {
@@ -74,27 +73,25 @@ namespace Developers.NpoiWrapper
         };
 
         /// <summary>
-        /// IndexedBorderList取り出しインデクス
+        /// Enumerator用インデクス
         /// </summary>
-        private int EnumBorderIndex { get; set; } = -1;
+        private int EnumeratorIndex { get; set; } = -1;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="PoiSheet">ISheetインスタンス</param>
-        /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
-        internal Borders(ISheet PoiSheet, CellRangeAddressList SafeAddressList)
+        /// <param name="ParentRange">Rangeインスタンス</param>
+        internal Borders(Range ParentRange)
         {
             //親Range情報の保存
-            this.PoiSheet = PoiSheet;
-            this.SafeRangeAddressList = SafeAddressList;
-            //IndexedBorderListのメンバー生成
-            foreach (XlBordersIndex Index in BoerderIndexList)
+            this.Parent = ParentRange;
+            //XlBordersIndexで定義される全８種類のメンバーをすべて生成
+            foreach (XlBordersIndex Index in Enum.GetValues(typeof(XlBordersIndex)))
             {
-                IndexedBorderList.Add(Index, new Border(PoiSheet, SafeAddressList, Index));
+                Item.Add(Index, new Border(this.Parent, Index));
             }
             //EntireRangeBorderのインスタンス生成(BordersIndexはnull)
-            EntireRangeBorder = new Border(this.PoiSheet, this.SafeRangeAddressList, null);
+            EntireRangeBorder = new Border(this.Parent, null);
         }
 
         /// <summary>
@@ -113,8 +110,8 @@ namespace Developers.NpoiWrapper
         public bool MoveNext()
         {
             bool RetVal = false;
-            EnumBorderIndex += 1;
-            if (EnumBorderIndex < BoerderIndexList.Count)
+            EnumeratorIndex += 1;
+            if (EnumeratorIndex < BoerderIndexList.Count)
             {
                 RetVal = true;
             }
@@ -123,12 +120,12 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// IEnumerator.Current実装
         /// </summary>
-        public virtual object Current
+        public virtual object Current　
         {
             get
             {
                 //EnumBorderIndexでBoerderIndexListからDictionaryのキーを取り出してそのキーで､､､
-                return IndexedBorderList[BoerderIndexList[EnumBorderIndex]];
+                return Item[BoerderIndexList[EnumeratorIndex]];
             }
         }
         /// <summary>
@@ -136,7 +133,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         public void Reset()
         {
-            EnumBorderIndex = -1;
+            EnumeratorIndex = -1;
         }
 
         /// <summary>
@@ -154,11 +151,12 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Bordersインデクサ
         /// </summary>
+        [IndexerName("_Default")]
         public Border this[XlBordersIndex Index]
         {
             get
             {
-                return IndexedBorderList[Index];
+                return Item[Index];
             }
         }
 
@@ -269,10 +267,10 @@ namespace Developers.NpoiWrapper
                 //LineStyle指定があれば適用
                 if (LineStyle is XlLineStyle SafeLineStyle)
                 {
-                    this.IndexedBorderList[Index].LineStyle = SafeLineStyle;
+                    this.Item[Index].LineStyle = SafeLineStyle;
                 }
                 //Weightを適用
-                this.IndexedBorderList[Index].Weight = Weight;
+                this.Item[Index].Weight = Weight;
                 //色指定判断
                 short? IndexedColor;
                 //自動指定
@@ -293,7 +291,7 @@ namespace Developers.NpoiWrapper
                 //ColorIndexに有効な指定があれば適用
                 if (IndexedColor != null)
                 {
-                    this.IndexedBorderList[Index].ColorIndex = IndexedColor;
+                    this.Item[Index].ColorIndex = IndexedColor;
                 }
                 //Color設定がある場合
                 if (Color != null)

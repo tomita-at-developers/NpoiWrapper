@@ -9,34 +9,32 @@ using System.Collections.Generic;
 
 namespace Developers.NpoiWrapper
 {
-    /*
-    --------------------------------------------------------------------------------------------   
-    Font interface of Interop.Excel is shown below....
-    --------------------------------------------------------------------------------------------
-    public interface Font
-    {
-        Application Application { get; }                                - not implemented.
-        XlCreator Creator       { get; }                                - not implemented.
-        object Parent           { get; }                                - not implemented.
-        object Background       { get; set; }   //XlBackground 
-        object Bold             { get; set; }	//bool					IsBold
-        object Color            { get; set; }	//double                ----------- later...
-        object ColorIndex       { get; set; }	//short					Color
-        object FontStyle        { get; set; }	//bool					- not implemented.
-        object Italic           { get; set; }	//bool					IsItalic
-        object Name             { get; set; }	//string				FontName
-        object OutlineFont      { get; set; }	//bool					- not implemented. no effect on windows.
-        object Shadow           { get; set; }	//bool					- not implemented. no effect on windows.
-        object Size             { get; set; }	//double				FontHeight, FontHeightInPoints
-        object Strikethrough    { get; set; }	//bool					IsStrikeout
-        object Subscript        { get; set; }	//bool					FontSuperScript TypeOffset
-        object Superscript      { get; set; }	//bool					FontSuperScript TypeOffset
-        object Underline        { get; set; }	//XlUnderlineStyle		FontUnderlineType Underline
-        object ThemeColor       { get; set; }	//int					- not implemented.
-        object TintAndShade     { get; set; }	//single				- not implemented.
-        XlThemeFont ThemeFont   { get; set; }	//XlThemeFont			- not implemented.
-    }
-    */
+    //----------------------------------------------------------------------------------------------
+    //Font interface of Interop.Excel is shown below....
+    //----------------------------------------------------------------------------------------------
+    //public interface Font
+    //{
+    //    Application Application { get; }                                - not implemented.
+    //    XlCreator Creator       { get; }                                - not implemented.
+    //    object Parent           { get; }                                - not implemented.
+    //    object Background       { get; set; }   //XlBackground 
+    //    object Bold             { get; set; }	//bool					IsBold
+    //    object Color            { get; set; }	//double                ----------- later...
+    //    object ColorIndex       { get; set; }	//short					Color
+    //    object FontStyle        { get; set; }	//bool					- not implemented.
+    //    object Italic           { get; set; }	//bool					IsItalic
+    //    object Name             { get; set; }	//string				FontName
+    //    object OutlineFont      { get; set; }	//bool					- not implemented. no effect on windows.
+    //    object Shadow           { get; set; }	//bool					- not implemented. no effect on windows.
+    //    object Size             { get; set; }	//double				FontHeight, FontHeightInPoints
+    //    object Strikethrough    { get; set; }	//bool					IsStrikeout
+    //    object Subscript        { get; set; }	//bool					FontSuperScript TypeOffset
+    //    object Superscript      { get; set; }	//bool					FontSuperScript TypeOffset
+    //    object Underline        { get; set; }	//XlUnderlineStyle		FontUnderlineType Underline
+    //    object ThemeColor       { get; set; }	//int					- not implemented.
+    //    object TintAndShade     { get; set; }	//single				- not implemented.
+    //    XlThemeFont ThemeFont   { get; set; }	//XlThemeFont			- not implemented.
+    //}
 
     /// <summary>
     /// FFontクラス
@@ -44,40 +42,32 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Font
     {
-        /// <summary>
-        /// ISheetインスタンス
-        /// </summary>
-        private ISheet PoiSheet { get; set; }
-
-        /// <summary>
-        /// CellRangeAddressListインスタンス
-        /// </summary>
-        private CellRangeAddressList SafeRangeAddressList { get; set; }
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; }
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="PoiSheet">ISheetインスタンス</param>
-        /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
-        public Font(ISheet PoiSheet, CellRangeAddressList SafeAddressList)
+        /// <param name="ParentRange">Rangeインスタンス</param>
+        public Font(Range ParentRange)
         {
             //親Range情報の保存
-            this.PoiSheet = PoiSheet;
-            this.SafeRangeAddressList = SafeAddressList;
+            this.Parent = ParentRange;
         }
 
         public object Bold
         {
             get
             {
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Bold));
             }
             set
             {
                 if (value is bool SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
                         new CellStyleParam(StyleName.Font.Bold, SafeValue)
@@ -96,14 +86,14 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 return (short?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.ColorIndex));
             }
             set
             {
                 if (value is short SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     List<CellStyleParam> Params = new List<CellStyleParam >
                     {
                         new CellStyleParam(StyleName.Font.ColorIndex, SafeValue)
@@ -120,7 +110,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsItalic);
                 return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Italic));
             }
@@ -128,7 +118,7 @@ namespace Developers.NpoiWrapper
             {
                 if (value is bool SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     { 
                         new CellStyleParam(StyleName.Font.Italic, SafeValue)
@@ -145,14 +135,14 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 return (string)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Name));
             }
             set
             {
                 if (value is string SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
                         new CellStyleParam(StyleName.Font.Name, SafeValue)
@@ -169,7 +159,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 return (double?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Size));
             }
             set
@@ -187,7 +177,7 @@ namespace Developers.NpoiWrapper
                 {
                     throw new ArgumentException("Font.Size");
                 }
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 List<CellStyleParam> Params = new List<CellStyleParam>
                 {
                     new CellStyleParam(StyleName.Font.Size, SafeValue)
@@ -199,14 +189,14 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Strikethrough));
             }
             set
             {
                 if (value is bool SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
                         new CellStyleParam(StyleName.Font.Strikethrough, SafeValue)
@@ -224,7 +214,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 object RetVal = null;
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.TypeOffset);
                 object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
                 if (CommonProp is FontSuperScript)
@@ -244,7 +234,7 @@ namespace Developers.NpoiWrapper
             {
                 if (value is bool SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     //変更初期値(true;FontSuperScript.Sub)
                     FontSuperScript PropValue = FontSuperScript.Sub;
                     //False指定の場合は現状によって判断
@@ -293,7 +283,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 object RetVal = DBNull.Value;
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.TypeOffset));
                 if (CommonProp is FontSuperScript)
                 {
@@ -312,7 +302,7 @@ namespace Developers.NpoiWrapper
             {
                 if (value is bool SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     //変更初期値(true:FontSuperScript.Super)
                     FontSuperScript PropValue = FontSuperScript.Super;
                     //False指定の場合は現状によって判断
@@ -361,14 +351,14 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                RangeStyle StyleManger = new RangeStyle(this.Parent);
                 return (FontUnderlineType?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Underline));
             }
             set
             {
                 if (value is XlUnderlineStyle SafeValue)
                 {
-                    RangeStyle StyleManger = new RangeStyle(this.PoiSheet, this.SafeRangeAddressList);
+                    RangeStyle StyleManger = new RangeStyle(this.Parent);
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     {
                         new CellStyleParam(StyleName.Font.Underline, (FontUnderlineType)SafeValue)

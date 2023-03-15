@@ -6,11 +6,11 @@ using NPOI.Util.Collections;
 using System;
 using System.Collections.Generic;
 
-
-
 namespace Developers.NpoiWrapper
 {
+    //----------------------------------------------------------------------------------------------
     // Interior interface in Interop.Excel is shown below...
+    //----------------------------------------------------------------------------------------------
     //public interface Interior
     //{
     //    Application Application { get; }
@@ -31,15 +31,9 @@ namespace Developers.NpoiWrapper
 
     public class Interior
     {
-        /// <summary>
-        /// 親ISheet
-        /// </summary>
-        private ISheet PoiSheet { get; set; }
-
-        /// <summary>
-        /// 絶対表現(RonwIndex,ColumnIndexとして直接利用可能)されたアドレスリスト
-        /// </summary>
-        private CellRangeAddressList SafeRangeAddressList { get; set; }
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; }
 
         /// <summary>
         /// RangeStyleクラス
@@ -49,7 +43,7 @@ namespace Developers.NpoiWrapper
         { 
             get
             {
-                if (_RangeStyle == null) { _RangeStyle = new RangeStyle(PoiSheet, SafeRangeAddressList); }
+                if (_RangeStyle == null) { _RangeStyle = new RangeStyle(this.Parent); }
                 return _RangeStyle;
             }
         }
@@ -58,11 +52,9 @@ namespace Developers.NpoiWrapper
         /// コンストラクタ
         /// </summary>
         /// <param name="PoiSheet">ISheetインスタンス</param>
-        /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
-        public Interior(ISheet PoiSheet, CellRangeAddressList SafeAddressList)
+        public Interior(Range ParentRange)
         {
-            this.PoiSheet = PoiSheet;
-            this.SafeRangeAddressList = SafeAddressList;
+            this.Parent = ParentRange;
         }
 
         /// <summary>

@@ -1,8 +1,37 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Developers.NpoiWrapper
 {
+    //----------------------------------------------------------------------------------------------
+    // Workbooks interface in Interop.Excel is shown below...
+    //----------------------------------------------------------------------------------------------
+    //public interface Workbooks : IEnumerable
+    //{
+    //    Application Application { get; }
+    //    XlCreator Creator { get; }
+    //    object Parent { get; }
+    //    int Count { get; }
+    //    Workbook Item { get; }
+    //    [IndexerName("_Default")]
+    //    Workbook this[object Index] { get; }
+    //    Workbook Add([Optional] object Template);
+    //    void Close();
+    //    new IEnumerator GetEnumerator();
+    //    Workbook _Open(string Filename, [Optional] object UpdateLinks, [Optional] object ReadOnly, [Optional] object Format, [Optional] object Password, [Optional] object WriteResPassword, [Optional] object IgnoreReadOnlyRecommended, [Optional] object Origin, [Optional] object Delimiter, [Optional] object Editable, [Optional] object Notify, [Optional] object Converter, [Optional] object AddToMru);
+    //    void __OpenText(string Filename, [Optional] object Origin, [Optional] object StartRow, [Optional] object DataType, XlTextQualifier TextQualifier = XlTextQualifier.xlTextQualifierDoubleQuote, [Optional] object ConsecutiveDelimiter, [Optional] object Tab, [Optional] object Semicolon, [Optional] object Comma, [Optional] object Space, [Optional] object Other, [Optional] object OtherChar, [Optional] object FieldInfo, [Optional] object TextVisualLayout);
+    //    void _OpenText(string Filename, [Optional] object Origin, [Optional] object StartRow, [Optional] object DataType, XlTextQualifier TextQualifier = XlTextQualifier.xlTextQualifierDoubleQuote, [Optional] object ConsecutiveDelimiter, [Optional] object Tab, [Optional] object Semicolon, [Optional] object Comma, [Optional] object Space, [Optional] object Other, [Optional] object OtherChar, [Optional] object FieldInfo, [Optional] object TextVisualLayout, [Optional] object DecimalSeparator, [Optional] object ThousandsSeparator);
+    //    Workbook Open(string Filename, [Optional] object UpdateLinks, [Optional] object ReadOnly, [Optional] object Format, [Optional] object Password, [Optional] object WriteResPassword, [Optional] object IgnoreReadOnlyRecommended, [Optional] object Origin, [Optional] object Delimiter, [Optional] object Editable, [Optional] object Notify, [Optional] object Converter, [Optional] object AddToMru, [Optional] object Local, [Optional] object CorruptLoad);
+    //    void OpenText(string Filename, [Optional] object Origin, [Optional] object StartRow, [Optional] object DataType, XlTextQualifier TextQualifier = XlTextQualifier.xlTextQualifierDoubleQuote, [Optional] object ConsecutiveDelimiter, [Optional] object Tab, [Optional] object Semicolon, [Optional] object Comma, [Optional] object Space, [Optional] object Other, [Optional] object OtherChar, [Optional] object FieldInfo, [Optional] object TextVisualLayout, [Optional] object DecimalSeparator, [Optional] object ThousandsSeparator, [Optional] object TrailingMinusNumbers, [Optional] object Local);
+    //    Workbook OpenDatabase(string Filename, [Optional] object CommandText, [Optional] object CommandType, [Optional] object BackgroundQuery, [Optional] object ImportDataAs);
+    //    void CheckOut(string Filename);
+    //    bool CanCheckOut(string Filename);
+    //    Workbook _OpenXML(string Filename, [Optional] object Stylesheets);
+    //    Workbook OpenXML(string Filename, [Optional] object Stylesheets, [Optional] object LoadOption);
+    //}
+
     /// <summary>
     /// Workbooksクラス
     /// Microsoft.Office.Interop.Excel.Workbooksをエミュレート
@@ -11,16 +40,28 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Workbooks : IEnumerable, IEnumerator
     {
-        internal List<Workbook> Books { get; private set; } = new List<Workbook>();
-        protected int EnumBookIndex { get; set; } = -1;
+        public Application Application { get { return this.Parent; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Application Parent { get; }
+
+        /// <summary>
+        /// Workbookリスト
+        /// </summary>
+        public List<Workbook> Item { get; private set; } = new List<Workbook>();
+
+        /// <summary>
+        /// Enumrator用インデクス
+        /// </summary>
+        private int EnumeratorIndex { get; set; } = -1;
 
         /// <summary>
         /// コンストラクタ
         /// NoiWrapperのプロパティとしてのみコンストラクトされる
+        /// <param name="ParentApp">親Application</param>
         /// </summary>
-        internal Workbooks()
+        internal Workbooks(Application ParentApplication)
         {
-            //なにもしない
+            this.Parent = ParentApplication;
         }
 
         /// <summary>
@@ -39,8 +80,8 @@ namespace Developers.NpoiWrapper
         public bool MoveNext()
         {
             bool RetVal = false;
-            EnumBookIndex += 1;
-            if (EnumBookIndex < Books.Count)
+            EnumeratorIndex += 1;
+            if (EnumeratorIndex < Item.Count)
             {
                 RetVal = true;
             }
@@ -49,42 +90,57 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// IEnumerator.Current実装
         /// </summary>
-        public object Current
-        {
-            get
-            {
-                return Books[EnumBookIndex];
-            }
-        }
+        public object Current { get { return Item[EnumeratorIndex]; } }
         /// <summary>
         /// IEnumerator.Resetの実装
         /// </summary>
-        public void Reset()
-        {
-            EnumBookIndex = -1;
-        }
+        public void Reset() { EnumeratorIndex = -1; }
 
         /// <summary>
-        /// 新規Excelブックの追加
+        /// Excelブックの作成
         /// </summary>
-        /// <param name="Excel97_2003">Excel97-2003形式で作成する場合true(省略時Excel2007以降形式)</param>
+        /// <param name="Template">新しいブックの作成方法。XlWBATemplateはxlWBATWorksheetのみサポート。ファイル名が指定された場合は拡張子のみ判断。</param>
         /// <returns>Workbookクラスインスタンス</returns>
-        public Workbook Add(bool Excel97_2003 = false)
+        public Workbook Add(object Template = null)
         {
-            Workbook Book = new Workbook(Excel97_2003);
-            Books.Add(Book);
+            bool Excel97_2003 = false;
+            if (Template != null)
+            {
+                if (Template is XlWBATemplate TempleteEnumValue)
+                {
+                    if (TempleteEnumValue != XlWBATemplate.xlWBATWorksheet)
+                    {
+                        throw new ArgumentException("Uusupported XlWBATemplate value is specified. (This implementation supports only xlWBATWorksheet.)");
+                    }
+
+                }
+                else if (Template is string TemplateFile)
+                {
+                    if(TemplateFile.EndsWith("xls"))
+                    {
+                        Excel97_2003 = true;
+                    }
+                }
+            }
+            Workbook Book = new Workbook(this, Excel97_2003);
+            Item.Add(Book);
             return Book;
         }
 
         /// <summary>
-        /// 既存Excelブックを開く
+        /// Excelブックを開く
         /// </summary>
         /// <param name="FileNanme">フルパスファイ名</param>
+        /// <param name="....">FileName以外はすべて無視します。</param>
         /// <returns>Workbookクラスインスタンス</returns>
-        public Workbook Open(string FileNanme)
+        public Workbook Open(
+            string FileName, object UpdateLinks = null, object ReadOnly = null, object Format = null,
+            object Password = null, object WriteResPassword = null, object IgnoreReadOnlyRecommended = null,
+            object Origin = null, object Delimiter = null, object Editable = null, object Notify = null,
+            object Converter = null, object AddToMru = null, object Local = null, object CorruptLoad = null)
         {
-            Workbook Book = new Workbook(FileNanme);
-            Books.Add(Book);
+            Workbook Book = new Workbook(this, FileName);
+            Item.Add(Book);
             return Book;
         }
 
@@ -93,12 +149,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public Workbook this[int index]
-        {
-            get
-            {
-                return Books[index];
-            }
-        }
+        [IndexerName("_Default")]
+        public Workbook this[int index] { get { return Item[index]; } }
     }
 }

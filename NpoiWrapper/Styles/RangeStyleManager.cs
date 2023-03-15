@@ -38,8 +38,8 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         /// <param name="PoiSheet">ISheetインスタンス</param>
         /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
-        public RangeStyleManager(ISheet PoiSheet, CellRangeAddressList SafeAddressList)
-            : base(PoiSheet, SafeAddressList)
+        public RangeStyleManager(Range ParentRange)
+            : base(ParentRange)
         {
             //何もしない
         }
@@ -49,7 +49,7 @@ namespace Developers.NpoiWrapper.Styles
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_Font == null) { _Font = new Font(base.PoiSheet, base.SafeRangeAddressList); }
+                if (_Font == null) { _Font = new Font(base.ParentRange); }
                 return _Font;
             }
         }
@@ -59,7 +59,7 @@ namespace Developers.NpoiWrapper.Styles
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_Borders == null) { _Borders = new Borders(base.PoiSheet, base.SafeRangeAddressList); }
+                if (_Borders == null) { _Borders = new Borders(base.ParentRange); }
                 return _Borders;
             }
         }
@@ -69,7 +69,7 @@ namespace Developers.NpoiWrapper.Styles
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_Interior == null) { _Interior = new Interior(base.PoiSheet, base.SafeRangeAddressList); }
+                if (_Interior == null) { _Interior = new Interior(base.ParentRange); }
                 return _Interior;
             }
         }

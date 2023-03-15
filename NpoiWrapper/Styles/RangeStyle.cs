@@ -22,33 +22,33 @@ namespace Developers.NpoiWrapper.Styles
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
         /// <summary>
+        /// 親Range
+        /// </summary>
+        internal Range ParentRange { get; }
+
+        /// <summary>
         /// 親IWorkbook
         /// </summary>
-        public IWorkbook PoiBook
-        { 
-            get { return this.PoiSheet.Workbook; }
-        }
+        public IWorkbook PoiBook { get { return this.ParentRange.Parent.Parent.PoiBook; } }
 
         /// <summary>
         /// 親ISheet
         /// </summary>
-        public ISheet PoiSheet { get; private set; }
+        public ISheet PoiSheet { get { return this.ParentRange.Parent.PoiSheet; } }
 
         /// <summary>
         /// 絶対表現(RonwIndex,ColumnIndexとして直接利用可能)されたアドレスリスト
         /// </summary>
-        public CellRangeAddressList SafeRangeAddressList { get; private set; }
+        public CellRangeAddressList SafeAddressList { get { return this.ParentRange.SafeAddressList; } }
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="PoiSheet">ISheetインスタンス</param>
-        /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
-        public RangeStyle(ISheet PoiSheet, CellRangeAddressList SafeAddressList)
+        /// <param name="ParentRange">Rangeインスタンス</param>
+        public RangeStyle(Range ParentRange)
         {
             //親Range情報の保存
-            this.PoiSheet = PoiSheet;
-            this.SafeRangeAddressList = SafeAddressList;
+            this.ParentRange = ParentRange;
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace Developers.NpoiWrapper.Styles
             //デフォルトスタイル取得(Cell未生成時に使用)
             ICellStyle DefaultStyle = PoiBook.GetCellStyleAt(0);
             //Areasループ
-            for (int a = 0; a < SafeRangeAddressList.CountRanges(); a++)
+            for (int a = 0; a < SafeAddressList.CountRanges(); a++)
             {
                 //Areasアドレス取得
-                CellRangeAddress Address = SafeRangeAddressList.GetCellRangeAddress(a);
+                CellRangeAddress Address = SafeAddressList.GetCellRangeAddress(a);
                 //行ループ
                 for (int RowIndex = Address.FirstRow; RowIndex <= Address.LastRow; RowIndex++)
                 {
@@ -209,10 +209,10 @@ namespace Developers.NpoiWrapper.Styles
             //デフォルトスタイル取得
             ICellStyle DefaultStyle = this.PoiBook.GetCellStyleAt(0);
             //Areaループ
-            for (int a = 0; a < SafeRangeAddressList.CountRanges(); a++)
+            for (int a = 0; a < SafeAddressList.CountRanges(); a++)
             {
                 //行ループ
-                CellRangeAddress Address = SafeRangeAddressList.GetCellRangeAddress(a);
+                CellRangeAddress Address = SafeAddressList.GetCellRangeAddress(a);
                 for (int RowIndex = Address.FirstRow; RowIndex <= Address.LastRow; RowIndex++)
                 {
                     //列ループ

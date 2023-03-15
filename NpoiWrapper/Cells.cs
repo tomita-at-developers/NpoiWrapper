@@ -59,7 +59,7 @@ namespace Developers.NpoiWrapper
                     throw new ArgumentException("Type of RowIndex, ColumnIndex should be int.");
                 }
                 //Rangeクラスインスタンス生成
-                return new Range(base.ParentSheet, RangeAddressList, base.RelativeTo);
+                return new Range(base.Parent, RangeAddressList, base.RelativeTo);
             }
         }
     }

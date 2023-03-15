@@ -1,14 +1,48 @@
 ﻿using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using System.Collections;
 using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Developers.NpoiWrapper
 {
+    //----------------------------------------------------------------------------------------------
+    // Worksheets interface in Interop.Excel is shown below...
+    //----------------------------------------------------------------------------------------------
+    //public interface Worksheets
+    //{
+    //    Application Application { get; }
+    //    XlCreator Creator { get; }
+    //    object Parent { get; }
+    //    int Count { get; }
+    //    object Item { get; }
+    //    HPageBreaks HPageBreaks { get; }
+    //    VPageBreaks VPageBreaks { get; }
+    //    object Visible { get; set; }
+    //    [IndexerName("_Default")]
+    //    object this[object Index] { get; }
+    //    object Add([Optional] object Before, [Optional] object After, [Optional] object Count, [Optional] object Type);
+    //    void Copy([Optional] object Before, [Optional] object After);
+    //    void Delete();
+    //    void FillAcrossSheets(Range Range, XlFillWith Type = XlFillWith.xlFillWithAll);
+    //    void Move([Optional] object Before, [Optional] object After);
+    //    IEnumerator GetEnumerator();
+    //    void _PrintOut([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate);
+    //    void PrintPreview([Optional] object EnableChanges);
+    //    void Select([Optional] object Replace);
+    //    void PrintOut([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate, [Optional] object PrToFileName);
+    //    void PrintOutEx([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate, [Optional] object PrToFileName, [Optional] object IgnorePrintAreas);
+    //}
+
     /// <summary>
-    /// Sheetsクラス
-    /// WorkboolクラスのAheetsメソッドのみが本クラスをコンストラクトする
+    /// Worksheetsクラス
+    /// Workbookクラスコンストラクト時にWorkbook.Worksheetsとしてコンストラクトされる。
     /// ユーザからは直接コンストラクトさせないのでコンストラクタはinternalにしている
+    /// Workbook.WorksheetsはSheets型なのでSheetsを継承しているが、Interop.ExcelではインターフェイスとしてのSheetsとWorksheetsに継承関係はない。
+    /// Worksheets実装段階ではSheetsを継承しているかも知れない。
     /// </summary>
     public class Worksheets : Sheets
     {
@@ -29,8 +63,8 @@ namespace Developers.NpoiWrapper
             get
             {
                 return new Worksheet(
-                    ParentBook,
-                    ParentBook.PoiBook.GetSheetAt(GetSheetIndexList(SheetTypes)[EnumSheetIndex]));
+                    Parent,
+                    Parent.PoiBook.GetSheetAt(GetSheetIndexList(SheetTypes)[EnumSheetIndex]));
             }
         }
  
@@ -44,7 +78,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 List<int> WorksheetIndex = GetWorksheetIndexList();
-                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheetAt(WorksheetIndex[Index-1]));
+                return new Worksheet(Parent, Parent.PoiBook.GetSheetAt(WorksheetIndex[Index-1]));
             }
         }
 
@@ -56,7 +90,7 @@ namespace Developers.NpoiWrapper
         public override dynamic this[string Name]        {
             get
             {
-                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheet(Name));
+                return new Worksheet(Parent, Parent.PoiBook.GetSheet(Name));
             }
         }
 
@@ -67,9 +101,9 @@ namespace Developers.NpoiWrapper
         private List<int> GetWorksheetIndexList()
         {
             List<int> WorksheetIndex = new List<int>();
-            for (int i = 0; i < ParentBook.PoiBook.NumberOfSheets; i++)
+            for (int i = 0; i < Parent.PoiBook.NumberOfSheets; i++)
             {
-                ISheet sheet = ParentBook.PoiBook.GetSheetAt(i);
+                ISheet sheet = Parent.PoiBook.GetSheetAt(i);
                 //ワークシートの選別(ただしHSSFSheetは選別不能！)
                 if (sheet is HSSFSheet
                     || (sheet is XSSFSheet && !(sheet is XSSFChartSheet))

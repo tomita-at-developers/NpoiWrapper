@@ -4,9 +4,45 @@ using NPOI.XSSF.UserModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Developers.NpoiWrapper
 {
+    //----------------------------------------------------------------------------------------------
+    // Sheets interface in Interop.Excel is shown below...
+    //----------------------------------------------------------------------------------------------
+    //public interface Sheets : IEnumerable
+    //{
+    //    Application Application { get; }
+    //    XlCreator Creator { get; }
+    //    object Parent { get; }
+    //    int Count { get; }
+    //    object Item { get; }
+    //    HPageBreaks HPageBreaks { get; }
+    //    VPageBreaks VPageBreaks { get; }
+    //    object Visible { get; set; }
+    //    [IndexerName("_Default")]
+    //    object this[object Index] { get; }
+    //    object Add([Optional] object Before, [Optional] object After, [Optional] object Count, [Optional] object Type);
+    //    void Copy([Optional] object Before, [Optional] object After);
+    //    void Delete();
+    //    void FillAcrossSheets([MarshalAs(UnmanagedType.Interface)] Range Range, XlFillWith Type = XlFillWith.xlFillWithAll);
+    //    void Move([Optional] object Before, [Optional] object After);
+    //    new IEnumerator GetEnumerator();
+    //    void _PrintOut([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate);
+    //    void PrintPreview([Optional] object EnableChanges);
+    //    void Select([Optional] object Replace);
+    //    void PrintOut([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate, [Optional] object PrToFileName);
+    //    void PrintOutEx([Optional] object From, [Optional] object To, [Optional] object Copies, [Optional] object Preview, [Optional] object ActivePrinter, [Optional] object PrintToFile, [Optional] object Collate, [Optional] object PrToFileName, [Optional] object IgnorePrintAreas);
+    //}
+
+    /// <summary>
+    /// Sheetsクラス
+    /// Workbookクラスコンストラクト時にWorkbook.Sheetsとしてコンストラクトされる。
+    /// ユーザからは直接コンストラクトさせないのでコンストラクタはinternalにしている
+    /// </summary>
     public class Sheets : IEnumerable, IEnumerator
     {
         [Flags]
@@ -18,7 +54,10 @@ namespace Developers.NpoiWrapper
             DialogSheet = 4
         }
 
-        internal Workbook ParentBook { get; private set; }
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Workbook Parent { get; private set; }
+
         protected SheetType SheetTypes { get; private set; }
         protected int EnumSheetIndex { get; set; } = -1;
 
@@ -38,7 +77,7 @@ namespace Developers.NpoiWrapper
         /// <param name="SheetTypes">対象とするシートのタイプ</param>
         internal Sheets(Workbook ParentWorkbook, SheetType SheetTypes)
         {
-            ParentBook = ParentWorkbook;
+            Parent = ParentWorkbook;
             this.SheetTypes = SheetTypes;
         }
 
@@ -74,8 +113,8 @@ namespace Developers.NpoiWrapper
             {
                 //とりあえずWorksheetを返す
                 return new Worksheet(
-                    ParentBook,
-                    ParentBook.PoiBook.GetSheetAt(GetSheetIndexList(SheetTypes)[EnumSheetIndex]));
+                    Parent,
+                    Parent.PoiBook.GetSheetAt(GetSheetIndexList(SheetTypes)[EnumSheetIndex]));
             }
         }
         /// <summary>
@@ -96,7 +135,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 //とりあえずWorksheetを返す
-                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheetAt(Index - 1));
+                return new Worksheet(Parent, Parent.PoiBook.GetSheetAt(Index - 1));
             }
         }
 
@@ -110,7 +149,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 //とりあえずWorksheetを返す
-                return new Worksheet(ParentBook, ParentBook.PoiBook.GetSheet(Name));
+                return new Worksheet(Parent, Parent.PoiBook.GetSheet(Name));
             }
         }
 
@@ -132,7 +171,7 @@ namespace Developers.NpoiWrapper
         /// <returns></returns>
         public Worksheet Add()
         {
-            return new Worksheet(ParentBook, ParentBook.PoiBook.CreateSheet());
+            return new Worksheet(Parent, Parent.PoiBook.CreateSheet());
         }
 
         /// <summary>
@@ -143,9 +182,9 @@ namespace Developers.NpoiWrapper
         protected List<int> GetSheetIndexList(SheetType SheetTypes)
         {
             List<int> SheetIndex = new List<int>();
-            for (int i = 0; i < ParentBook.PoiBook.NumberOfSheets; i++)
+            for (int i = 0; i < Parent.PoiBook.NumberOfSheets; i++)
             {
-                ISheet sheet = ParentBook.PoiBook.GetSheetAt(i);
+                ISheet sheet = Parent.PoiBook.GetSheetAt(i);
                 //ワークシートが指定されている場合
                 if(SheetTypes.HasFlag(SheetType.Worksheet))
                 {
