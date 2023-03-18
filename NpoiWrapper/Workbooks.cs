@@ -41,24 +41,26 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Workbooks : IEnumerable, IEnumerator
     {
-        public Application Application { get { return this.Parent; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Application Parent { get; }
+        #region "fields"
 
         /// <summary>
         /// Workbookリスト
         /// </summary>
-        public List<Workbook> Item { get; private set; } = new List<Workbook>();
+        private readonly List<Workbook> _Item = new List<Workbook>();
 
         /// <summary>
         /// Workbookに付与する通し番号
         /// </summary>
-        private int BookIndex { get; set; } = 0;
+        private int BookIndex = 0;
 
         /// <summary>
         /// Enumrator用インデクス
         /// </summary>
         private int EnumeratorIndex = -1;
+
+        #endregion
+
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -69,6 +71,10 @@ namespace Developers.NpoiWrapper
         {
             this.Parent = ParentApplication;
         }
+
+        #endregion
+
+        #region "interface implementations"
 
         /// <summary>
         /// GetEnumeratorの実装
@@ -87,7 +93,7 @@ namespace Developers.NpoiWrapper
         {
             bool RetVal = false;
             EnumeratorIndex += 1;
-            if (EnumeratorIndex < Item.Count)
+            if (EnumeratorIndex < _Item.Count)
             {
                 RetVal = true;
             }
@@ -96,11 +102,29 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// IEnumerator.Current実装
         /// </summary>
-        public object Current { get { return Item[EnumeratorIndex]; } }
+        public object Current { get { return _Item[EnumeratorIndex]; } }
         /// <summary>
         /// IEnumerator.Resetの実装
         /// </summary>
         public void Reset() { EnumeratorIndex = -1; }
+
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return this.Parent; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Application Parent { get; }
+
+        #endregion
+
+        #endregion
+
+        #region "methods"
+
+        #region "emulated public methods"
 
         /// <summary>
         /// Excelブックの作成
@@ -129,7 +153,7 @@ namespace Developers.NpoiWrapper
                 }
             }
             Workbook Book = new Workbook(this.Parent, GetNextBookIndex(), Excel97_2003);
-            Item.Add(Book);
+            _Item.Add(Book);
             return Book;
         }
 
@@ -146,9 +170,29 @@ namespace Developers.NpoiWrapper
             object Converter = null, object AddToMru = null, object Local = null, object CorruptLoad = null)
         {
             Workbook Book = new Workbook(this.Parent, GetNextBookIndex(), Filename);
-            Item.Add(Book);
+            _Item.Add(Book);
             return Book;
         }
+
+        #endregion
+
+        #region "private methods"
+
+        /// <summary>
+        /// 次のBookIndex値を取得
+        /// </summary>
+        /// <returns></returns>
+        private int GetNextBookIndex()
+        {
+            this.BookIndex += 1;
+            return this.BookIndex;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region "indexers"
 
         /// <summary>
         /// インデクサ
@@ -156,14 +200,8 @@ namespace Developers.NpoiWrapper
         /// <param name="index"></param>
         /// <returns></returns>
         [IndexerName("_Default")]
-        public Workbook this[int index] { get { return Item[index]; } }
+        public Workbook this[int index] { get { return _Item[index]; } }
 
- 
-        private int GetNextBookIndex()
-        {
-            this.BookIndex += 1;
-            return this.BookIndex;
-        }
-    
+        #endregion
     }
 }

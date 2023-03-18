@@ -19,6 +19,8 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Range : _Range
     {
+        #region "Constructors"
+
         /// <summary>
         /// コンスラクタ
         /// </summary>
@@ -56,5 +58,7 @@ namespace Developers.NpoiWrapper
             : base(ParentSheet, RangeAddressList, RelativeTo, CountAs)
         {
         }
+
+        #endregion
     }
 }

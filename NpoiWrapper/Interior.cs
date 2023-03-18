@@ -33,22 +33,16 @@ namespace Developers.NpoiWrapper
 
     public class Interior
     {
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Range Parent { get; }
+        #region "fields"
 
         /// <summary>
         /// RangeStyleクラス
         /// </summary>
         private RangeStyle _RangeStyle;
-        private RangeStyle RangeStyle
-        { 
-            get
-            {
-                if (_RangeStyle == null) { _RangeStyle = new RangeStyle(this.Parent); }
-                return _RangeStyle;
-            }
-        }
+
+        #endregion
+
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -58,6 +52,16 @@ namespace Developers.NpoiWrapper
         {
             this.Parent = ParentRange;
         }
+
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; }
 
         /// <summary>
         /// セル内部の色(FillBackgroundColor)
@@ -132,5 +136,26 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        #endregion
+
+        #region "private properties"
+
+        /// <summary>
+        /// RangeStyleクラスインスタンス
+        /// </summary>
+        private RangeStyle RangeStyle
+        {
+            get
+            {
+                //最初にアクセスしたときにコンストラクト
+                if (_RangeStyle == null) { _RangeStyle = new RangeStyle(this.Parent); }
+                return _RangeStyle;
+            }
+        }
+
+        #endregion
+
+        #endregion
     }
 }

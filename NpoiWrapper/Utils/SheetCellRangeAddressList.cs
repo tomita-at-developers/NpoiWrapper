@@ -10,12 +10,8 @@ namespace Developers.NpoiWrapper.Utils
     /// </summary>
     internal class SheetCellRangeAddressList
     {
-        /// <summary>
-        /// シート番号
-        /// </summary>
-        public int SheetIndex { get; set; } = -1;
-        public CellRangeAddressList RangeAddressList { get; set; }
-        
+        #region "constructors"
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -35,6 +31,20 @@ namespace Developers.NpoiWrapper.Utils
             this.SheetIndex = SheetIndex;
             this.RangeAddressList = CellRangeAddressList;
         }
+
+        #endregion
+
+        #region "properties"
+
+        /// <summary>
+        /// シート番号
+        /// </summary>
+        public int SheetIndex { get; set; } = -1;
+        public CellRangeAddressList RangeAddressList { get; set; }
+
+        #endregion
+
+        #region "methods"
 
         /// <summary>
         /// 指定されたシートがRangeListに含まれるか判定
@@ -99,6 +109,8 @@ namespace Developers.NpoiWrapper.Utils
             }
             return RetVal;
         }
+
+        #endregion
     }
 }
 

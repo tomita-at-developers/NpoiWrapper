@@ -46,6 +46,8 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Worksheets : Sheets
     {
+        #region "constructors"
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -54,6 +56,10 @@ namespace Developers.NpoiWrapper
             : base(ParentWorkbook, SheetType.Worksheet)
         {
         }
+
+        #endregion
+
+        #region "interface implementations"
 
         /// <summary>
         /// IEnumerator.Current実装
@@ -67,32 +73,12 @@ namespace Developers.NpoiWrapper
                     Parent.PoiBook.GetSheetAt(GetSheetIndexList(SheetTypes)[EnumSheetIndex]));
             }
         }
- 
-        /// <summary>
-        /// インデクザ
-        /// </summary>
-        /// <param name="Index">シートインデクス(１開始)</param>
-        /// <returns></returns>
-        public override dynamic this[int Index]
-        {
-            get
-            {
-                List<int> WorksheetIndex = GetWorksheetIndexList();
-                return new Worksheet(Parent, Parent.PoiBook.GetSheetAt(WorksheetIndex[Index-1]));
-            }
-        }
 
-        /// <summary>
-        /// インデクザ
-        /// </summary>
-        /// <param name="Name">シート名</param>
-        /// <returns></returns>
-        public override dynamic this[string Name]        {
-            get
-            {
-                return new Worksheet(Parent, Parent.PoiBook.GetSheet(Name));
-            }
-        }
+        #endregion
+
+        #region "methods"
+
+        #region "private methods"
 
         /// <summary>
         /// このBookに含まれるWorksheetのIndexリストを取得する
@@ -114,5 +100,40 @@ namespace Developers.NpoiWrapper
             }
             return WorksheetIndex;
         }
+
+        #endregion
+
+        #endregion
+
+        #region "indexers"
+
+        /// <summary>
+        /// インデクザ
+        /// </summary>
+        /// <param name="Index">シートインデクス(１開始)</param>
+        /// <returns></returns>
+        public override dynamic this[int Index]
+        {
+            get
+            {
+                List<int> WorksheetIndex = GetWorksheetIndexList();
+                return new Worksheet(Parent, Parent.PoiBook.GetSheetAt(WorksheetIndex[Index - 1]));
+            }
+        }
+
+        /// <summary>
+        /// インデクザ
+        /// </summary>
+        /// <param name="Name">シート名</param>
+        /// <returns></returns>
+        public override dynamic this[string Name]
+        {
+            get
+            {
+                return new Worksheet(Parent, Parent.PoiBook.GetSheet(Name));
+            }
+        }
+
+        #endregion
     }
 }

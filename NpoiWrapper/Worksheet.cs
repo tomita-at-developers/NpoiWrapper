@@ -1,15 +1,10 @@
-﻿using Developers.NpoiWrapper.Configurations.Models;
-using NPOI.OpenXmlFormats.Spreadsheet;
-using NPOI.SS.Formula.Functions;
-using NPOI.SS.UserModel;
+﻿using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
-using Org.BouncyCastle.Crypto.Generators;
-using static Developers.NpoiWrapper.Sheets;
-using static System.Net.Mime.MediaTypeNames;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Xml.Linq;
+using System;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 
 namespace Developers.NpoiWrapper
 {
@@ -154,16 +149,17 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Worksheet
     {
+        #region "fields"
+
+        /// <summary>
+        /// log4net
+        /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Workbook Parent { get; }
+        #endregion
 
-        public Cells Cells { get; } 
-        public Range Range { get; }
-        internal ISheet PoiSheet { get; private set; }
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -184,6 +180,16 @@ namespace Developers.NpoiWrapper
             Range = new Range(this, new CellRangeAddressList(-1, -1, -1, -1));
         }
 
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Workbook Parent { get; }
+
         /// <summary>
         /// シート名
         /// </summary>
@@ -201,14 +207,63 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// シートIndex
+        /// シートインデックス(1開始)
         /// </summary>
-        public int Index
+        public long Index { get { return this.PoiIndex + 1; } }
+
+        /// <summary>
+        /// Cellsオブジェクト
+        /// </summary>
+        public Cells Cells { get; }
+
+        /// <summary>
+        /// Rangeオブジェクト
+        /// </summary>
+        public Range Range { get; }
+
+        #endregion
+
+        #region "internal properties"
+
+        /// <summary>
+        /// POIシート
+        /// </summary>
+        internal ISheet PoiSheet { get; private set; }
+
+        /// <summary>
+        /// POIのシートIndex(0開始)
+        /// </summary>
+        internal int PoiIndex { get { return Parent.PoiBook.GetSheetIndex(PoiSheet.SheetName); } }
+
+        #endregion
+
+        #endregion
+
+        #region "methods"
+
+        #region "emulated public methods"
+
+        /// <summary>
+        /// シートの選択
+        /// </summary>
+        /// <param name="Replace"></param>
+        public void Select(object Replace = null)
         {
-            get
+            bool IsReplace = true;
+            if (Replace is bool BoolValue)
             {
-                return Parent.PoiBook.GetSheetIndex(PoiSheet.SheetName);
+                IsReplace = BoolValue;
             }
+            //Replace(default:true)ならば他シートのSelect解除。
+            if (IsReplace)
+            {
+                for (int s = 0; s < Parent.PoiBook.NumberOfSheets; s++)
+                {
+                    Parent.PoiBook.GetSheetAt(s).IsSelected = false;
+                }
+            }
+            //自シートをSelectedにする。
+            PoiSheet.IsSelected = true;
         }
 
         /// <summary>
@@ -222,19 +277,57 @@ namespace Developers.NpoiWrapper
             Parent.Windows[1].ActiveSheet = this;
             //Application上でActiveSheetにする
             this.Application.ActiveSheet = this;
-            //POI上でシートをActiveにする
-            Parent.PoiBook.SetActiveSheet(this.Index);
+            //自シートのみをSelectedにする。(これをやらないと過去にActiveにしたシートの幾つかが累積的にSelected状態になってしまう)
+            Select(true);
+            //自シートをActiveにする。
+            Parent.PoiBook.SetActiveSheet(this.PoiIndex);
         }
 
         /// <summary>
-        /// シートのコピー
+        /// シートのコピー(同一Workbook内のみサポート)
         /// </summary>
-        /// <param name="SheetName"></param>
+        /// <param name="Before">指定したシートの直前にコピー</param>
+        /// <param name="After">指定したシートの直後にコピー</param>
         /// <returns></returns>
-        public Worksheet Copy(string SheetName)
+        public void Copy(object Before = null, object After = null)
         {
-            ISheet Sheet = PoiSheet.CopySheet(SheetName);
-            return new Worksheet(Parent, Sheet);
+            int Type = 0;
+            ISheet Position = null;
+            //Beforeのチェック
+            if (Before is Worksheet SafeBefore)
+            {
+                Position = SafeBefore.PoiSheet;
+                Type += 1;
+            }
+            //Afterのチェック
+            if (After is Worksheet SafeAfter)
+            {
+                Position = SafeAfter.PoiSheet;
+                Type += 2;
+            }
+            //Before, Afterいずれか一方であること
+            if (Type == 1 || Type == 2)
+            {
+                //同一ブック内であること
+                if (Position.Workbook.Equals(Parent.PoiBook))
+                {
+                    //元シートの名前にサフィックスを付加した名前をもとに一意で安全な名前を取得し、その名前でコピー
+                    ISheet Sheet = PoiSheet.CopySheet(GetSafeUniqueSheetName(AddOrUpdateSuffix(PoiSheet.SheetName)));
+                    //指定された場所にインデックス変更
+                    int PositionIndex = Parent.PoiBook.GetSheetIndex(Position);
+                    Parent.PoiBook.SetSheetOrder(Sheet.SheetName, Type == 1 ? PositionIndex : PositionIndex + 1);
+                }
+                //別ブックならば例外スロー
+                else
+                {
+                    throw new ArgumentException("Copy to another Workbook is not supported in this vsersion.");
+                }
+            }
+            //Before, Afterの両方が指定されていれば例外スロー
+            else
+            {
+                throw new ArgumentException("Both of Before and After are specified."); 
+            }
         }
 
         /// <summary>
@@ -245,6 +338,41 @@ namespace Developers.NpoiWrapper
             int SheetIndex = Parent.PoiBook.GetSheetIndex(PoiSheet.SheetName);
             Parent.PoiBook.RemoveSheetAt(SheetIndex);
         }
+
+        /// <summary>
+        /// シートの保護
+        /// HSSFではこの操作によりオートフィルターが無効化される。
+        /// </summary>
+        /// <param name="Password">パスワード</param>
+        /// <param name="...">Password以外はすべて無視</param>
+        public void Protect(
+            object Password = null, object DrawingObjects = null, object Contents = null, object Scenarios = null,
+            object UserInterfaceOnly = null, object AllowFormattingCells = null, object AllowFormattingColumns = null,
+            object AllowFormattingRows = null, object AllowInsertingColumns = null, object AllowInsertingRows = null,
+            object AllowInsertingHyperlinks = null, object AllowDeletingColumns = null, object AllowDeletingRows = null,
+            object AllowSorting = null, object AllowFiltering = null, object AllowUsingPivotTables = null)
+        {
+            string Passwd = "";
+            if (Password is string SafePqassword)
+            {
+                Passwd = SafePqassword;
+            }
+            PoiSheet.ProtectSheet(Passwd);
+            //XSSFならロック解除できるのでやっておく
+            if (PoiSheet is XSSFSheet xssfSheet)
+            {
+                xssfSheet.LockAutoFilter(false);
+                xssfSheet.LockSort(false);
+            }
+            else
+            {
+                //為す術なし
+            }
+        }
+
+        #endregion
+
+        #region "alternative public methods"
 
         /// <summary>
         /// ページ設定
@@ -309,26 +437,6 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// シートの保護
-        /// HSSFではこの操作によりオートフィルターが無効化される。
-        /// </summary>
-        /// <param name="Password"></param>
-        public void Protect(string Password = "")
-        {
-            PoiSheet.ProtectSheet(Password);
-            //XSSFならロック解除できるのでやっておく
-            if (PoiSheet is XSSFSheet xssfSheet)
-            {
-                xssfSheet.LockAutoFilter(false);
-                xssfSheet.LockSort(false);
-            }
-            else
-            {
-                //為す術なし
-            }
-        }
-
-        /// <summary>
         /// 先頭行/先頭列の固定
         /// Interop.Excelでは以下のような指定方法であり、WindowというPOIでは少々捉えにくい概念を含んでいる。
         /// POIのIWorkbook.SetActiveSheetで実現できそうだが、POIではFreezePaneがSheetの機能なので、素直にWorksheetにした。
@@ -357,5 +465,80 @@ namespace Developers.NpoiWrapper
         {
             PoiSheet.SetAutoFilter(CellRangeAddress.ValueOf(FilterRange));
         }
+
+        #endregion
+
+        #region "private methods"
+
+        /// <summary>
+        /// 指定された文字列(シート名)にサフィックスを追加。(既にあれば更新。)
+        /// </summary>
+        /// <param name="OriginalName"></param>
+        /// <returns></returns>
+        private string AddOrUpdateSuffix(string OriginalName)
+        {
+            string RetVal;
+            Regex Reg1 = new Regex(@"\s\([0-9]{1,}\)$");
+            Match Match = Reg1.Match(OriginalName);
+            //末尾が" (9)"ならその番号をアップ
+            if (Match.Success)
+            {
+                RetVal = Reg1.Replace(OriginalName, "");
+                Regex Reg2 = new Regex(@"[0-9]{1,}");
+                Match Mach2 = Reg2.Match(Match.Value);
+                string SeqNoString = Mach2.Value;
+                int SeqNo = int.Parse(SeqNoString);
+                RetVal = RetVal + " (" + (SeqNo + 1).ToString() + ")";
+            }
+            //単に" (2)"を付加
+            else
+            {
+                RetVal = OriginalName + " (2)";
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// 指定された名前を安全かつブック内で重複のない唯一の名前にする。
+        /// </summary>
+        /// <param name="NameProposal">元とする名前</param>
+        /// <returns></returns>
+        private string GetSafeUniqueSheetName(string NameProposal)
+        {
+            //使えない文字をスペースに変換する
+            string RetVal = WorkbookUtil.CreateSafeSheetName(NameProposal);
+            //既存シート名のリストアップ
+            List<string> SheetNameList = new List<string>();
+            for (int s = 0; s < Parent.PoiBook.NumberOfSheets; s++)
+            {
+                SheetNameList.Add(Parent.PoiBook.GetSheetAt(s).SheetName);
+            }
+            //既存シートとの名前衝突がなくなるまでループ
+            bool Unique = false;
+            while (Unique == false)
+            {
+                int Duplication = 0;
+                foreach (string SheetName in SheetNameList)
+                {
+                    if (RetVal == SheetName)
+                    {
+                        //名前の更新
+                        RetVal = AddOrUpdateSuffix(RetVal);
+                        //重複カウント
+                        Duplication += 1;
+                    }
+                }
+                //重複がなければ脱出
+                if (Duplication == 0)
+                {
+                    Unique = true;
+                }
+            }
+            return RetVal;
+        }
+
+        #endregion
+
+        #endregion
     }
 }

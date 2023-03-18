@@ -14,8 +14,19 @@ namespace Developers.NpoiWrapper.Styles.Utils
     /// </summary>
     internal class CellStyleUpdateHistory
     {
+        #region "constats"
+
         public const short None = -1;
+
+        #endregion
+
+        #region "fields"
+
         private readonly List<Log> UpdateLogs = new List<Log>();
+
+        #endregion
+
+        #region "methods"
 
         /// <summary>
         /// 更新履歴の取り合わせ
@@ -66,6 +77,9 @@ namespace Developers.NpoiWrapper.Styles.Utils
             return RetVal;
         }
 
+        #endregion
+
+        #region "classes"
         /// <summary>
         /// CellStyle更新履歴クラス
         /// </summary>
@@ -81,5 +95,7 @@ namespace Developers.NpoiWrapper.Styles.Utils
                 this.AppliedIndex = AppliedIndex;
             }
         }
+
+        #endregion
     }
 }

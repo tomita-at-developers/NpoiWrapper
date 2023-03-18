@@ -317,14 +317,54 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class _Application
     {
+        #region "fields"
+
         /// <summary>
-        /// お決まりの３プロパティも最上位では少々事情が異なる。
-        /// 同名プロパティは持てないのでApplicationはapplicationに名前を変えている。
-        /// Parentには便宜的に自分をセットしている。
+        /// お決まりの３プロパティの元となる情報
         /// </summary>
         public readonly Application Application;
         public readonly XlCreator Creator = XlCreator.xlCreatorCode;
-        public readonly Application Parent; 
+        public readonly Application Parent;
+
+        /// <summary>
+        /// Excel標準の色インデックスを使用するかどうかを示すフラグ(現在未使用)
+        /// </summary>
+        internal readonly bool Use2003ColorIndex = false;
+
+        /// <summary>
+        /// Selectionプロパティの実体
+        /// </summary>
+        private readonly Dictionary<string, object> _selection = new Dictionary<string, object>();
+
+        #endregion
+
+        #region "constructors"
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public _Application(bool Use2003ColorIndex)
+        {
+            this.Application = (Application)this;
+            this.Parent = (Application)this;
+            this.Windows = new Windows(this);
+            this.Workbooks = new Workbooks((Application)this);
+            this.Use2003ColorIndex = Use2003ColorIndex;
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public _Application()
+            : this(false)
+        {
+        }
+
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
 
         public Windows Windows { get; }
         public Workbooks Workbooks { get; }
@@ -358,33 +398,6 @@ namespace Developers.NpoiWrapper
         public bool DisplayAlerts { get; internal set; } = false;
 
         /// <summary>
-        /// Selectionプロパティの実体
-        /// </summary>
-        private Dictionary<string, object> _selection = new Dictionary<string, object>();
-
-        internal bool Use2003ColorIndex { get; private set; } = false;
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public _Application(bool Use2003ColorIndex)
-        {
-            this.Application = (Application)this;
-            this.Parent = (Application)this;
-            this.Windows = new Windows(this);
-            this.Workbooks = new Workbooks((Application)this);
-            this.Use2003ColorIndex = Use2003ColorIndex;
-        }
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public _Application()
-            : this(false)
-        {
-        }
-
-        /// <summary>
         /// Selectionプロパティ(getterのみ)
         /// ActiveSheetにセットされたWorksheetオブジェクトからWorkbook.IndexとWorksheet.Nameを取り出し、、
         /// その２つをキーに格納されたオブジェクトを取り出す。
@@ -409,6 +422,14 @@ namespace Developers.NpoiWrapper
             }
         }
 
+        #endregion
+
+        #endregion
+
+        #region "methods"
+
+        #region "internal methods"
+
         /// <summary>
         /// Selectionセッター
         /// </summary>
@@ -428,5 +449,9 @@ namespace Developers.NpoiWrapper
                 throw new InvalidOperationException("This sheet is not active.");
             }
         }
+
+        #endregion
+
+        #endregion
     }
 }

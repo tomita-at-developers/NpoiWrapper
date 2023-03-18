@@ -45,21 +45,21 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Sheets : IEnumerable, IEnumerator
     {
-        [Flags]
-        public enum SheetType
-        {
-            None = 0,
-            Worksheet = 1,
-            ChartSheet = 2,
-            DialogSheet = 4
-        }
+        #region "fields"
 
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Workbook Parent { get; private set; }
+        /// <summary>
+        /// シートのタイプを示すフラグ
+        /// </summary>
+        protected SheetType SheetTypes;
 
-        protected SheetType SheetTypes { get; private set; }
-        protected int EnumSheetIndex { get; set; } = -1;
+        /// <summary>
+        /// IEnumerator用列インデクス
+        /// </summary>
+        protected int EnumSheetIndex = -1;
+
+        #endregion
+
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ(全種類のシート)
@@ -80,6 +80,38 @@ namespace Developers.NpoiWrapper
             Parent = ParentWorkbook;
             this.SheetTypes = SheetTypes;
         }
+
+        #endregion
+
+        #region "enums"
+
+        /// <summary>
+        /// 管理対象とするシートの種類を示すフラグ
+        /// </summary>
+        [Flags]
+        public enum SheetType
+        {
+            /// <summary>
+            /// なし
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// ワークシート
+            /// </summary>
+            Worksheet = 1,
+            /// <summary>
+            /// チャートシート(グラフシート)
+            /// </summary>
+            ChartSheet = 2,
+            /// <summary>
+            /// ダイアログシート
+            /// </summary>
+            DialogSheet = 4
+        }
+
+        #endregion
+
+        #region "interface implementations"
 
         /// <summary>
         /// GetEnumeratorの実装
@@ -125,33 +157,15 @@ namespace Developers.NpoiWrapper
             EnumSheetIndex = -1;
         }
 
-        /// <summary>
-        /// インデクサ(Index指定)
-        /// </summary>
-        /// <param name="Index">シートIndex(１開始)</param>
-        /// <returns></returns>
-        public virtual dynamic this[int Index]
-        {
-            get
-            {
-                //とりあえずWorksheetを返す
-                return new Worksheet(Parent, Parent.PoiBook.GetSheetAt(Index - 1));
-            }
-        }
+        #endregion
 
-        /// <summary>
-        /// インデクサ(名前指定)
-        /// </summary>
-        /// <param name="Index"></param>
-        /// <returns></returns>
-        public virtual dynamic this[string Name]
-        {
-            get
-            {
-                //とりあえずWorksheetを返す
-                return new Worksheet(Parent, Parent.PoiBook.GetSheet(Name));
-            }
-        }
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Workbook Parent { get; private set; }
 
         /// <summary>
         /// シート数の取得
@@ -164,6 +178,14 @@ namespace Developers.NpoiWrapper
             }
         }
 
+        #endregion
+
+        #endregion
+
+        #region "methods"
+
+        #region "emulated public methods"
+
         /// <summary>
         /// シートの追加
         /// ★常に末尾に追加される。追加位置の指定はできない。
@@ -173,6 +195,10 @@ namespace Developers.NpoiWrapper
         {
             return new Worksheet(Parent, Parent.PoiBook.CreateSheet());
         }
+
+        #endregion
+
+        #region "protected methods"
 
         /// <summary>
         /// このBookに含まれるSheetのIndexリストを取得する
@@ -216,5 +242,41 @@ namespace Developers.NpoiWrapper
             }
             return SheetIndex;
         }
+
+        #endregion
+
+        #endregion
+
+        #region "indexers"
+
+        /// <summary>
+        /// インデクサ(Index指定)
+        /// </summary>
+        /// <param name="Index">シートIndex(１開始)</param>
+        /// <returns></returns>
+        public virtual dynamic this[int Index]
+        {
+            get
+            {
+                //とりあえずWorksheetを返す
+                return new Worksheet(Parent, Parent.PoiBook.GetSheetAt(Index - 1));
+            }
+        }
+
+        /// <summary>
+        /// インデクサ(名前指定)
+        /// </summary>
+        /// <param name="Index"></param>
+        /// <returns></returns>
+        public virtual dynamic this[string Name]
+        {
+            get
+            {
+                //とりあえずWorksheetを返す
+                return new Worksheet(Parent, Parent.PoiBook.GetSheet(Name));
+            }
+        }
+
+        #endregion
     }
 }

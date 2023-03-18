@@ -12,6 +12,8 @@ namespace Developers.NpoiWrapper.Styles
     /// </summary>
     internal class RangeStyleManager : RangeStyle
     {
+        #region "fields"
+
         /// <summary>
         /// log4net
         /// </summary>
@@ -33,6 +35,10 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         private Interior _Interior = null;
 
+        #endregion
+
+        #region "constructors"
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -43,6 +49,10 @@ namespace Developers.NpoiWrapper.Styles
         {
             //何もしない
         }
+
+        #endregion
+
+        #region "properties"
 
         public Font Font
         {
@@ -222,5 +232,7 @@ namespace Developers.NpoiWrapper.Styles
         {
             return Borders.Around(LineStyle, Weight, ColorIndex, Color);
         }
+
+        #endregion
     }
 }

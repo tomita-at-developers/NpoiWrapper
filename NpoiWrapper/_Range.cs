@@ -204,57 +204,13 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class _Range : IEnumerable, IEnumerator
     {
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Worksheet Parent { get; }
+        #region "fields"
 
         /// <summary>
-        /// Countプロパティが示す値の種別(セル数、行数、列数)
+        /// log4net
         /// </summary>
-        internal enum CountType
-        {
-            Default,
-            Rows,
-            Columns
-        }
-
-        #region "private properties"
-
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
-
-        /// <summary>
-        /// Rangeアドレス(-1を含む)
-        /// </summary>
-        internal CellRangeAddressList RawAddressList { get; }
-        /// <summary>
-        /// Rangeアドレス(-1を含まないのでforで安全にアクセスできる)
-        /// </summary>
-        internal CellRangeAddressList SafeAddressList { get; }
-        /// <summary>
-        /// 相対アドレスの基点アドレス
-        /// </summary>
-        internal CellRangeAddress RelativeTo { get; }
-        /// <summary>
-        /// Countプロパティが示す値の種別(セル数、行数、列数)
-        /// </summary>
-        private CountType CountAs { get; } = CountType.Default;
-        /// <summary>
-        /// ICellStyleが持つスタイル情報の管理
-        /// </summary>
-        private RangeStyleManager _StyleManager = null;
-        /// <summary>
-        /// スタイル情報管理クラスインスタンスへのアクセサ
-        /// </summary>
-        private RangeStyleManager StyleManager
-        {
-            get 
-            {
-                //最初にアクセスされたときにインスタンス化する
-                if (_StyleManager == null) { _StyleManager = new RangeStyleManager((Range)this); }
-                return _StyleManager;
-            }
-        }
         /// <summary>
         /// IEnumerator用行インデクス
         /// </summary>
@@ -263,6 +219,10 @@ namespace Developers.NpoiWrapper
         /// IEnumerator用列インデクス
         /// </summary>
         private int EnumeratorColumnIndex = -1;
+        /// <summary>
+        /// ICellStyleが持つスタイル情報の管理
+        /// </summary>
+        private RangeStyleManager _StyleManager = null;
 
         #endregion
 
@@ -325,7 +285,30 @@ namespace Developers.NpoiWrapper
 
         #endregion
 
-        #region "IEnumrator implementation"
+        #region "enums"
+
+        /// <summary>
+        /// Countプロパティが示す値の種別(セル数、行数、列数)
+        /// </summary>
+        internal enum CountType
+        {
+            /// <summary>
+            /// Countはセル数を示す(標準)
+            /// </summary>
+            Default,
+            /// <summary>
+            /// Countは行数を示す
+            /// </summary>
+            Rows,
+            /// <summary>
+            /// Countは列数を示す
+            /// </summary>
+            Columns
+        }
+
+        #endregion
+
+        #region "interface implementations"
 
         /// <summary>
         /// GetEnumeratorの実装
@@ -392,108 +375,13 @@ namespace Developers.NpoiWrapper
 
         #endregion
 
+        #region "properties"
+
         #region "emulated public properties"
 
-        /// <summary>
-        /// インデクサー
-        /// </summary>
-        /// <param name="Cell1"></param>
-        /// <param name="Cell2"></param>
-        /// <returns></returns>
-        [IndexerName("_Default")]
-        public virtual Range this[object Cell1, object Cell2 = null]
-        {
-            get
-            {
-                //アドレス計算用リスト初期化
-                CellRangeAddressList AddressList = new CellRangeAddressList();
-                //Cells指定の場合
-                if (Cell1 is Range cell1)
-                {
-                    //Cell1が単一セルであること
-                    if (cell1.Count == 1)
-                    {
-                        AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(cell1.Address));
-                    }
-                    //上記以外は例外スロー
-                    else
-                    {
-                        throw new ArgumentException("Cell1 contains multiple cells.");
-                    }
-                    //Cell2の指定があること
-                    if (Cell2 != null && Cell2 is Range cell2)
-                    {
-                        //Cell2が単一セルであること
-                        if (cell2.Count == 1)
-                        {
-                            AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(cell2.Address));
-                        }
-                        //上記以外は例外スロー
-                        else
-                        {
-                            throw new ArgumentException("Cell2 contains multiple cells.");
-                        }
-                    }
-                    //Cell2の指定がなければ例外スロー
-                    else
-                    {
-                        throw new ArgumentException("In case type of Cell1 is Cells, Type of Cell2 must be Cells.");
-                    }
-                    //アドレスの統合
-                    AddressList = RangeUtil.CreateMergedAddressList(AddressList);
-                }
-                //Cell1がStringの場合(A1形式)
-                else if (Cell1 is string adr1)
-                {
-                    string[] AdrLst1 = adr1.Split(',');
-                    //複数アドレスの場合
-                    if (AdrLst1.Length > 1)
-                    {
-                        //Cell1の複数アドレスをそのまま使用
-                        foreach (string adr in AdrLst1)
-                        {
-                            AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr));
-                        }
-                        //Cell2があれば例外スロー
-                        if (Cell2 != null)
-                        {
-                            throw new ArgumentException("In case Cell1 has multiple cells, Cell2 must be null.");
-                        }
-                    }
-                    //単一アドレスの場合
-                    else
-                    {
-                        //Cell1(A1形式)からアドレス生成しアレイに追記
-                        AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr1));
-                        //Cell2がStringの場合(A1形式)
-                        if (Cell2 != null && Cell2 is string adr2)
-                        {
-                            string[] AdrLst2 = adr2.Split(',');
-                            //単一アドレスなら採用
-                            if (AdrLst2.Length == 1)
-                            {
-                                //Cell2(A1形式)からアドレス生成しアレイに追記
-                                AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr2));
-                            }
-                            //複数アドレスなら例外スロー
-                            else
-                            {
-                                throw new ArgumentException("Cell2 contains multiple cells.");
-                            }
-                        }
-                        //アドレスの統合
-                        AddressList = RangeUtil.CreateMergedAddressList(AddressList);
-                    }
-                }
-                //Cellsでもstringでもなければ例外スロー
-                else
-                {
-                    throw new ArgumentException("Type of Cell1 must be Cells or string.");
-                }
-                //Rangeクラスインスタンス生成
-                return new Range(Parent, AddressList, RelativeTo);
-            }
-        }
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Worksheet Parent { get; }
 
         /// <summary>
         /// Count
@@ -924,7 +812,6 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Rangeの行高さ合計(単位はPoint)
         /// </summary>
-        
         public object Height
         {
             //Rangeに含まれる行の高さ合計値
@@ -951,10 +838,10 @@ namespace Developers.NpoiWrapper
                 return RetVal;
             }
         }
+
         /// <summary>
         /// Range各行の高さ(単位はPoint)
         /// </summary>
-        
         public object RowHeight
         {
             get
@@ -1008,10 +895,10 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
         /// <summary>
         /// Rangeの列幅合計(単位は文字幅の1/20を1とする値であり、Pointではない)
         /// </summary>
-        
         public object Width
         {
             //Rangeに含まれる列の幅合計値
@@ -1028,10 +915,10 @@ namespace Developers.NpoiWrapper
                 return RetVal;
             }
         }
+
         /// <summary>
         /// Range各列の幅(単位は文字幅の1/20を1とする値であり、Pointではない)
         /// </summary>
-        
         public object ColumnWidth
         {
             get
@@ -1072,6 +959,7 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
         /// <summary>
         /// 罫線情報
         /// </summary>
@@ -1142,6 +1030,153 @@ namespace Developers.NpoiWrapper
         }
 
         #endregion
+
+        #region "internal properties"
+
+        /// <summary>
+        /// Rangeアドレス(-1を含む)
+        /// </summary>
+        internal CellRangeAddressList RawAddressList { get; }
+        /// <summary>
+        /// Rangeアドレス(-1を含まないのでforで安全にアクセスできる)
+        /// </summary>
+        internal CellRangeAddressList SafeAddressList { get; }
+        /// <summary>
+        /// 相対アドレスの基点アドレス
+        /// </summary>
+        internal CellRangeAddress RelativeTo { get; }
+
+        #endregion
+
+        #region "private properties"
+
+        /// <summary>
+        /// Countプロパティが示す値の種別(セル数、行数、列数)
+        /// </summary>
+        private CountType CountAs { get; } = CountType.Default;
+        /// <summary>
+        /// スタイル情報管理クラスインスタンスへのアクセサ
+        /// </summary>
+        private RangeStyleManager StyleManager
+        {
+            get
+            {
+                //最初にアクセスされたときにインスタンス化する
+                if (_StyleManager == null) { _StyleManager = new RangeStyleManager((Range)this); }
+                return _StyleManager;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region "indexers"
+
+        /// <summary>
+        /// インデクサー
+        /// </summary>
+        /// <param name="Cell1"></param>
+        /// <param name="Cell2"></param>
+        /// <returns></returns>
+        [IndexerName("_Default")]
+        public virtual Range this[object Cell1, object Cell2 = null]
+        {
+            get
+            {
+                //アドレス計算用リスト初期化
+                CellRangeAddressList AddressList = new CellRangeAddressList();
+                //Cells指定の場合
+                if (Cell1 is Range cell1)
+                {
+                    //Cell1が単一セルであること
+                    if (cell1.Count == 1)
+                    {
+                        AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(cell1.Address));
+                    }
+                    //上記以外は例外スロー
+                    else
+                    {
+                        throw new ArgumentException("Cell1 contains multiple cells.");
+                    }
+                    //Cell2の指定があること
+                    if (Cell2 != null && Cell2 is Range cell2)
+                    {
+                        //Cell2が単一セルであること
+                        if (cell2.Count == 1)
+                        {
+                            AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(cell2.Address));
+                        }
+                        //上記以外は例外スロー
+                        else
+                        {
+                            throw new ArgumentException("Cell2 contains multiple cells.");
+                        }
+                    }
+                    //Cell2の指定がなければ例外スロー
+                    else
+                    {
+                        throw new ArgumentException("In case type of Cell1 is Cells, Type of Cell2 must be Cells.");
+                    }
+                    //アドレスの統合
+                    AddressList = RangeUtil.CreateMergedAddressList(AddressList);
+                }
+                //Cell1がStringの場合(A1形式)
+                else if (Cell1 is string adr1)
+                {
+                    string[] AdrLst1 = adr1.Split(',');
+                    //複数アドレスの場合
+                    if (AdrLst1.Length > 1)
+                    {
+                        //Cell1の複数アドレスをそのまま使用
+                        foreach (string adr in AdrLst1)
+                        {
+                            AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr));
+                        }
+                        //Cell2があれば例外スロー
+                        if (Cell2 != null)
+                        {
+                            throw new ArgumentException("In case Cell1 has multiple cells, Cell2 must be null.");
+                        }
+                    }
+                    //単一アドレスの場合
+                    else
+                    {
+                        //Cell1(A1形式)からアドレス生成しアレイに追記
+                        AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr1));
+                        //Cell2がStringの場合(A1形式)
+                        if (Cell2 != null && Cell2 is string adr2)
+                        {
+                            string[] AdrLst2 = adr2.Split(',');
+                            //単一アドレスなら採用
+                            if (AdrLst2.Length == 1)
+                            {
+                                //Cell2(A1形式)からアドレス生成しアレイに追記
+                                AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr2));
+                            }
+                            //複数アドレスなら例外スロー
+                            else
+                            {
+                                throw new ArgumentException("Cell2 contains multiple cells.");
+                            }
+                        }
+                        //アドレスの統合
+                        AddressList = RangeUtil.CreateMergedAddressList(AddressList);
+                    }
+                }
+                //Cellsでもstringでもなければ例外スロー
+                else
+                {
+                    throw new ArgumentException("Type of Cell1 must be Cells or string.");
+                }
+                //Rangeクラスインスタンス生成
+                return new Range(Parent, AddressList, RelativeTo);
+            }
+        }
+
+        #endregion
+
+        #region "methods"
 
         #region "emulated public methods"
 
@@ -1367,5 +1402,6 @@ namespace Developers.NpoiWrapper
 
         #endregion
 
+        #endregion
     }
 }

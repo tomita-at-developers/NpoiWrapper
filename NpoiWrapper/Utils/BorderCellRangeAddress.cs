@@ -24,15 +24,16 @@ namespace Developers.NpoiWrapper.Utils
     /// </summary>
     internal class BorderCellRangeAddress : CellRangeAddress
     {
+        #region "constants"
+
         //Range分割配列Index
         public const int FirstRangeIndex = 0;
         public const int InternalRangeIndex = 1;
         public const int LastRangeIndex = 2;
 
-        /// <summary>
-        /// バージョン情報。シートの最大行数/列数の判断に利用。
-        /// </summary>
-        private SpreadsheetVersion SheetVersion { get; }
+        #endregion
+
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -63,6 +64,10 @@ namespace Developers.NpoiWrapper.Utils
                   CellRangeAddress.FirstColumn, CellRangeAddress.LastColumn, Version)
         {
         }
+
+        #endregion
+
+        #region "properties"
 
         /// <summary>
         /// Rangeに含まれる行の数
@@ -128,6 +133,15 @@ namespace Developers.NpoiWrapper.Utils
         /// <param name="ColumnIndex">列Index</param>
         /// <returns></returns>
         public bool HasNextColumn(int ColumnIndex) { return (ColumnIndex < base.LastColumn); }
+
+        /// <summary>
+        /// バージョン情報。シートの最大行数/列数の判断に利用。
+        /// </summary>
+        private SpreadsheetVersion SheetVersion { get; }
+
+        #endregion
+
+        #region "methods"
 
         /// <summary>
         /// 指定されたBorderIndexに対応するCellRangeAddressの取得
@@ -325,5 +339,7 @@ namespace Developers.NpoiWrapper.Utils
             }
             return RetVal;
         }
+
+        #endregion
     }
 }

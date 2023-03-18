@@ -41,31 +41,24 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Borders : IEnumerable, IEnumerator
     {
+        #region "fields"
+
         /// <summary>
         /// log4net
         /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Range Parent { get; }
-
         /// <summary>
         /// Borderリスト
         /// </summary>
-        public Dictionary<XlBordersIndex, Border> Item { get; } = new Dictionary<XlBordersIndex, Border>();
+        private readonly Dictionary<XlBordersIndex, Border> _Item = new Dictionary<XlBordersIndex, Border>();
 
-        /// <summary>
-        /// 全てのXlBordersIndexを支配するBorderインスタンス
-        /// </summary>
-        private Border EntireRangeBorder { get; }
-        
         /// <summary>
         /// BorderIndexリスト
         /// foreachで取得する場合は斜線２種類を除く下記６種類
         /// </summary>
-        private List<XlBordersIndex> BoerderIndexList { get; } = new List<XlBordersIndex>()
+        private readonly List<XlBordersIndex> BoerderIndexList = new List<XlBordersIndex>()
         {
             XlBordersIndex.xlEdgeTop, XlBordersIndex.xlEdgeBottom,
             XlBordersIndex.xlEdgeLeft, XlBordersIndex.xlEdgeRight,
@@ -73,9 +66,18 @@ namespace Developers.NpoiWrapper
         };
 
         /// <summary>
+        /// 全てのXlBordersIndexを支配するBorderインスタンス
+        /// </summary>
+        private readonly Border EntireRangeBorder;
+
+        /// <summary>
         /// Enumerator用インデクス
         /// </summary>
         private int EnumeratorIndex = -1;
+
+        #endregion
+
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -88,11 +90,15 @@ namespace Developers.NpoiWrapper
             //XlBordersIndexで定義される全８種類のメンバーをすべて生成
             foreach (XlBordersIndex Index in Enum.GetValues(typeof(XlBordersIndex)))
             {
-                Item.Add(Index, new Border(this.Parent, Index));
+                _Item.Add(Index, new Border(this.Parent, Index));
             }
             //EntireRangeBorderのインスタンス生成(BordersIndexはnull)
             EntireRangeBorder = new Border(this.Parent, null);
         }
+
+        #endregion
+
+        #region "interface implementations"
 
         /// <summary>
         /// GetEnumeratorの実装
@@ -125,7 +131,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 //EnumBorderIndexでBoerderIndexListからDictionaryのキーを取り出してそのキーで､､､
-                return Item[BoerderIndexList[EnumeratorIndex]];
+                return _Item[BoerderIndexList[EnumeratorIndex]];
             }
         }
         /// <summary>
@@ -136,6 +142,22 @@ namespace Developers.NpoiWrapper
             EnumeratorIndex = -1;
         }
 
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; }
+
+        /// <summary>
+        /// C#では引数を指定するプロパティが実現できなかった。
+        /// なのでItemは実装しない。Indexer経由での取得のみサポート。
+        /// </summary>
+        //public Border Item { get; }
+
         /// <summary>
         /// Borders.Countプロパティ
         /// </summary>
@@ -145,18 +167,6 @@ namespace Developers.NpoiWrapper
             {
                 //Interop.Excelでは、どうやら常に6になる模様。
                 return BoerderIndexList.Count;
-            }
-        }
-
-        /// <summary>
-        /// Bordersインデクサ
-        /// </summary>
-        [IndexerName("_Default")]
-        public Border this[XlBordersIndex Index]
-        {
-            get
-            {
-                return Item[Index];
             }
         }
 
@@ -248,6 +258,14 @@ namespace Developers.NpoiWrapper
             }
         }
 
+        #endregion
+
+        #endregion
+
+        #region "methods"
+
+        #region "internal methods"
+
         /// <summary>
         /// 囲み線の設定
         /// </summary>
@@ -267,10 +285,10 @@ namespace Developers.NpoiWrapper
                 //LineStyle指定があれば適用
                 if (LineStyle is XlLineStyle SafeLineStyle)
                 {
-                    this.Item[Index].LineStyle = SafeLineStyle;
+                    this._Item[Index].LineStyle = SafeLineStyle;
                 }
                 //Weightを適用
-                this.Item[Index].Weight = Weight;
+                this._Item[Index].Weight = Weight;
                 //色指定判断
                 short? IndexedColor;
                 //自動指定
@@ -291,7 +309,7 @@ namespace Developers.NpoiWrapper
                 //ColorIndexに有効な指定があれば適用
                 if (IndexedColor != null)
                 {
-                    this.Item[Index].ColorIndex = IndexedColor;
+                    this._Item[Index].ColorIndex = IndexedColor;
                 }
                 //Color設定がある場合
                 if (Color != null)
@@ -302,5 +320,26 @@ namespace Developers.NpoiWrapper
             //常にtrueでリターン
             return true;
         }
+
+        #endregion
+
+        #endregion
+
+        #region "indexers"
+
+        /// <summary>
+        /// Bordersインデクサ
+        /// </summary>
+        [IndexerName("_Default")]
+        public Border this[XlBordersIndex Index]
+        {
+            get
+            {
+                return this._Item[Index];
+            }
+        }
+
+        #endregion
+
     }
 }

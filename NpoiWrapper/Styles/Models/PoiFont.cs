@@ -6,162 +6,40 @@ using System.Reflection;
 
 namespace Developers.NpoiWrapper.Styles.Models
 {
+    //----------------------------------------------------------------------------------------------
+    // IFont interface  is shown below...
+    //----------------------------------------------------------------------------------------------
+    //public interface IFont
+    //{
+    //    string FontName { get; set; }
+    //    double FontHeight { get; set; }
+    //    double FontHeightInPoints { get; set; }
+    //    bool IsItalic { get; set; }
+    //    bool IsStrikeout { get; set; }
+    //    short Color { get; set; }
+    //    FontSuperScript TypeOffset { get; set; }
+    //    FontUnderlineType Underline { get; set; }
+    //    short Charset { get; set; }
+    //    short Index { get; }
+    //    [Obsolete("deprecated POI 3.15 beta 2. Use IsBold instead.")]
+    //    short Boldweight { get; set; }
+    //    bool IsBold { get; set; }
+    //    void CloneStyleFrom(IFont src);
+    //}
+
     internal class PoiFont : IFont
     {
-        // IFont interface  is shown below...
-        //public interface IFont
-        //{
-        //    string FontName { get; set; }
-        //    double FontHeight { get; set; }
-        //    double FontHeightInPoints { get; set; }
-        //    bool IsItalic { get; set; }
-        //    bool IsStrikeout { get; set; }
-        //    short Color { get; set; }
-        //    FontSuperScript TypeOffset { get; set; }
-        //    FontUnderlineType Underline { get; set; }
-        //    short Charset { get; set; }
-        //    short Index { get; }
-        //    [Obsolete("deprecated POI 3.15 beta 2. Use IsBold instead.")]
-        //    short Boldweight { get; set; }
-        //    bool IsBold { get; set; }
-        //    void CloneStyleFrom(IFont src);
-        //}
+        #region "fields"
 
+        /// <summary>
+        /// log4net
+        /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-        /// <summary>
-        /// フォント
-        /// ApplyStyleFrom、Commitでセット
-        /// </summary>
-        public IFont Font { get; private set; }
-        public short InitialIndex { get; private set; } = -1;
+        #endregion
 
-        private bool Updated { get; set; } = false;
-
-        [Import(true), Comparison(false), Export(false)]    public short Index { get; private set; }    //set追加
-
-        private String _FontName = string.Empty;
-        [Import(true), Comparison(true), Export(true)]      public String FontName
-        {
-            get { return _FontName;  }
-            set
-            {
-                _FontName = value;
-                Updated = true;
-            } 
-        }
-        private double _FontHeight;
-        [Import(false), Comparison(false), Export(false)]      public double FontHeight
-        {
-            get { return _FontHeight; }
-            set
-            {
-                _FontHeight = value;
-                Updated = true;
-            }
-        }
-        private double _FontHeightInPoints;
-        [Import(true), Comparison(true), Export(true)]      public double FontHeightInPoints
-        {
-            get { return _FontHeightInPoints; }
-            set 
-            {
-                _FontHeightInPoints = value;
-                Updated = true;
-            }
-        }
-        private bool _IsItalic;
-        [Import(true), Comparison(true), Export(true)]      public bool IsItalic
-        {
-            get { return _IsItalic; }
-            set
-            {
-                _IsItalic = value;
-                Updated = true;
-            }
-        }
-        private bool _IsStrikeout;
-        [Import(true), Comparison(true), Export(true)]      public bool IsStrikeout
-        {
-            get { return _IsStrikeout; }
-            set
-            {
-                _IsStrikeout = value;
-                Updated = true;
-            }
-        }
-        private short _Color;
-        [Import(true), Comparison(true), Export(true)]      public short Color
-        {
-            get { return _Color; }
-            set
-            {
-                _Color = value;
-                Updated = true;
-            }
-        }
-        private FontSuperScript _TypeOffset;
-        [Import(true), Comparison(true), Export(true)]      public FontSuperScript TypeOffset
-        {
-            get { return _TypeOffset; }
-            set
-            {
-                _TypeOffset = value;
-                Updated = true;
-            }
-        }
-        private FontUnderlineType _Underline;
-        [Import(true), Comparison(true), Export(true)]      public FontUnderlineType Underline
-        {
-            get { return _Underline; }
-            set
-            {
-                _Underline = value;
-                Updated = true;
-            }
-        }
-        private short _Charset;
-        [Import(true), Comparison(true), Export(true)]      public short Charset
-        {
-            get { return _Charset; }
-            set
-            {
-                _Charset = value;
-                Updated = true;
-            }
-        }
-        //deprecated POI 3.15 beta 2. Use IsBold instead.
-        private short _Boldweight;
-        [Import(true), Comparison(true), Export(true)]      public short Boldweight
-        {
-            get { return _Boldweight; }
-            set
-            {
-                _Boldweight = value;
-                Updated = true;
-            }
-        }
-        private bool _IsBold;
-        [Import(true), Comparison(true), Export(true)]      public bool IsBold
-        {
-            get { return _IsBold; }
-            set
-            {
-                _IsBold = value;
-                Updated = true;
-            }
-        }
-
-        public void CloneStyleFrom(IFont src)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Workbook
-        /// </summary>
-        private IWorkbook PoiBook { get; set; }
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -174,6 +52,168 @@ namespace Developers.NpoiWrapper.Styles.Models
             //指定されたフォントをインポート
             ApplyStyleFrom(this.PoiBook.GetFontAt(FontIndex));
         }
+
+        #endregion
+
+        #region "interface implementations"
+
+        #region "underlying fields"
+
+        private String _FontName = string.Empty;
+        private double _FontHeight;
+        private double _FontHeightInPoints;
+        private bool _IsItalic;
+        private bool _IsStrikeout;
+        private short _Color;
+        private FontSuperScript _TypeOffset;
+        private FontUnderlineType _Underline;
+        private short _Charset;
+        private short _Boldweight;
+        private bool _IsBold;
+
+        #endregion
+
+        #region "mandatory properties"
+
+        [Import(true), Comparison(false), Export(false)]    public short Index { get; private set; }    //set追加
+
+        [Import(true), Comparison(true), Export(true)]      public String FontName
+        {
+            get { return _FontName;  }
+            set
+            {
+                _FontName = value;
+                Updated = true;
+            } 
+        }
+        [Import(false), Comparison(false), Export(false)]      public double FontHeight
+        {
+            get { return _FontHeight; }
+            set
+            {
+                _FontHeight = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public double FontHeightInPoints
+        {
+            get { return _FontHeightInPoints; }
+            set 
+            {
+                _FontHeightInPoints = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public bool IsItalic
+        {
+            get { return _IsItalic; }
+            set
+            {
+                _IsItalic = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public bool IsStrikeout
+        {
+            get { return _IsStrikeout; }
+            set
+            {
+                _IsStrikeout = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public short Color
+        {
+            get { return _Color; }
+            set
+            {
+                _Color = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public FontSuperScript TypeOffset
+        {
+            get { return _TypeOffset; }
+            set
+            {
+                _TypeOffset = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public FontUnderlineType Underline
+        {
+            get { return _Underline; }
+            set
+            {
+                _Underline = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public short Charset
+        {
+            get { return _Charset; }
+            set
+            {
+                _Charset = value;
+                Updated = true;
+            }
+        }
+        //deprecated POI 3.15 beta 2. Use IsBold instead.
+        [Import(true), Comparison(true), Export(true)]      public short Boldweight
+        {
+            get { return _Boldweight; }
+            set
+            {
+                _Boldweight = value;
+                Updated = true;
+            }
+        }
+        [Import(true), Comparison(true), Export(true)]      public bool IsBold
+        {
+            get { return _IsBold; }
+            set
+            {
+                _IsBold = value;
+                Updated = true;
+            }
+        }
+
+        #endregion
+
+        #region "mandatory methods"
+
+        public void CloneStyleFrom(IFont src)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region "properties
+
+        /// <summary>
+        /// フォント
+        /// ApplyStyleFrom、Commitでセット
+        /// </summary>
+        public IFont Font { get; private set; }
+        /// <summary>
+        /// 初期Index
+        /// </summary>
+        private short InitialIndex { get; set; } = -1;
+        /// <summary>
+        /// 変更の有無
+        /// </summary>
+        private bool Updated { get; set; } = false;
+        /// <summary>
+        /// Workbook
+        /// </summary>
+        private IWorkbook PoiBook { get; }
+
+        #endregion
+
+        #region "methods"
 
         /// <summary>
         /// 指定されたフォント定義を自プロパティにインポート
@@ -308,5 +348,7 @@ namespace Developers.NpoiWrapper.Styles.Models
                 }
             }
         }
+
+        #endregion
     }
 }

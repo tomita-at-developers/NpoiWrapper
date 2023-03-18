@@ -31,15 +31,48 @@ namespace Developers.NpoiWrapper
     //}
     public class Windows
     {
+        #region "fields"
+
+        /// <summary>
+        /// Windowコレクション
+        /// </summary>
+        private readonly Dictionary<int, Window> _Item = new Dictionary<int, Window>();
+
+        /// <summary>
+        /// Windowコレクション用Index
+        /// </summary>
+        private int _ItemIndex = 0;
+
+        #endregion
+
+        #region "constructors"
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="ParentObject">親オブジェクト(ApplicationまたはWorkbook</param>
+        internal Windows(object ParentObject)
+        {
+            this.Parent = ParentObject;
+        }
+
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
         public Application Application
         {
             get
             {
                 Application RetVal = null;
+                //親がApplicationクラスの場合は親自身をセット
                 if (this.Parent is Application app)
                 {
                     RetVal = app;
                 }
+                //親がWorkbookの場合はWorkbookが持つApplicationをセット
                 else if (this.Parent is Workbook wb)
                 {
                     RetVal = wb.Application;
@@ -50,43 +83,27 @@ namespace Developers.NpoiWrapper
         public XlCreator Creator { get { return Application.Creator; } }
         public object Parent { get; }   //Applicationの場合とWorkbookの場合とがある。
 
-        private Dictionary<int, Window> _Item = new Dictionary<int, Window>();
-        private int ItemIndex { get; set; } = 0;
+        /// <summary>
+        /// C#では引数を指定するプロパティが実現できなかった。
+        /// なのでItemは実装しない。Indexer経由での取得のみサポート。
+        /// </summary>
+        // public Window Item { get; }
 
-        internal Windows(object ParentBook)
-        {
-            this.Parent = ParentBook;
-        }
-
+        /// <summary>
+        /// Windowの数
+        /// </summary>
         public int Count
         {
             get { return _Item.Count; }
         }
 
-        [IndexerName("_Default")]
-        public Window this[object Index]
-        {
-            get
-            {
-                Window RetVal = null;
-                //intの場合
-                if (Index is int IntegerIndex)
-                {
-                    RetVal = _Item[IntegerIndex];
-                }
-                //stringの場合
-                else if (Index is string StringIndex)
-                {
-                    //指定された文字列のCaptionを持つレコードの検索
-                    Dictionary<int, Window> Select = _Item.Where(w => w.Value.Caption == StringIndex).ToDictionary(w => w.Key, w => w.Value);
-                    if (Select.Count == 1)
-                    {
-                        RetVal = Select[0];
-                    }
-                }
-                return RetVal;
-            }
-        }
+        #endregion
+
+        #endregion
+
+        #region "methods"
+
+        #region "internal methods"
 
         /// <summary>
         /// Windowの追加
@@ -155,15 +172,49 @@ namespace Developers.NpoiWrapper
         /// <returns></returns>
         internal int GetNextItemIndex()
         {
-            this.ItemIndex += 1;
-            return this.ItemIndex;
+            this._ItemIndex += 1;
+            return this._ItemIndex;
         }
         /// <summary>
         /// ItemIndex：リセット
         /// </summary>
         internal void ResetItemIndex()
         {
-            this.ItemIndex = 0;
+            this._ItemIndex = 0;
         }
+
+        #endregion
+
+        #endregion
+
+        #region "indexers"
+
+        [IndexerName("_Default")]
+        public Window this[object Index]
+        {
+            get
+            {
+                Window RetVal = null;
+                //intの場合
+                if (Index is int IntegerIndex)
+                {
+                    RetVal = _Item[IntegerIndex];
+                }
+                //stringの場合
+                else if (Index is string StringIndex)
+                {
+                    //指定された文字列のCaptionを持つレコードの検索
+                    Dictionary<int, Window> Select = _Item.Where(w => w.Value.Caption == StringIndex).ToDictionary(w => w.Key, w => w.Value);
+                    if (Select.Count == 1)
+                    {
+                        RetVal = Select[0];
+                    }
+                }
+                return RetVal;
+            }
+        }
+
+        #endregion
+
     }
 }

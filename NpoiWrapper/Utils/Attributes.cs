@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace Developers.NpoiWrapper.Utils
 {
+    /// <summary>
+    /// カスタムプロパティ：Import
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     internal class ImportAttribute : Attribute
     {
@@ -16,6 +19,9 @@ namespace Developers.NpoiWrapper.Utils
         }
     }
 
+    /// <summary>
+    /// カスタムプロパティ：Compare
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     internal class ComparisonAttribute : Attribute
     {
@@ -27,6 +33,9 @@ namespace Developers.NpoiWrapper.Utils
         }
     }
 
+    /// <summary>
+    /// カスタムプロパティ：Export
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     internal class ExportAttribute : Attribute
     {

@@ -42,9 +42,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Font
     {
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Range Parent { get; }
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -56,6 +54,19 @@ namespace Developers.NpoiWrapper
             this.Parent = ParentRange;
         }
 
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public porperties"
+
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; }
+
+        /// <summary>
+        /// 太字指定
+        /// </summary>
         public object Bold
         {
             get
@@ -81,7 +92,9 @@ namespace Developers.NpoiWrapper
             }
         }
 
-        //object ColorIndex { get; set; }
+        /// <summary>
+        /// 文字色 
+        /// </summary>
         public object ColorIndex
         {
             get
@@ -106,6 +119,10 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        /// <summary>
+        /// 斜字体
+        /// </summary>
         public object Italic
         {
             get
@@ -131,6 +148,10 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        /// <summary>
+        /// フォント名
+        /// </summary>
         public object Name
         {
             get
@@ -155,6 +176,10 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+        
+        /// <summary>
+        /// フォントサイズ
+        /// </summary>
         public object Size
         {
             get
@@ -185,6 +210,10 @@ namespace Developers.NpoiWrapper
                 StyleManger.UpdateProperties(Params);
             }
         }
+
+        /// <summary>
+        /// 取消線
+        /// </summary>
         public object Strikethrough
         {
             get
@@ -209,6 +238,10 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        /// <summary>
+        /// 下付文字
+        /// </summary>
         public object Subscript
         { 
             get
@@ -278,6 +311,10 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+ 
+        /// <summary>
+        /// 上付文字
+        /// </summary>
         public object Superscript
         {
             get
@@ -347,6 +384,10 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        /// <summary>
+        /// 下線の種類
+        /// </summary>
         public object Underline
         {
             get
@@ -371,5 +412,9 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        #endregion
+
+        #endregion
     }
 }

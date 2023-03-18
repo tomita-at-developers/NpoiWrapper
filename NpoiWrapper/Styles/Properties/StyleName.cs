@@ -3,6 +3,9 @@ using Developers.NpoiWrapper.Utils;
 
 namespace Developers.NpoiWrapper.Styles.Properties
 {
+    /// <summary>
+    /// PoiCellStyle更新対象プロパティ名
+    /// </summary>
     internal static class StyleName
     {
         public static readonly string HorizontaiAlignment = NameOf<PoiCellStyle>.FullName(n => n.Alignment);
@@ -16,6 +19,9 @@ namespace Developers.NpoiWrapper.Styles.Properties
             public static readonly string Pattern = NameOf<PoiCellStyle>.FullName(n => n.FillPattern);
             public static readonly string PatternColorIndex = NameOf<PoiCellStyle>.FullName(n => n.FillForegroundColor);
         }
+        /// <summary>
+        /// 罫線関連はPoiCellStyleプロパティ名ではなく、Excel風の仮想プロパティ名を定義している
+        /// </summary>
         public static class XlsBorder
         {
             public static readonly string LineStyle = NameOf<Border>.FullName(nameof(Border), n => n.LineStyle);

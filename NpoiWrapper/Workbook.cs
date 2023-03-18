@@ -228,31 +228,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Workbook
     {
-        public Application Application { get { return this.Parent; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Application Parent { get; }
-        public Windows Windows { get; }
-
-        internal IWorkbook PoiBook {get; private set; }
-        public string Name { get; private set; } = string.Empty;
-        internal Dictionary<string, ICellStyle> CellStyles { get; private set; } = new Dictionary<string, ICellStyle>();
-        internal Dictionary<string, Configurations.Models.PageSetup> PageSetups { get; private set; } = new Dictionary<string, Configurations.Models.PageSetup>();
-        internal IFont Font { get; private set; } = null;
-        public Sheets Worksheets { get; private set; }
-        public Sheets Sheets { get; private set; }
-        public Worksheet ActiveSheet { get { return new Worksheet(this, PoiBook.GetSheetAt(PoiBook.ActiveSheetIndex)); } }
-
-        internal int Index { get; private set; }
-
-        /// <summary>
-        /// 新規ファイルを作成する
-        /// <param name="ParentApplication">親Application</param>
-        /// <param name="ParentApplication">親Application</param>
-        /// </summary>
-        //internal Workbook(Application ParentApplication)
-        //    : this(ParentApplication, false)
-        //{
-        //}
+        #region "constructors"
 
         /// <summary>
         /// 新規ファイルを作成する
@@ -320,6 +296,76 @@ namespace Developers.NpoiWrapper
             this.Application.Windows.SetActiveWindow(this.Windows[1]);
         }
 
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return this.Parent; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Application Parent { get; }
+
+        /// <summary>
+        /// このBookが持つWindowのコレクション
+        /// 本実装ではSDI前提で１つのWorkbookは１つのWindowしか持たない。なので常に要素数は１。
+        /// </summary>
+        public Windows Windows { get; }
+
+        /// <summary>
+        /// Worksheetsクラス
+        /// </summary>
+        public Sheets Worksheets { get; }
+
+        /// <summary>
+        /// Sheetクラス 
+        /// </summary>
+        public Sheets Sheets { get; }
+
+        /// <summary>
+        /// アクティブシートの取得
+        /// </summary>
+        public Worksheet ActiveSheet { get { return new Worksheet(this, PoiBook.GetSheetAt(PoiBook.ActiveSheetIndex)); } }
+
+        /// <summary>
+        /// ブック名
+        /// </summary>
+        public string Name { get; private set; } = string.Empty;
+
+        #endregion
+
+        #region "internal properties
+
+        /// <summary>
+        /// このブックのIndex。Workbooksから指定される。
+        /// WorkbookはApplicationに一つしか生成しないので、このIndexはこのApplicationインスタンスで一意である。
+        /// </summary>
+        internal int Index { get; }
+
+        /// <summary>
+        /// このWorkbookのIWorkbook
+        /// </summary>
+        internal IWorkbook PoiBook { get; }
+
+        /// <summary>
+        /// 設定ファイルから読み取ったCellStyle定義
+        /// Range.SetStyleが参照。
+        /// </summary>
+        internal Dictionary<string, ICellStyle> CellStyles { get; } = new Dictionary<string, ICellStyle>();
+        /// <summary>
+        /// 設定ファイルから読み取った印刷ページ設定
+        /// Worksheet.PageSetupが参照。
+        /// </summary>
+        internal Dictionary<string, Configurations.Models.PageSetup> PageSetups { get; } = new Dictionary<string, Configurations.Models.PageSetup>();
+
+        #endregion
+
+        #endregion
+
+        #region "methods"
+
+        #region "emulated public methods"
+
         /// <summary>
         /// BookをActiveBookに設定する。
         /// </summary>
@@ -378,10 +424,14 @@ namespace Developers.NpoiWrapper
         /// <param name="SaveChanges"></param>
         /// <param name="Filename"></param>
         /// <param name="RouteWorkbook"></param>
-        void Close([Optional] object SaveChanges, [Optional] object Filename, [Optional] object RouteWorkbook)
+        public void Close([Optional] object SaveChanges, [Optional] object Filename, [Optional] object RouteWorkbook)
         {
             PoiBook.Close();
         }
+
+        #endregion
+
+        #region "private methods"
 
         /// <summary>
         /// 設定ファイル(NpoiWrapper.config)の設定を反映
@@ -391,6 +441,7 @@ namespace Developers.NpoiWrapper
             //設定ファイル(NpoiWrapper.config)の読込
             Configurations.ConfigurationManager CfgManager = new Configurations.ConfigurationManager();
             //フォントの生成
+            IFont Font = null;
             if (CfgManager.Configs.Font != null)
             {
                 Font = PoiBook.CreateFont();
@@ -427,5 +478,9 @@ namespace Developers.NpoiWrapper
                 CellStyles.Add(cs.Name, pcs);
             }
         }
+
+        #endregion
+
+        #endregion
     }
 }

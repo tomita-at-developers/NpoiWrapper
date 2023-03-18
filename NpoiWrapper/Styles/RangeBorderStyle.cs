@@ -12,11 +12,44 @@ namespace Developers.NpoiWrapper.Styles
 {
     internal class RangeBorderStyle
     {
+        #region "fields"
+
         /// <summary>
         /// log4net
         /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
+        #endregion
+
+        #region "constructors"
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="PoiSheet">ISheetインスタンス</param>
+        /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
+        /// <param name="BordersIndex">XlBordersIndex値</param>
+        public RangeBorderStyle(ISheet PoiSheet, CellRangeAddressList SafeAddressList, XlBordersIndex? BordersIndex)
+        {
+            //親Range情報の保存
+            this.PoiSheet = PoiSheet;
+            //CellRangeAddressListの保存(安全化して保存)
+            this.WholeRangeAddressList = RangeUtil.CreateSafeCellRangeAddressList(SafeAddressList, this.PoiBook.SpreadsheetVersion);
+            //Border情報の保存
+            this.BordersIndex = BordersIndex;
+            //このBordersIndexが担当するRangeAddressの切り出し
+            for (int a = 0; a < this.WholeRangeAddressList.CountRanges(); a++)
+            {
+                IndexdRangeAddressList.Add(
+                    new BorderCellRangeAddress(this.WholeRangeAddressList.GetCellRangeAddress(a), this.PoiBook.SpreadsheetVersion)
+                            .GetIndexedBorderCellRangeAddress(this.BordersIndex));
+            }
+        }
+
+        #endregion
+
+        #region "properties"
 
         /// <summary>
         /// 親IWorkbook
@@ -64,28 +97,9 @@ namespace Developers.NpoiWrapper.Styles
         private object CommonXlsWeight { get; set; }
         private object CommonColorIndex { get; set; }
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="PoiSheet">ISheetインスタンス</param>
-        /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
-        /// <param name="BordersIndex">XlBordersIndex値</param>
-        public RangeBorderStyle(ISheet PoiSheet, CellRangeAddressList SafeAddressList, XlBordersIndex? BordersIndex)
-        {
-            //親Range情報の保存
-            this.PoiSheet = PoiSheet;
-            //CellRangeAddressListの保存(安全化して保存)
-            this.WholeRangeAddressList = RangeUtil.CreateSafeCellRangeAddressList(SafeAddressList, this.PoiBook.SpreadsheetVersion);
-            //Border情報の保存
-            this.BordersIndex = BordersIndex;
-            //このBordersIndexが担当するRangeAddressの切り出し
-            for (int a = 0; a < this.WholeRangeAddressList.CountRanges(); a++)
-            {
-                IndexdRangeAddressList.Add(
-                    new BorderCellRangeAddress(this.WholeRangeAddressList.GetCellRangeAddress(a), this.PoiBook.SpreadsheetVersion)
-                            .GetIndexedBorderCellRangeAddress(this.BordersIndex));
-            }
-        }
+        #endregion
+
+        #region "methods"
 
         /// <summary>
         /// Rangeのプロパティ設定値を１つ取得する(全セルで同一値であればその値を、同一でなければnullが取得される。)
@@ -826,5 +840,7 @@ namespace Developers.NpoiWrapper.Styles
             IRow Row = this.PoiSheet.GetRow(RowIndex) ?? this.PoiSheet.CreateRow(RowIndex);
             return Row.GetCell(ColumnIndex) ?? Row.CreateCell(ColumnIndex);
         }
+
+        #endregion
     }
 }

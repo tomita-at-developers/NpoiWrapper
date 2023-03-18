@@ -6,10 +6,17 @@ using System.Xml.Serialization;
 
 namespace Developers.NpoiWrapper.Configurations
 {
+    /// <summary>
+    /// 設定ファイル読取
+    /// </summary>
     internal class ConfigurationManager
     {
+        #region "constructors"
 
-        public Models.Configurations Configs { get; private set; }
+        /// <summary>
+        /// コンストラクタ
+        /// 設定ファイルを読み込んでConfigsにデシリアライズする。
+        /// </summary>
         public ConfigurationManager()
         {
             //設定ファイルの読み込み
@@ -25,5 +32,16 @@ namespace Developers.NpoiWrapper.Configurations
                 Configs = (Models.Configurations)Serializer.Deserialize(xmlReader);
             }
         }
+
+        #endregion
+
+        #region "properties"
+
+        /// <summary>
+        /// 設定ファイル読取結果
+        /// </summary>
+        public Models.Configurations Configs { get; private set; }
+
+        #endregion
     }
 }

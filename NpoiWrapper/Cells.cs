@@ -11,8 +11,17 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Cells : Range
     {
+        #region "fields"
+
+        /// <summary>
+        /// log4net
+        /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
+        #endregion
+
+        #region "constructors"
 
         /// <summary>
         /// コンスラクタ
@@ -26,6 +35,10 @@ namespace Developers.NpoiWrapper
             Logger.Debug(RangeUtil.CellRangeAddressListToString(RangeAddressList));
             //なにもしない
         }
+
+        #endregion
+
+        #region "indexers"
 
         /// <summary>
         /// インデクサー
@@ -62,5 +75,7 @@ namespace Developers.NpoiWrapper
                 return new Range(base.Parent, RangeAddressList, base.RelativeTo);
             }
         }
+
+        #endregion
     }
 }

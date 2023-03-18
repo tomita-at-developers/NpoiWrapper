@@ -22,38 +22,20 @@ namespace Developers.NpoiWrapper
     //    object TintAndShade { get; set; }
     //}
 
+    /// <summary>
+    /// Borderクラス
+    /// Microsoft.Office.Interop.Excel.Borderをエミュレート
+    /// </summary>
     public class Border
     {
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Range Parent { get; } 
-
-        /// <summary>
-        /// ISheetインスタンス
-        /// </summary>
-        private ISheet PoiSheet { get { return Parent.Parent.PoiSheet; } }
-
-        /// <summary>
-        /// CellRangeAddressListインスタンス
-        /// </summary>
-        private CellRangeAddressList SafeAddressList { get { return this.Parent.SafeAddressList; } }
-
-        /// <summary>
-        /// 親RangeのSafeAddressList
-        /// </summary>
-        private XlBordersIndex? BordersIndex { get; }
-
-        /// <summary>
-        /// Range情報読み取り書込み
-        /// </summary>
-        private RangeBorderStyle BorderStyle { get; }
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="ParentRanget">Rangeインスタンス</param>
         /// <param name="BordersIndex">XlBordersIndex値</param>
-        public Border(Range ParentRanget, XlBordersIndex? BordersIndex)
+        internal Border(Range ParentRanget, XlBordersIndex? BordersIndex)
         {
             //親Range情報の保存
             this.Parent = ParentRanget;
@@ -62,6 +44,16 @@ namespace Developers.NpoiWrapper
             //RangeBorderStyle生成
             BorderStyle = new RangeBorderStyle(this.PoiSheet, this.SafeAddressList, this.BordersIndex);
         }
+
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Range Parent { get; }
 
         /// <summary>
         /// 罫線スタイル(EXCEL)
@@ -131,5 +123,33 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        #endregion
+
+        #region "private properties"
+
+        /// <summary>
+        /// ISheetインスタンス
+        /// </summary>
+        private ISheet PoiSheet { get { return Parent.Parent.PoiSheet; } }
+
+        /// <summary>
+        /// CellRangeAddressListインスタンス
+        /// </summary>
+        private CellRangeAddressList SafeAddressList { get { return this.Parent.SafeAddressList; } }
+
+        /// <summary>
+        /// 親RangeのSafeAddressList
+        /// </summary>
+        private XlBordersIndex? BordersIndex { get; }
+
+        /// <summary>
+        /// Range情報読み取り書込み
+        /// </summary>
+        private RangeBorderStyle BorderStyle { get; }
+
+        #endregion
+
+        #endregion
     }
 }

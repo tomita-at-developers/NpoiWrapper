@@ -6,18 +6,7 @@
     /// </summary>
     internal class BorderStyleParam
     {
-        /// <summary>
-        /// 対象名
-        /// </summary>
-        public string Name { get; private set; }
-        /// <summary>
-        /// 適用する値
-        /// </summary>
-        public object Value { get; private set; } = null;
-        /// <summary>
-        /// 更新フラグ
-        /// </summary>
-        public bool Update { get; private set; } = false;
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ(参照用)
@@ -40,6 +29,27 @@
             this.Update = true;
         }
 
+        #endregion
+
+        #region "properties"
+
+        /// <summary>
+        /// 対象名
+        /// </summary>
+        public string Name { get; private set; }
+        /// <summary>
+        /// 適用する値
+        /// </summary>
+        public object Value { get; private set; } = null;
+        /// <summary>
+        /// 更新フラグ
+        /// </summary>
+        public bool Update { get; private set; } = false;
+
+        #endregion
+
+        #region "methods"
+
         /// <summary>
         /// 文字列に変換する
         /// </summary>
@@ -54,5 +64,7 @@
             RetVal += "]";
             return RetVal;
         }
+
+        #endregion
     }
 }

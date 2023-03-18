@@ -7,9 +7,17 @@ using NPOI.SS.UserModel;
 
 namespace Developers.NpoiWrapper.Styles.Utils
 {
+    /// <summary>
+    /// objectで指定されたColorIndexをshort?にキャストする。
+    /// </summary>
     internal class ColorPallet
     {
-        public short? Index { get; } = null;
+        #region "constructors"
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="Index">objectで指定されたColorIndex</param>
         public ColorPallet(object Index)
         {
             if (Index is XlColorIndex EnumValue)
@@ -31,5 +39,16 @@ namespace Developers.NpoiWrapper.Styles.Utils
                 this.Index = null;
             }
         }
+
+        #endregion
+
+        #region "properties"
+
+        /// <summary>
+        /// objectからshortにキャストされたColorIndex値
+        /// </summary>
+        public short? Index { get; } = null;
+
+        #endregion
     }
 }

@@ -9,8 +9,17 @@ namespace Developers.NpoiWrapper.Utils
 {
     internal static class ColorPallet2003
     {
-        public static readonly Dictionary<int, short> Excel2003ColorMap;
+        #region "fields"
 
+        private static readonly Dictionary<int, short> Excel2003ColorMap;
+
+        #endregion
+
+        #region "constructors"
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         static ColorPallet2003()
         {
             Excel2003ColorMap = new Dictionary<int, short>()
@@ -74,6 +83,10 @@ namespace Developers.NpoiWrapper.Utils
             };
         }
 
+        #endregion
+
+        #region "methods"
+
         /// <summary>
         /// Excel2003のColorIndex値からIndecedColorsの該当色Index値を取得する。
         /// パレットがカスタマイズされている場合は必ずしも正しい値が取得できるとは限らない。
@@ -107,5 +120,7 @@ namespace Developers.NpoiWrapper.Utils
             }
             return RetVal;
         }
+
+        #endregion
     }
 }

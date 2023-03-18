@@ -25,6 +25,8 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Application : _Application
     {
+        #region "constructors"
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -40,5 +42,7 @@ namespace Developers.NpoiWrapper
             : base()
         {
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿using Developers.NpoiWrapper.Utils;
-using NPOI.SS.Formula.Functions;
-using NPOI.SS.UserModel;
+﻿using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
@@ -15,31 +13,17 @@ namespace Developers.NpoiWrapper.Styles
     /// </summary>
     internal class RangeStyle
     {
+        #region "fields"
+
         /// <summary>
         /// log4net
         /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-        /// <summary>
-        /// 親Range
-        /// </summary>
-        internal Range ParentRange { get; }
+        #endregion
 
-        /// <summary>
-        /// 親IWorkbook
-        /// </summary>
-        public IWorkbook PoiBook { get { return this.ParentRange.Parent.Parent.PoiBook; } }
-
-        /// <summary>
-        /// 親ISheet
-        /// </summary>
-        public ISheet PoiSheet { get { return this.ParentRange.Parent.PoiSheet; } }
-
-        /// <summary>
-        /// 絶対表現(RonwIndex,ColumnIndexとして直接利用可能)されたアドレスリスト
-        /// </summary>
-        public CellRangeAddressList SafeAddressList { get { return this.ParentRange.SafeAddressList; } }
+        #region "constructors"
 
         /// <summary>
         /// コンストラクタ
@@ -50,6 +34,34 @@ namespace Developers.NpoiWrapper.Styles
             //親Range情報の保存
             this.ParentRange = ParentRange;
         }
+
+        #endregion
+
+        #region "properties"
+
+        /// <summary>
+        /// 親Range
+        /// </summary>
+        protected Range ParentRange { get; }
+
+        /// <summary>
+        /// 親IWorkbook
+        /// </summary>
+        private IWorkbook PoiBook { get { return this.ParentRange.Parent.Parent.PoiBook; } }
+
+        /// <summary>
+        /// 親ISheet
+        /// </summary>
+        private ISheet PoiSheet { get { return this.ParentRange.Parent.PoiSheet; } }
+
+        /// <summary>
+        /// 絶対表現(RonwIndex,ColumnIndexとして直接利用可能)されたアドレスリスト
+        /// </summary>
+        private CellRangeAddressList SafeAddressList { get { return this.ParentRange.SafeAddressList; } }
+
+        #endregion
+
+        #region "methods"
 
         /// <summary>
         /// プロパティ名で指定されたICellStyleのプロパティをRangeから取得する
@@ -324,5 +336,7 @@ namespace Developers.NpoiWrapper.Styles
             IRow Row = this.PoiSheet.GetRow(RowIndex) ?? this.PoiSheet.CreateRow(RowIndex);
             return Row.GetCell(ColumnIndex) ?? Row.CreateCell(ColumnIndex);
         }
+
+        #endregion
     }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Developers.NpoiWrapper.Utils
 {
-    static public class RangeUtil
+    public static class RangeUtil
     {
         /// <summary>
         /// CellRangeAddressListに含まれるアドレスからA1形式の文字列アドレスリストを生成。

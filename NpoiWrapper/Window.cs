@@ -83,14 +83,12 @@ namespace Developers.NpoiWrapper
     //}
     public class Window
     {
-        public Application Application { get { return Parent.Application; } }
-        public XlCreator Creator { get { return Application.Creator; } }
-        public Workbook Parent { get; } // 調べてみたら親はBookだった
+        #region "constructors"
 
-        public string Caption { get; }
-        public Worksheet ActiveSheet { get; internal set; }
-        internal Range RangeSelection { get; set; }
-
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="ParentBook">親Workbookクラス</param>
         internal Window(Workbook ParentBook)
         {
             this.Parent = ParentBook;
@@ -99,10 +97,31 @@ namespace Developers.NpoiWrapper
             this.RangeSelection = null;
         }
 
+        #endregion
+
+        #region "properties"
+
+        #region "emulated public properties"
+
+        public Application Application { get { return Parent.Application; } }
+        public XlCreator Creator { get { return Application.Creator; } }
+        public Workbook Parent { get; } // 調べてみたら親はBookだった
+
+        /// <summary>
+        /// Windowキャプション
+        /// </summary>
+        public string Caption { get; }
+
+        /// <summary>
+        /// アクティブシート
+        /// Worksheetクラスからセットしてもらう。
+        /// </summary>
+        public Worksheet ActiveSheet { get; internal set; }
+
         /// <summary>
         /// 表示枠の固定
         /// </summary>
-        bool FreezePanes
+        public bool FreezePanes
         {
             get
             {
@@ -164,5 +183,18 @@ namespace Developers.NpoiWrapper
             }
         }
 
+        #endregion
+
+        #region "internal properties"
+
+        /// <summary>
+        /// 選択済Range
+        /// Rangeクラスからセットしてもらう。
+        /// </summary>
+        internal Range RangeSelection { get; set; }
+
+        #endregion
+
+        #endregion
     }
 }

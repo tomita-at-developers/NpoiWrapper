@@ -10,13 +10,43 @@ namespace Developers.NpoiWrapper.Styles.Models
 {
     internal class PoiCellStyle : ICellStyle
     {
+        #region "fields"
+
+        /// <summary>
+        /// log4net
+        /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-        public ICellStyle CellStyle { get; private set; }
+        /// <summary>
+        /// 書式文字列
+        /// </summary>
+        public string _DataFormatString = string.Empty;
+
+        #endregion
+
+        #region "construcrtors"
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="ParentSheet">Worksheetインスタンス</param>
+        /// <param name="StyleIndex">スタイルIndex</param>
+        public PoiCellStyle(ISheet PoiSheet, short StyleIndex)
+        {
+            this.PoiSheet = PoiSheet;
+            //指定されたスタイルをインポート
+            this.CellStyle = this.PoiBook.GetCellStyleAt(StyleIndex);
+            ApplyStyleFrom(this.CellStyle);
+        }
+
+        #endregion
+
+        #region "interface implementations"
+
+        #region "mandatory properties"
 
         [Import(true), Comparison(false), Export(false)] public short Index { get; /*追加*/ private set; }
-
         [Import(true), Comparison(true), Export(true)] public bool ShrinkToFit { get; set; }
         [Import(true), Comparison(true), Export(true)] public short DataFormat { get; set; }
         [Import(true), Comparison(false), Export(false)] public short FontIndex { get; /*追加*/ private set; }
@@ -56,6 +86,10 @@ namespace Developers.NpoiWrapper.Styles.Models
         /// </summary>
         [Import(false), Comparison(false), Export(false)] public IColor FillForegroundColorColor { get; }
 
+        #endregion
+
+        #region "mandatory methods"
+
         /// <summary>
         /// 必須メソッド実装
         /// DataFormatから実際の書式文字列を特定したもの
@@ -94,10 +128,20 @@ namespace Developers.NpoiWrapper.Styles.Models
             throw new NotImplementedException();
         }
 
+        #endregion
+
+        #endregion
+
+        #region "properties"
+
         /// <summary>
-        /// 追加の実装:DataFormatをGetDataFormatString()で展開して格納
+        /// 基点とするCellStyle。ApplyStyleFromまはたCommitでセット。
         /// </summary>
-        public string _DataFormatString = string.Empty;
+        public ICellStyle CellStyle { get; private set; }
+
+        /// <summary>
+        /// ICellStyleの拡張:DataFormatをGetDataFormatString()で展開して格納
+        /// </summary>
         [Import(false), Comparison(true), Export(false)]
         public string DataFormatString
         {
@@ -112,14 +156,14 @@ namespace Developers.NpoiWrapper.Styles.Models
         }
 
         /// <summary>
-        /// 追加の実装:FontIndexをGetFont()で展開して格納
+        /// ICellStyleの拡張:FontIndexをGetFont()で展開して格納
         /// </summary>
         public PoiFont PoiFont { get; private set; }
 
         /// <summary>
         /// 親ISheetクラスインスタンス
         /// </summary>
-        private ISheet PoiSheet { get; set; }
+        private ISheet PoiSheet { get; }
 
         /// <summary>
         /// 親IWorkbook
@@ -129,18 +173,9 @@ namespace Developers.NpoiWrapper.Styles.Models
             get { return PoiSheet.Workbook; }
         }
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="ParentSheet">Worksheetインスタンス</param>
-        /// <param name="StyleIndex">スタイルIndex</param>
-        public PoiCellStyle(ISheet PoiSheet, short StyleIndex)
-        {
-            this.PoiSheet = PoiSheet;
-            //指定されたスタイルをインポート
-            this.CellStyle = this.PoiBook.GetCellStyleAt(StyleIndex);
-            ApplyStyleFrom(this.CellStyle);
-        }
+        #endregion
+
+        #region "methods"
 
         /// <summary>
         /// 指定されたスタイルを自プロパティにインポート
@@ -365,5 +400,7 @@ namespace Developers.NpoiWrapper.Styles.Models
                 this.DataFormat = PoiBook.CreateDataFormat().GetFormat(this.DataFormatString);
             }
         }
+
+        #endregion
     }
 }

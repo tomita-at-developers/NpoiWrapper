@@ -2,6 +2,9 @@
 
 namespace Developers.NpoiWrapper.Styles.Properties
 {
+    /// <summary>
+    /// Excel名前のLineStyleを取得する(PoiのBorderStyleから)
+    /// </summary>
     internal class XlsBorderStyle
     {
         //----------------------------------------------------------------------------------------------------------------------------------------
@@ -18,9 +21,12 @@ namespace Developers.NpoiWrapper.Styles.Properties
         // XlLineStyle.xlSlantDashDot = 13                          BorderStyle.SlantedDashDot
         // XlLineStyle.xlLineStyleNone = -4142                      BorderStyle.None
         //------------------------------------------------------------------------------------------------------------------------------------------
-        public XlLineStyle LineStyle { get; private set; } = XlLineStyle.xlLineStyleNone;
-        public XlBorderWeight Weight { get; private set; } = XlBorderWeight.xlThin;
+        #region "constructors"
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="PoiBorderStyle">PoiのBorderStyle</param>
         public XlsBorderStyle(BorderStyle PoiBorderStyle)
         {
             LineStyle = XlLineStyle.xlLineStyleNone;
@@ -89,5 +95,20 @@ namespace Developers.NpoiWrapper.Styles.Properties
                     break;
             }
         }
+
+        #endregion
+
+        #region "properties"
+
+        /// <summary>
+        /// Excel名前のXlLineStyle
+        /// </summary>
+        public XlLineStyle LineStyle { get; private set; } = XlLineStyle.xlLineStyleNone;
+        /// <summary>
+        /// Excel名前のXlBorderWeight
+        /// </summary>
+        public XlBorderWeight Weight { get; private set; } = XlBorderWeight.xlThin;
+
+        #endregion
     }
 }

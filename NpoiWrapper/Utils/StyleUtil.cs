@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Developers.NpoiWrapper.Utils
 {
-    internal class StyleUtil
+    internal static class StyleUtil
     {
         /// <summary>
         /// Bookが持つCellStyleの全てに対し、そのStyleの利用セル数をカウントする。
