@@ -38,7 +38,7 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Enumrator用インデクス
         /// </summary>
-        private int EnumeratorIndex { get; set; } = -1;
+        private int EnumeratorIndex = -1;
 
         /// <summary>
         /// コンストラクタ

@@ -69,13 +69,17 @@
     <Compile Include="Styles\RangeStyle.cs" />
     <Compile Include="Styles\RangeStyleManager.cs" />
     <Compile Include="Styles\Utils\CellStyleUpdateHistory.cs" />
+    <Compile Include="Styles\Utils\ColorPallet.cs" />
     <Compile Include="Utils\Attributes.cs" />
     <Compile Include="Utils\BorderCellRangeAddress.cs" />
     <Compile Include="Utils\CellValue.cs" />
+    <Compile Include="Utils\ColorPallet2003.cs" />
     <Compile Include="Utils\NameOf.cs" />
     <Compile Include="Utils\RangeUtil.cs" />
     <Compile Include="Utils\SheetCellRangeAddressList.cs" />
     <Compile Include="Utils\StyleUtil.cs" />
+    <Compile Include="Window.cs" />
+    <Compile Include="Windows.cs" />
     <Compile Include="Workbook.cs" />
     <Compile Include="Workbooks.cs" />
     <Compile Include="Worksheet.cs" />
@@ -88,6 +92,7 @@
     <Compile Include="XlHAlign.cs" />
     <Compile Include="XlLineStyle.cs" />
     <Compile Include="XlPattern.cs" />
+    <Compile Include="XlSaveAsAccessMode.cs" />
     <Compile Include="XlUnderlineStyle.cs" />
     <Compile Include="XlVAlign.cs" />
     <Compile Include="XlWBATemplate.cs" />

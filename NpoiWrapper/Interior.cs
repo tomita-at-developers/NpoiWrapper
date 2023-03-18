@@ -1,8 +1,10 @@
 ﻿using Developers.NpoiWrapper.Styles;
 using Developers.NpoiWrapper.Styles.Properties;
+using Developers.NpoiWrapper.Styles.Utils;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.Util.Collections;
+using SixLabors.ImageSharp.Metadata.Profiles.Iptc;
 using System;
 using System.Collections.Generic;
 
@@ -68,10 +70,11 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                if (value is short SafeValue)
+                ColorPallet Pallet = new ColorPallet(value);
+                if (Pallet.Index != null)
                 {
                     List<CellStyleParam> Params = new List<CellStyleParam>
-                    { { new CellStyleParam(StyleName.Interior.ColorIndex, SafeValue) } };
+                    { { new CellStyleParam(StyleName.Interior.ColorIndex, Pallet.Index) } };
                     RangeStyle.UpdateProperties(Params);
                 }
                 else
@@ -116,15 +119,16 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                if (value is short SafeValue)
+                ColorPallet Pallet = new ColorPallet(value);
+                if (Pallet.Index != null)
                 {
                     List<CellStyleParam> Params = new List<CellStyleParam>
-                    { { new CellStyleParam(StyleName.Interior.PatternColorIndex, SafeValue) } };
+                    { { new CellStyleParam(StyleName.Interior.PatternColorIndex, Pallet.Index) } };
                     RangeStyle.UpdateProperties(Params);
                 }
                 else
                 {
-                    throw new ArgumentNullException("Range.Interior.ColorIndex");
+                    throw new ArgumentNullException("Range.Interior.PatternColorIndex");
                 }
             }
         }

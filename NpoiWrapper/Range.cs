@@ -258,11 +258,11 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// IEnumerator用行インデクス
         /// </summary>
-        private int EnumRowOfs { get; set; } = 0;
+        private int EnumeratorRowIndex = 0;
         /// <summary>
         /// IEnumerator用列インデクス
         /// </summary>
-        private int EnumColumnOfs { get; set; } = -1;
+        private int EnumeratorColumnIndex = -1;
 
         #endregion
 
@@ -345,13 +345,13 @@ namespace Developers.NpoiWrapper
             bool RetVal = false;
             CellRangeAddress Adr = SafeAddressList.GetCellRangeAddress(0);
             //次にカラムがない場合は次の行の先頭カラムへ
-            EnumColumnOfs += 1;
-            if (Adr.FirstColumn + EnumColumnOfs > Adr.LastColumn)
+            EnumeratorColumnIndex += 1;
+            if (Adr.FirstColumn + EnumeratorColumnIndex > Adr.LastColumn)
             {
-                EnumRowOfs += 1;
-                EnumColumnOfs = 0;
+                EnumeratorRowIndex += 1;
+                EnumeratorColumnIndex = 0;
                 //まだ行があればture
-                if (Adr.FirstRow + EnumRowOfs <= Adr.LastRow)
+                if (Adr.FirstRow + EnumeratorRowIndex <= Adr.LastRow)
                 {
                     RetVal = true;
                 }
@@ -359,7 +359,7 @@ namespace Developers.NpoiWrapper
             //次にカラムがあれば行を維持し次のカラムへ
             else
             {
-                EnumColumnOfs += 0;
+                EnumeratorColumnIndex += 0;
                 RetVal = true;
 
             }
@@ -376,8 +376,8 @@ namespace Developers.NpoiWrapper
                 return new Range(
                     Parent,
                     new CellRangeAddressList(
-                        Adr.FirstRow + EnumRowOfs, Adr.FirstRow + EnumRowOfs,
-                        Adr.FirstColumn + EnumColumnOfs, Adr.FirstColumn + EnumColumnOfs),
+                        Adr.FirstRow + EnumeratorRowIndex, Adr.FirstRow + EnumeratorRowIndex,
+                        Adr.FirstColumn + EnumeratorColumnIndex, Adr.FirstColumn + EnumeratorColumnIndex),
                     RelativeTo);
             }
         }
@@ -386,8 +386,8 @@ namespace Developers.NpoiWrapper
         /// </summary>
         public void Reset()
         {
-            EnumRowOfs = 0;
-            EnumColumnOfs = -1;
+            EnumeratorRowIndex = 0;
+            EnumeratorColumnIndex = -1;
         }
 
         #endregion
@@ -1083,6 +1083,11 @@ namespace Developers.NpoiWrapper
         public Font Font { get { return StyleManager.Font; } }
 
         /// <summary>
+        /// セルの内部(塗りつぶし)
+        /// </summary>
+        public Interior Interior { get { return StyleManager.Interior; } }
+
+        /// <summary>
         /// 文字位置(水平方向)
         /// </summary>
         public object HorizontalAlignment
@@ -1139,6 +1144,17 @@ namespace Developers.NpoiWrapper
         #endregion
 
         #region "emulated public methods"
+
+        /// <summary>
+        /// Rangeの選択
+        /// </summary>
+        public void Select()
+        {
+            //親BookのWindowにこのRangeをセットする。
+            this.Parent.Parent.Windows[1].RangeSelection = this;
+            //ApplicationにこのRangeをセットする。
+            this.Application.SetSelection(this.Parent, this);
+        }
 
         /// <summary>
         /// セルのコメントを生成する

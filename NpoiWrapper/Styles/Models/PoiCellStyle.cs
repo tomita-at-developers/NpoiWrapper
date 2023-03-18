@@ -1,5 +1,7 @@
-﻿using Developers.NpoiWrapper.Utils;
+﻿using Developers.NpoiWrapper.Configurations.Models;
+using Developers.NpoiWrapper.Utils;
 using NPOI.SS.UserModel;
+using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -40,15 +42,17 @@ namespace Developers.NpoiWrapper.Styles.Models
         [Import(true), Comparison(true), Export(true)] public BorderStyle BorderDiagonalLineStyle { get; set; }
         [Import(false), Comparison(true), Export(true)] public BorderDiagonal BorderDiagonal { get; set; }
         /// <summary>
-        /// FillBackgroundColorからIColor(以下２プロパティを持つ)を特定したもの
-        ///     short Indexed { get; }
-        ///     byte[] RGB { get; }
+        /// FillBackgroundColorと同義のIColorオブジェクト
+        /// NPOIのICellStyle実装クラスでは、一方を更新するともう一方も自動更新される。
+        /// 本クラスは自動更新をサポートしていないので、ColorIndex系のみ更新可能としている。
+        /// IColor系の更新はサポートしていないので、Comparison, Exportはfalse指定としている。
         /// </summary>
         [Import(false), Comparison(false), Export(false)] public IColor FillBackgroundColorColor { get; }
         /// <summary>
-        /// FillForegroundColorからIColor(以下２プロパティを持つ)を特定したもの
-        ///     short Indexed { get; }
-        ///     byte[] RGB { get; }
+        /// FillForegroundColorと同義のIColorオブジェクト
+        /// NPOIのICellStyle実装クラスでは、一方を更新するともう一方も自動更新される。
+        /// 本クラスは自動更新をサポートしていないので、ColorIndex系のみ更新可能としている。
+        /// IColor系の更新はサポートしていないので、Comparison, Exportはfalse指定としている。
         /// </summary>
         [Import(false), Comparison(false), Export(false)] public IColor FillForegroundColorColor { get; }
 
@@ -255,7 +259,7 @@ namespace Developers.NpoiWrapper.Styles.Models
                 //いま保持しているスタイルがこのセルのみで使用している場合
                 if (StyleUsages.ContainsKey(Index) && StyleUsages[Index] == 1)
                 {
-                    //現状がIndex=0出なければそれを使う
+                    //現状がIndex=0でなければそれを使う
                     if (Index != 0)
                     {
                         AvalableIndex = Index;
@@ -295,6 +299,16 @@ namespace Developers.NpoiWrapper.Styles.Models
                 this.ApplyTo(CellStyle);
                 Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style.[Index:" + CellStyle.Index + "] is newly created.");
             }
+            //★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+            // NPOIのバグ対応
+            // Fill系のColorを指すると予期しないColorColorがセットされてしまう。
+            // なのでコンパイラのアクセス制限を強引に乗り越えてnullをセットする。
+            //BindingFlags Flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty;
+            //PropertyInfo BGColor = CellStyle.GetType().GetProperty("FillBackgroundColorColor", Flag);
+            //BGColor?.SetValue(CellStyle, null);
+            //PropertyInfo FGColor = CellStyle.GetType().GetProperty("FillForegroundColorColor", Flag);
+            //FGColor?.SetValue(CellStyle, null);
+            //★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
             //Indexを新しい値に更新する
             this.Index = CellStyle.Index;
             this.FontIndex = PoiFont.Index;
@@ -323,6 +337,8 @@ namespace Developers.NpoiWrapper.Styles.Models
                     //ただしICellStyeから拡張された独自プロパティは無視
                     PropertyInfo TargetProp = CellStyle.GetType().GetProperty(MyProp.Name);
                     TargetProp?.SetValue(CellStyle, MyProp.GetValue(this));
+
+                    Logger.Debug(TargetProp.Name + "=" + (MyProp.GetValue(this) ?? "null"));
                 }
             }
             //FontからFontをセットする

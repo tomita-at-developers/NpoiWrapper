@@ -3,7 +3,7 @@
     /// <summary>
     /// カラーパレット上のインデックス
     /// </summary>
-    public enum XlColorIndex : short
+    public enum XlColorIndex
     {
         xlColorIndexAutomatic = -4105,
         xlColorIndexNone = -4142

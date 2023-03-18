@@ -212,6 +212,21 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
+        /// シートのアクティブ化
+        /// </summary>
+        public void Activate()
+        {
+            //親BookをActiveにする(Application.ActiveWorkbook, Application.Windows:Index＝1)
+            Parent.Activate();
+            //親BookのWindowでActiveSheetに設定する
+            Parent.Windows[1].ActiveSheet = this;
+            //Application上でActiveSheetにする
+            this.Application.ActiveSheet = this;
+            //POI上でシートをActiveにする
+            Parent.PoiBook.SetActiveSheet(this.Index);
+        }
+
+        /// <summary>
         /// シートのコピー
         /// </summary>
         /// <param name="SheetName"></param>
@@ -319,7 +334,7 @@ namespace Developers.NpoiWrapper
         /// POIのIWorkbook.SetActiveSheetで実現できそうだが、POIではFreezePaneがSheetの機能なので、素直にWorksheetにした。
         /// WorkSheet.Activate()
         /// WorkSheet.Range("A2").Select()
-        /// ActiveWindow.FreezePanes = True
+        /// Application.ActiveWindow.FreezePanes = True
         /// </summary>
         /// <param name="TopLeftCell">固定位置(A1形式)</param>
         public void CreateFreezePane(string TopLeftCell)

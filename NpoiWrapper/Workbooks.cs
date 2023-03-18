@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Developers.NpoiWrapper
 {
@@ -50,9 +51,14 @@ namespace Developers.NpoiWrapper
         public List<Workbook> Item { get; private set; } = new List<Workbook>();
 
         /// <summary>
+        /// Workbookに付与する通し番号
+        /// </summary>
+        private int BookIndex { get; set; } = 0;
+
+        /// <summary>
         /// Enumrator用インデクス
         /// </summary>
-        private int EnumeratorIndex { get; set; } = -1;
+        private int EnumeratorIndex = -1;
 
         /// <summary>
         /// コンストラクタ
@@ -122,7 +128,7 @@ namespace Developers.NpoiWrapper
                     }
                 }
             }
-            Workbook Book = new Workbook(this, Excel97_2003);
+            Workbook Book = new Workbook(this.Parent, GetNextBookIndex(), Excel97_2003);
             Item.Add(Book);
             return Book;
         }
@@ -131,15 +137,15 @@ namespace Developers.NpoiWrapper
         /// Excelブックを開く
         /// </summary>
         /// <param name="FileNanme">フルパスファイ名</param>
-        /// <param name="....">FileName以外はすべて無視します。</param>
+        /// <param name="....">Filename以外はすべて無視します。</param>
         /// <returns>Workbookクラスインスタンス</returns>
         public Workbook Open(
-            string FileName, object UpdateLinks = null, object ReadOnly = null, object Format = null,
+            string Filename, object UpdateLinks = null, object ReadOnly = null, object Format = null,
             object Password = null, object WriteResPassword = null, object IgnoreReadOnlyRecommended = null,
             object Origin = null, object Delimiter = null, object Editable = null, object Notify = null,
             object Converter = null, object AddToMru = null, object Local = null, object CorruptLoad = null)
         {
-            Workbook Book = new Workbook(this, FileName);
+            Workbook Book = new Workbook(this.Parent, GetNextBookIndex(), Filename);
             Item.Add(Book);
             return Book;
         }
@@ -151,5 +157,13 @@ namespace Developers.NpoiWrapper
         /// <returns></returns>
         [IndexerName("_Default")]
         public Workbook this[int index] { get { return Item[index]; } }
+
+ 
+        private int GetNextBookIndex()
+        {
+            this.BookIndex += 1;
+            return this.BookIndex;
+        }
+    
     }
 }

@@ -6,6 +6,8 @@ using System.Data.Odbc;
 using System.Data.OleDb;
 using System.Runtime.InteropServices;
 using System.Web.UI.WebControls;
+using System.Collections.Generic;
+using System;
 
 namespace Developers.NpoiWrapper
 {
@@ -15,6 +17,28 @@ namespace Developers.NpoiWrapper
     //public interface Application : _Application, AppEvents_Event
     //{
     //}
+
+    /// <summary>
+    /// Applicationクラス
+    /// </summary>
+    public class Application : _Application
+    {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public Application(bool Use2003ColorIndex)
+            : base(Use2003ColorIndex)
+        {
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public Application()
+            : this(false)
+        {
+        }
+    }
     //----------------------------------------------------------------------------------------------
     // _Application interface in Interop.Excel is shown below...
     //----------------------------------------------------------------------------------------------
@@ -319,21 +343,118 @@ namespace Developers.NpoiWrapper
     /// NpoiWrapperクラス
     /// Microsoft.Office.Interop.Excel.Applicationをエミュレート
     /// </summary>
-    public class Application
+    public class _Application
     {
         /// <summary>
-        /// Workbooksクラス
+        /// お決まりの３プロパティも最上位では少々事情が異なる。
+        /// 同名プロパティは持てないのでApplicationはapplicationに名前を変えている。
+        /// Parentには便宜的に自分をセットしている。
         /// </summary>
+        public readonly Application Application;
+        public readonly XlCreator Creator = XlCreator.xlCreatorCode;
+        public readonly Application Parent; 
+
+        public Windows Windows { get; }
         public Workbooks Workbooks { get; }
-        public XlCreator Creator { get; } = XlCreator.xlCreatorCode;
+        /// <summary>
+        /// ActiveWindow
+        /// Workbookにて勝手にセットしてもらう。
+        /// </summary>
+        public Window ActiveWindow { get; internal set; }
+        /// <summary>
+        /// ActiveWorkbook
+        /// Workbookにて勝手にセットしてもらう。
+        /// </summary>
+        public Workbook ActiveWorkbook { get; internal set; }
+        /// <summary>
+        /// ActiveSheet
+        /// Worksheetにて勝手にセットしてもらう。
+        /// </summary>
+        public object ActiveSheet { get; internal set; }
+        /// <summary>
+        /// ActiveCell
+        /// 未サポート
+        /// </summary>
+        public Range ActiveCell { get; internal set; }
+        /// <summary>
+        /// Visible(ダミー実装)
+        /// </summary>
+        public bool Visible { get; internal set; } = false;
+        /// <summary>
+        /// DisplayAlerts(ダミー実装)
+        /// </summary>
+        public bool DisplayAlerts { get; internal set; } = false;
+
+        /// <summary>
+        /// Selectionプロパティの実体
+        /// </summary>
+        private Dictionary<string, object> _selection = new Dictionary<string, object>();
+
+        internal bool Use2003ColorIndex { get; private set; } = false;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public Application()
+        public _Application(bool Use2003ColorIndex)
         {
-            this.Workbooks = new Workbooks(this);
+            this.Application = (Application)this;
+            this.Parent = (Application)this;
+            this.Windows = new Windows(this);
+            this.Workbooks = new Workbooks((Application)this);
+            this.Use2003ColorIndex = Use2003ColorIndex;
         }
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public _Application()
+            : this(false)
+        {
+        }
+
+        /// <summary>
+        /// Selectionプロパティ(getterのみ)
+        /// ActiveSheetにセットされたWorksheetオブジェクトからWorkbook.IndexとWorksheet.Nameを取り出し、、
+        /// その２つをキーに格納されたオブジェクトを取り出す。
+        /// </summary>
+        public dynamic Selection
+        {
+            get
+            {
+                dynamic RetVal = null;
+                //ActiveSheetが存在すること
+                if (ActiveSheet != null)
+                {
+                    //_SelectionにこのSheetのオブジェクトがあればそれを返す。
+                    Worksheet Target = (Worksheet)ActiveSheet;
+                    string KeyString = Target.Parent.Index.ToString() + ":" + Target.Name;
+                    if (_selection.ContainsKey(KeyString))
+                    {
+                        RetVal = _selection[Target.Parent.Index.ToString() + ":" + Target.Name];
+                    }
+                }
+                return RetVal;
+            }
+        }
+
+        /// <summary>
+        /// Selectionセッター
+        /// </summary>
+        /// <param name="Setter">セット主体のWorksheet</param>
+        /// <param name="SelectedObject">セットするオブジェクト</param>
+        /// <exception cref="InvalidOperationException"></exception>
+        internal void SetSelection(Worksheet Setter, object SelectedObject)
+        {
+            Worksheet Current = (Worksheet)ActiveSheet;
+            if (Current?.Parent.Index == Setter.Parent.Index && Current?.Name == Setter.Name)
+            {
+
+                _selection[Setter.Parent.Index.ToString() + ":" + Setter.Name] = SelectedObject;
+            }
+            else
+            {
+                throw new InvalidOperationException("This sheet is not active.");
+            }
+        }
     }
 }
