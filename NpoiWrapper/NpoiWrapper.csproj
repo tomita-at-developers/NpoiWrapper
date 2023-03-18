@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="_Application.cs" />
     <Compile Include="Areas.cs" />
     <Compile Include="Border.cs" />
     <Compile Include="Borders.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Interior.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="_Range.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Sheets.cs" />
     <Compile Include="Styles\Models\PoiCellStyle.cs" />
