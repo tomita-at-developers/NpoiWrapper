@@ -8,6 +8,7 @@ using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using System.Runtime.InteropServices;
 using System.Web.UI.WebControls;
+using log4net.Repository.Hierarchy;
 
 namespace Developers.NpoiWrapper
 {
@@ -228,64 +229,54 @@ namespace Developers.NpoiWrapper
     /// </summary>
     public class Workbook
     {
+        #region "fields"
+
+        /// <summary>
+        /// log4net
+        /// </summary>
+        private static readonly log4net.ILog Logger
+            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
+        #endregion
+
         #region "constructors"
 
         /// <summary>
-        /// 新規ファイルを作成する
-        /// <param name="ParentApplication">親Application</param>
-        /// <param name="BookIndex">親Application(正確にはWorkbooks)で一意はWorkbookIndex</param>
-        /// <param name="Excel97_2003">Excel97_2003形式の場合のみTrue</param>
+        /// コンストラクタ(Workbooks.Open用)
         /// </summary>
-        internal Workbook(Application ParentApplication, int BookIndex, bool Excel97_2003)
+        /// <param name="ParentApplication">親Application</param>
+        /// <param name="BookIndex">このApplicationインスタンス(正確にはWorkbooks)で一意なインデックス番号</param>
+        /// <param name="PoiBook">POIのWorkbookインスタンス</param>
+        /// <param name="Stream"></param>
+        internal Workbook(Application ParentApplication, int BookIndex, IWorkbook PoiBook, string FileName, bool ReadOnly)
+            : this(ParentApplication, BookIndex, PoiBook)
         {
-            //親Application保存
-            this.Parent = ParentApplication;
-            //このBookのIndex保存
-            this.Index = BookIndex;
-            //Excel形式判断
-            if (Excel97_2003)
-            {
-                //Excel97-2003
-                PoiBook = new HSSFWorkbook();
-            }
-            else
-            {
-                //Excel2007以降
-                PoiBook = new XSSFWorkbook();
-            }
-            //設定ファイルの内容を反映
-            ApplyConfigs();
-            //新規の場合はシートを一つ追加しておく
-            PoiBook.CreateSheet();
-            //Workbooksから指定されたIndexで仮の名前を生成して保存
-            this.Name = "Book(" + this.Index + ")" + (Excel97_2003 ? ".xls" : ".xlsx");
-            //Sheets,Worksheetsの初期化
-            Sheets = new Sheets(this);
-            Worksheets = new Worksheets(this);
-            //Wondowsの生成とWindowのセット
-            this.Windows = new Windows(this);
-            this.Windows.SetActiveWindow(new Window(this));
-            //Application.Windowsへもセット
-            this.Application.Windows.SetActiveWindow(this.Windows[1]);
+            //ファイル名の再保存
+            this.FullName = FileName;
+            //保存先ファイル名の保存
+            this.FileNameToSave = this.FullName;
+            //読取専用の保存
+            this.ReadOnly = ReadOnly;
         }
 
         /// <summary>
-        /// 既存ファイルを開く(読取専用のみサポート)
+        /// コンストラクタ(Workbooks.Add用)
         /// </summary>
         /// <param name="ParentApplication">親Application</param>
-        /// <param name="BookIndex">親Application(正確にはWorkbooks)で一意はWorkbookIndex</param>
-        /// <param name="FileName">開くファイルの名前(フルパス)</param>
-        internal Workbook(Application ParentApplication, int BookIndex, string FileName)
+        /// <param name="BookIndex">このApplicationインスタンス(正確にはWorkbooks)で一意なインデックス番号</param>
+        /// <param name="PoiBook">POIのWorkbookインスタンス</param>
+        internal Workbook(Application ParentApplication, int BookIndex, IWorkbook PoiBook)
         {
             //親Application保存
             this.Parent = ParentApplication;
             //このBookのIndex保存
             this.Index = BookIndex;
-            ////ファイルを開く
-            FileStream Stream = new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            PoiBook = WorkbookFactory.Create(Stream);
-            //ファイル名を保存
-            this.Name = FileName;
+            //IWorkbookの保存
+            this.PoiBook = PoiBook;
+            //ファイル名の初期値
+            this.FullName = Path.Combine(
+                                System.Environment.CurrentDirectory,
+                                "Book(" + this.Index + ")." + PoiBook.SpreadsheetVersion.DefaultExtension);
             //Sheets,Worksheetsの初期化
             Sheets = new Sheets(this);
             Worksheets = new Worksheets(this);
@@ -294,6 +285,11 @@ namespace Developers.NpoiWrapper
             this.Windows.SetActiveWindow(new Window(this));
             //Application.Windowsへもセット
             this.Application.Windows.SetActiveWindow(this.Windows[1]);
+            //シートがない場合は一つ作っておく
+            if (PoiBook.NumberOfSheets == 0)
+            {
+                PoiBook.CreateSheet();
+            }
         }
 
         #endregion
@@ -325,12 +321,23 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// アクティブシートの取得
         /// </summary>
-        public Worksheet ActiveSheet { get { return new Worksheet(this, PoiBook.GetSheetAt(PoiBook.ActiveSheetIndex)); } }
+        public Worksheet ActiveSheet
+        { 
+            get
+            {
+                Worksheet Sheet = null;
+                if (PoiBook.NumberOfSheets > 0)
+                {
+                    Sheet = new Worksheet(this, PoiBook.GetSheetAt(PoiBook.ActiveSheetIndex));
+                }
+                return Sheet;
+            }
+        }
 
         /// <summary>
         /// ブック名
         /// </summary>
-        public string Name { get; private set; } = string.Empty;
+        public string Name { get { return Path.GetFileName(this.FullName); } }
 
         #endregion
 
@@ -360,6 +367,26 @@ namespace Developers.NpoiWrapper
 
         #endregion
 
+        #region "private properties
+
+        /// <summary>
+        /// Saveでの保存先
+        /// 新規時はSaveAsするまでEmpty。
+        /// </summary>
+        private string FileNameToSave { get; set; } = string.Empty;
+
+        /// <summary>
+        /// フルパスファイル名
+        /// </summary>
+        private string FullName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Bookを読取専用で開いたか否かを示すフラグ
+        /// </summary>
+        private bool ReadOnly { get; set; } = false;
+
+        #endregion
+
         #endregion
 
         #region "methods"
@@ -377,54 +404,86 @@ namespace Developers.NpoiWrapper
             this.Application.Windows.SetActiveWindow(Windows[1]);
         }
 
-        ///// <summary>
-        ///// 開いているファイルの保存
-        ///// </summary>
-        //public void Save()
-        //{
-        //    //ファイル保存
-        //    using (FileStream fs = new FileStream(FileName, FileMode.Create, FileAccess.Write))
-        //    {
-        //        PoiBook.Write(fs, false);
-        //    }
-        //}
+        /// <summary>
+        /// 開いているファイルの保存
+        /// </summary>
+        public void Save()
+        {
+            //保存先ファイルがあって、読取専用でない場合のみ処理。それ以外では無視してなにもしない。
+            //Interop.Excelも概ね同様な動作だが、新規の時にSaveすると、その後のSaveAsは正しくコールしてもエラーとなる。
+            if (this.FileNameToSave.Length > 0 && !ReadOnly)
+            {
+                //ファイル保存
+                using (FileStream fs = new FileStream(this.FileNameToSave, FileMode.Open, FileAccess.Write))
+                {
+                    PoiBook.Write(fs, false);
+                }
+            }
+        }
 
         /// <summary>
         /// 名前を付けて保存(保存後は閉じる)
         /// </summary>
         /// <param name="Filename">フルパスファイル名</param>
-        /// <param name="....">Filename以外はすべて無視します。</param>
+        /// <param name="FileFormat">未使用(無視されます)</param>
+        /// <param name="Password">未使用(無視されます)</param>
+        /// <param name="WriteResPassword">未使用(無視されます)</param>
+        /// <param name="ReadOnlyRecommended">未使用(無視されます)</param>
+        /// <param name="CreateBackup">未使用(無視されます)</param>
+        /// <param name="AccessMode">未使用(無視されます)</param>
+        /// <param name="ConflictResolution">未使用(無視されます)</param>
+        /// <param name="AddToMru">未使用(無視されます)</param>
+        /// <param name="TextCodepage">未使用(無視されます)</param>
+        /// <param name="TextVisualLayout">未使用(無視されます)</param>
+        /// <param name="Local">未使用(無視されます)</param>
         public void SaveAs(
             object Filename = null, object FileFormat = null, object Password = null, object WriteResPassword = null, object ReadOnlyRecommended = null,
             object CreateBackup = null, XlSaveAsAccessMode AccessMode = XlSaveAsAccessMode.xlNoChange, object ConflictResolution = null,
             object AddToMru =null, object TextCodepage = null, object TextVisualLayout = null, object Local = null)
-        //public void SaveAs(string Path)
         {
-            if (Filename != null)
+            //Filenameが指定されていれば採用
+            if(Filename is string SafeName)
             {
-                if(Filename is string SafeName)
-                {
-                    this.Name = SafeName;
-                }
+                this.FullName = SafeName;
+            }
+            string Passwd = string.Empty;
+            if (Password is string SafePass)
+            {
+                Passwd = SafePass;
+            }
+            //ファイル名のみの指定であればカレントフォルダーに出力
+            if (Path.GetDirectoryName(this.FullName).Length == 0)
+            {
+                this.FullName = Path.Combine(System.Environment.CurrentDirectory, this.FullName);
             }
             //現在のWorkbookの既定拡張子を取得
             string DefaultExtension = PoiBook.SpreadsheetVersion.DefaultExtension;
             //拡張子は既定拡張子を適用
-            this.Name = System.IO.Path.ChangeExtension(this.Name, DefaultExtension);
-            //ファイル保存
-            using (FileStream Stream = new FileStream(this.Name, FileMode.Create, FileAccess.Write))
+            this.FullName = System.IO.Path.ChangeExtension(this.FullName, DefaultExtension);
+            try
             {
-                PoiBook.Write(Stream, false);
+                //ファイル保存
+                using (FileStream Stream = new FileStream(this.FullName, FileMode.Create, FileAccess.Write))
+                {
+                    PoiBook.Write(Stream, false);
+                }
+                //保存先ファイル名の保存
+                this.FileNameToSave = this.FullName;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.ToString());
+                throw;
             }
         }
 
         /// <summary>
-        /// Bookを閉じるe
+        /// Bookを閉じる
         /// </summary>
-        /// <param name="SaveChanges"></param>
-        /// <param name="Filename"></param>
-        /// <param name="RouteWorkbook"></param>
-        public void Close([Optional] object SaveChanges, [Optional] object Filename, [Optional] object RouteWorkbook)
+        /// <param name="SaveChanges">未使用(無視されます)</param>
+        /// <param name="Filename">未使用(無視されます)</param>
+        /// <param name="RouteWorkbook">未使用(無視されます)</param>
+        public void Close(object SaveChanges = null, object Filename = null, object RouteWorkbook = null)
         {
             PoiBook.Close();
         }
