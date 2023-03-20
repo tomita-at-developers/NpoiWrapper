@@ -254,6 +254,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="Index">シートIndex(１開始)</param>
         /// <returns></returns>
+        [IndexerName("_Default")]
         public virtual dynamic this[int Index]
         {
             get
@@ -268,6 +269,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="Index"></param>
         /// <returns></returns>
+        [IndexerName("_Default")]
         public virtual dynamic this[string Name]
         {
             get

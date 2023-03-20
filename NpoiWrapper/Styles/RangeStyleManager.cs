@@ -35,6 +35,11 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         private Interior _Interior = null;
 
+        /// <summary>
+        /// RangeCommentクラスインスタンス
+        /// </summary>
+        private RangeComment _RangeComment = null;
+
         #endregion
 
         #region "constructors"
@@ -81,6 +86,14 @@ namespace Developers.NpoiWrapper.Styles
                 //最初にアクセスされたときにインスタンス化する
                 if (_Interior == null) { _Interior = new Interior(base.ParentRange); }
                 return _Interior;
+            }
+        }
+
+        public Comment Comment
+        {
+            get
+            {
+                return RangeComment.Comment;
             }
         }
 
@@ -218,6 +231,21 @@ namespace Developers.NpoiWrapper.Styles
                 }
             }
         }
+
+        private RangeComment RangeComment
+        {
+            get
+            {
+                //最初にアクセスされたときにインスタンス化する
+                if (_RangeComment == null) { _RangeComment = new RangeComment(base.ParentRange); }
+                return _RangeComment;
+            }
+        }
+
+        #endregion
+
+        #region "methods"
+
         /// <summary>
         /// 囲み罫線
         /// </summary>
@@ -231,6 +259,16 @@ namespace Developers.NpoiWrapper.Styles
                             XlColorIndex ColorIndex = XlColorIndex.xlColorIndexAutomatic, object Color = null)
         {
             return Borders.Around(LineStyle, Weight, ColorIndex, Color);
+        }
+
+        /// <summary>
+        /// コメントの追加
+        /// </summary>
+        /// <param name="Text">コメント文字列</param>
+        /// <returns></returns>
+        public Comment AddComment(object Text = null)
+        {
+            return RangeComment.AddComment(Text);
         }
 
         #endregion

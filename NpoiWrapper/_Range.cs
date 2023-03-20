@@ -3,12 +3,15 @@ using Developers.NpoiWrapper.Utils;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using NPOI.Util;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Developers.NpoiWrapper
 {
@@ -33,6 +36,7 @@ namespace Developers.NpoiWrapper
     //    int Count { get; }
     //    Range CurrentArray { get; }
     //    Range CurrentRegion { get; }
+    //    [IndexerName("_Default")]
     //    object this[[Optional] object RowIndex, [Optional] object ColumnIndex] { get; set; }
     //    Range Dependents { get; }
     //    Range DirectDependents { get; }
@@ -1029,6 +1033,14 @@ namespace Developers.NpoiWrapper
             set { StyleManager.WrapText = value; }
         }
 
+        /// <summary>
+        /// コメント
+        /// </summary>
+        public Comment Comment
+        {
+            get { return StyleManager.Comment; }
+        }
+
         #endregion
 
         #region "internal properties"
@@ -1195,44 +1207,9 @@ namespace Developers.NpoiWrapper
         /// セルのコメントを生成する
         /// </summary>
         /// <param name="CommentText">コメント文字列</param>
-        public void AddComment(string CommentText = "")
+        public Comment AddComment(object Text = null)
         {
-            //Office.Interop.Excelにならい非連続Rangeの全てに適用
-            for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
-            {
-                //先頭アドレス取得
-                CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
-                //行ループ
-                for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
-                {
-                    //行の取得(なければ生成)
-                    IRow row = Parent.PoiSheet.GetRow(RIdx) ?? Parent.PoiSheet.CreateRow(RIdx);
-                    //列ループ
-                    for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
-                    {
-                        //列の取得(なければ生成)
-                        ICell cell = row.GetCell(CIdx) ?? row.CreateCell(CIdx);
-                        IDrawing drawing = Parent.PoiSheet.CreateDrawingPatriarch();
-                        IClientAnchor anchor = Parent.Parent.PoiBook.GetCreationHelper().CreateClientAnchor();
-                        //サイズは固定で４×３を指定
-                        anchor.Col1 = cell.ColumnIndex;
-                        anchor.Col2 = cell.ColumnIndex + 4;
-                        anchor.Row1 = cell.RowIndex;
-                        anchor.Row2 = cell.RowIndex + 3;
-                        IComment comment = drawing.CreateCellComment(anchor);
-                        if (Parent.PoiSheet is HSSFSheet)
-                        {
-                            comment.String = new HSSFRichTextString(CommentText);
-                        }
-                        else
-                        {
-                            comment.String = new XSSFRichTextString(CommentText);
-                        }
-                        cell.CellComment = comment;
-                    }
-                }
-
-            }
+            return StyleManager.AddComment(Text);
         }
 
         /// <summary>
@@ -1265,7 +1242,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="LineStyle">線の種類</param>
         /// <param name="Weight">線の太さ</param>
-        /// <param name="ColorIndex">カラーパレット上の色インデックス。VBならはともかく、C#だとCastしないと色指定できない。</param>
+        /// <param name="ColorIndex">カラーパレット上の色インデックス。NPOIのColorIndexはInterop.Excelのそれと異なるので要注意。</param>
         /// <param name="Color">未サポート</param>
         /// <returns></returns>
         public object BorderAround(

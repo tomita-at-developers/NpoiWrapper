@@ -112,6 +112,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="Index">シートインデクス(１開始)</param>
         /// <returns></returns>
+        [IndexerName("_Default")]
         public override dynamic this[int Index]
         {
             get
@@ -126,6 +127,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="Name">シート名</param>
         /// <returns></returns>
+        [IndexerName("_Default")]
         public override dynamic this[string Name]
         {
             get

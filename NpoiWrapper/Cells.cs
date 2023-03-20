@@ -1,6 +1,7 @@
 ﻿using Developers.NpoiWrapper.Utils;
 using NPOI.SS.Util;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Developers.NpoiWrapper
 {
@@ -46,6 +47,7 @@ namespace Developers.NpoiWrapper
         /// <param name="RowIndex"></param>
         /// <param name="ColumnIndex"></param>
         /// <returns></returns>
+        [IndexerName("_Default")]
         public override Range this[object RowIndex, object ColumnIndex]
         {
             get
