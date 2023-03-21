@@ -149,6 +149,15 @@ namespace Developers.NpoiWrapper
 
     public class Comment
     {
+        #region "fields"
+
+        /// <summary>
+        /// CommentTextプロパティの実体
+        /// </summary>
+        private string _CommentText = string.Empty;
+
+        #endregion
+
         #region "constants"
 
         private const int DEFAULT_COMMENT_SIZE_X = 4;
@@ -157,6 +166,10 @@ namespace Developers.NpoiWrapper
         private const int DEFAULT_TOP_LEFT_OFFSET_Y_IN_POINT = 100;
         private const int DEFAULT_BOTTM_RIGHT_OFFSET_X_IN_POINT = 100;
         private const int DEFAULT_BOTTM_RIGHT_OFFSET_Y_IN_POINT = 100;
+        //private const int DEFAULT_TOP_LEFT_OFFSET_X_IN_POINT = 0;
+        //private const int DEFAULT_TOP_LEFT_OFFSET_Y_IN_POINT = 0;
+        //private const int DEFAULT_BOTTM_RIGHT_OFFSET_X_IN_POINT = 0;
+        //private const int DEFAULT_BOTTM_RIGHT_OFFSET_Y_IN_POINT = 0;
 
         #endregion
 
@@ -283,7 +296,11 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// コメント文字列
         /// </summary>
-        internal string CommentText { get; set; } = string.Empty;
+        internal string CommentText
+        {
+            get { return this._CommentText; }
+            set { this._CommentText = value ?? string.Empty; } 
+        }
 
         /// <summary>
         /// 開かれた状態にする(public Visibleの実体)
@@ -409,42 +426,52 @@ namespace Developers.NpoiWrapper
         #region "internal methods"
 
         /// <summary>
-        /// 現在のプロパティを実Cellに適用する。
+        /// コメントを作成または更新する。
         /// </summary>
         internal void Apply()
         {
+            IComment Comment;
             //列の取得(なければ生成)
-            NPOI.SS.UserModel.ICell Cell = Utils.CellUtil.GetOrCreateCell(Parent.Parent.PoiSheet, OwnerAddress.Row, OwnerAddress.Column);
-            //ClientAnchr生成
-            IDrawing drawing = Parent.Parent.PoiSheet.CreateDrawingPatriarch();
-            IClientAnchor anchor = Parent.Parent.Parent.PoiBook.GetCreationHelper().CreateClientAnchor();
-            anchor.Col1 = TopLeftAddress.Column;
-            anchor.Row1 = TopLeftAddress.Row;
-            anchor.Col2 = BottomRightAddress.Column;
-            anchor.Row2 = BottomRightAddress.Row;
-            anchor.Dx1 = this.TopLeftOftsetX;
-            anchor.Dy1 = this.TopLeftOffsetY;
-            anchor.Dx2 = this.BottomRightOffsetX;
-            anchor.Dy2 = this.BottomRightOffsetY;
-            //コメント生成
-            IComment Comment = drawing.CreateCellComment(anchor);
-            //Authorセット
-            Comment.Author = this.Author;
-            //コメント文字セット(リッチテキスト変換)
-            if (Parent.Parent.PoiSheet is HSSFSheet)
+            NPOI.SS.UserModel.ICell Cell = Utils.CellUtil.GetOrCreateCell(Parent.Parent.PoiSheet, OwnerAddress);
+            //コメントがあればそれを使う
+            if(Cell.CellComment != null)
             {
-                Comment.String = new HSSFRichTextString(this.CommentText);
+                Comment = Cell.CellComment;
             }
+            //コメントがなければ作る
             else
             {
-                Comment.String = new XSSFRichTextString(this.CommentText);
+                //ClientAnchr生成
+                IDrawing drawing = Parent.Parent.PoiSheet.CreateDrawingPatriarch();
+                IClientAnchor anchor = Parent.Parent.Parent.PoiBook.GetCreationHelper().CreateClientAnchor();
+                anchor.Col1 = TopLeftAddress.Column;
+                anchor.Row1 = TopLeftAddress.Row;
+                anchor.Col2 = BottomRightAddress.Column;
+                anchor.Row2 = BottomRightAddress.Row;
+                anchor.Dx1 = this.TopLeftOftsetX;
+                anchor.Dy1 = this.TopLeftOffsetY;
+                anchor.Dx2 = this.BottomRightOffsetX;
+                anchor.Dy2 = this.BottomRightOffsetY;
+                //コメント生成
+                Comment = drawing.CreateCellComment(anchor);
+                //セルに適用
+                Cell.CellComment = Comment;
+                //Authorセット
+                Comment.Author = this.Author;
+                //表示/非表示セット
+                Comment.Visible = this.Visible;
             }
             //表示/非表示セット
             Comment.Visible = this.Visible;
-            //セルに適用
-            Cell.CellComment = Comment;
+            ////コメント文字セット(リッチテキスト変換)
+            Comment.String = Parent.Parent.Parent.PoiBook.GetCreationHelper().CreateRichTextString(this.CommentText);
         }
 
+        /// <summary>
+        /// シート内で、このコメントの次、または前のコメントを取得する
+        /// </summary>
+        /// <param name="Offset">前の場合は０未満、次の場合は０以上の数値を指定する。省略時は次のコメントを取得。</param>
+        /// <returns>コメントオブジェクト</returns>
         internal Comment GetComment(int Offset = 1)
         {
             Comment RetVal = null;

@@ -7,7 +7,7 @@ namespace Developers.NpoiWrapper.Utils
     /// プロパティ名取得クラス
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
-    public static class NameOf<TSource>
+    internal static class NameOf<TSource>
     {
         /// <summary>
         /// プロパティ名の取得。

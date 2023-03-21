@@ -45,6 +45,8 @@
     <Compile Include="Comment.cs" />
     <Compile Include="Styles\RangeComment.cs" />
     <Compile Include="Utils\CellUtil.cs" />
+    <Compile Include="Utils\XlCellAddress.cs" />
+    <Compile Include="Utils\XlRangeAddress.cs" />
     <Compile Include="_Application.cs" />
     <Compile Include="Areas.cs" />
     <Compile Include="Border.cs" />

@@ -6,14 +6,14 @@ using System.Linq;
 
 namespace Developers.NpoiWrapper.Utils
 {
-    public static class RangeUtil
+    internal static class RangeUtil
     {
         /// <summary>
         /// CellRangeAddressListに含まれるアドレスからA1形式の文字列アドレスリストを生成。
         /// </summary>
         /// <param name="RangeAddressList"></param>
         /// <returns></returns>
-        static internal string CellRangeAddressListToString(CellRangeAddressList RangeAddressList)
+        public static string CellRangeAddressListToString(CellRangeAddressList RangeAddressList)
         {
             string RetVal = "Range";
             for (int a = 0; a < RangeAddressList.CountRanges(); a++)
@@ -32,7 +32,7 @@ namespace Developers.NpoiWrapper.Utils
         /// <param name="RangeAddressList">対象CellRangeAddressList</param>
         /// <param name="Version">IBookが示すSpreadsheetVersion(最大値取得用)</param>
         /// <returns>評価済Rangeアドレスリスト</returns>
-        static public CellRangeAddressList CreateSafeCellRangeAddressList(CellRangeAddressList RangeAddressList, SpreadsheetVersion Version)
+        public static CellRangeAddressList CreateSafeCellRangeAddressList(CellRangeAddressList RangeAddressList, SpreadsheetVersion Version)
         {
             CellRangeAddressList RetVal = new CellRangeAddressList();
             for (int i = 0; i < RangeAddressList.CountRanges(); i++)
@@ -50,7 +50,7 @@ namespace Developers.NpoiWrapper.Utils
         /// <param name="RangeAddressList">対象CellRangeAddress</param>
         /// <param name="Version">IBookが示すSpreadsheetVersion(最大値取得用)</param>
         /// <returns>評価済Rangeアドレス</returns>
-        static public CellRangeAddress CreatetSafeCellRangeAddress(CellRangeAddress RangeAddress, SpreadsheetVersion Version)
+        public static CellRangeAddress CreatetSafeCellRangeAddress(CellRangeAddress RangeAddress, SpreadsheetVersion Version)
         {
             //参照を断った新しいアドレスを生成
             CellRangeAddress RetVal = RangeAddress.Copy();
@@ -122,7 +122,7 @@ namespace Developers.NpoiWrapper.Utils
         /// </summary>
         /// <param name="RangeAddressList">処理対象のCellRangeAddressList</param>
         /// <returns>CellRangeAddressList</returns>
-        static internal CellRangeAddressList CreateMergedAddressList(CellRangeAddressList RangeAddressList)
+        public static CellRangeAddressList CreateMergedAddressList(CellRangeAddressList RangeAddressList)
         {
             List<int> FirstRow = new List<int>();
             List<int> LastRow = new List<int>();
@@ -163,7 +163,7 @@ namespace Developers.NpoiWrapper.Utils
         /// <param name="Lengths">要素数配列{一次元長, 二次元長}</param>
         /// <param name="ColumnCount">開始インデクス{一次元開始値, 二次元開始値}</param>
         /// <returns></returns>
-        static internal dynamic CreateArrayInstance(Type ElementType, int[] Lengths, int[] LowerBounds)
+        public static dynamic CreateArrayInstance(Type ElementType, int[] Lengths, int[] LowerBounds)
         {
             dynamic dataArray = (object[,])Array.CreateInstance(ElementType, Lengths, LowerBounds);
             return dataArray;

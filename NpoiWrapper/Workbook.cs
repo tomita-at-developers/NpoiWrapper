@@ -410,11 +410,11 @@ namespace Developers.NpoiWrapper
         public void Save()
         {
             //保存先ファイルがあって、読取専用でない場合のみ処理。それ以外では無視してなにもしない。
-            //Interop.Excelも概ね同様な動作だが、新規の時にSaveすると、その後のSaveAsは正しくコールしてもエラーとなる。
+            //Interop.Excelも概ね同様な動作。
             if (this.FileNameToSave.Length > 0 && !ReadOnly)
             {
-                //ファイル保存
-                using (FileStream fs = new FileStream(this.FileNameToSave, FileMode.Open, FileAccess.Write))
+                //ファイル保存(完全上書き:Create/Write)
+                using (FileStream fs = new FileStream(this.FileNameToSave, FileMode.Create, FileAccess.Write))
                 {
                     PoiBook.Write(fs, false);
                 }

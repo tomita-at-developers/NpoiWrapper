@@ -50,7 +50,7 @@ namespace Developers.NpoiWrapper.Utils
     /// <summary>
     /// AttributeUtilityクラス
     /// </summary>
-    public static class AttributeUtility
+    internal static class AttributeUtility
     {
         //
         // T で指定したプロパティを1つだけ取得
