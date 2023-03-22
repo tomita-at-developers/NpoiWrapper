@@ -25,6 +25,7 @@ namespace Developers.NpoiWrapper
     //}
     //----------------------------------------------------------------------------------------------
     //  Corresponding interface in NPOI IComment is shown below...
+    //----------------------------------------------------------------------------------------------
     //  ＜ 注意＞
     //  - Address, Row, Column, ClientAnchr.Row1/Col1
     //    - Address

@@ -44,9 +44,14 @@
   <ItemGroup>
     <Compile Include="Comment.cs" />
     <Compile Include="Styles\RangeComment.cs" />
+    <Compile Include="Utils\CellRangeAddressListOperator.cs" />
     <Compile Include="Utils\CellUtil.cs" />
     <Compile Include="Utils\XlCellAddress.cs" />
     <Compile Include="Utils\XlRangeAddress.cs" />
+    <Compile Include="Validation.cs" />
+    <Compile Include="XlDVAlertStyle.cs" />
+    <Compile Include="XlDVType.cs" />
+    <Compile Include="XlFormatConditionOperator.cs" />
     <Compile Include="_Application.cs" />
     <Compile Include="Areas.cs" />
     <Compile Include="Border.cs" />

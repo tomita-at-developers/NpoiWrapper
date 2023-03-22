@@ -1334,7 +1334,7 @@ namespace Developers.NpoiWrapper
                 //なぜかサプレスTRUEにすると表示される
                 Val.SuppressDropDownArrow = true;
             }
-            Val.ErrorStyle = 0;
+            Val.ErrorStyle = ERRORSTYLE.STOP;
             Val.ShowErrorBox = ShowErrorBox;
             Val.CreateErrorBox(ErrorBoxTitle, ErrorBoxText);
             Val.ShowPromptBox = ShowPronptBox;
