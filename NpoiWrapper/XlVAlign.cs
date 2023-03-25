@@ -47,7 +47,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     internal static class XlVAlignParser
     {
-        private static Dictionary<XlVAlign, VerticalAlignment> _Map = new Dictionary<XlVAlign, VerticalAlignment>()
+        private static readonly Dictionary<XlVAlign, VerticalAlignment> _Map = new Dictionary<XlVAlign, VerticalAlignment>()
         {
             { XlVAlign.xlVAlignBottom,      VerticalAlignment.Bottom        },
             { XlVAlign.xlVAlignCenter,      VerticalAlignment.Center        },

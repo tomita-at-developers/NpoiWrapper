@@ -714,13 +714,12 @@ namespace Developers.NpoiWrapper
                     case XlDVType.xlValidateWholeNumber:
                     case XlDVType.xlValidateDecimal:
                     case XlDVType.xlValidateTextLength:
-                        double DoubleValue;
                         //即値でなければ式とみなす
-                        if (!double.TryParse(this._Formula1, out DoubleValue))
+                        if (!double.TryParse(this._Formula1, out _))
                         {
                             this._Formula1 = Formularize(this._Formula1);
                         }
-                        if (!double.TryParse(this._Formula2, out DoubleValue))
+                        if (!double.TryParse(this._Formula2, out _))
                         {
                             this._Formula2 = Formularize(this._Formula2);
                         }
@@ -951,9 +950,8 @@ namespace Developers.NpoiWrapper
             //DataValidationHelper取得
             IDataValidationHelper Helper = Parent.Parent.PoiSheet.GetDataValidationHelper();
             //Constraint
-            IDataValidationConstraint Cst = null;
+            IDataValidationConstraint Cst;
             //XlパラメータのPoi化
-            int PoiValidationType = XlDVTypeParser.GetPoiValue((XlDVType)this._Type);
             int PoiOperatorType = XlFormatConditionOperatorParser.GetPoiValue((XlFormatConditionOperator)this._Operator);
             ST_DataValidationImeMode PoiIMEMode = XlIMEModeParser.GetPoiValue((XlIMEMode)this._IMEMode);
             int PoiAlertStyle = XlDVAlertStyleParser.GetPoiValue((XlDVAlertStyle)this._AlertStyle);
@@ -1100,8 +1098,7 @@ namespace Developers.NpoiWrapper
         {
             DateTimeString = null;
             bool RetVal = false;
-            double Temp;
-            if (double.TryParse(OATimeString, out Temp))
+            if (double.TryParse(OATimeString, out double Temp))
             {
                 try
                 {
@@ -1122,8 +1119,7 @@ namespace Developers.NpoiWrapper
         {
             OADate = null;
             bool RetVal = false;
-            DateTime DateTimeValue;
-            if (DateTime.TryParse(DateString, out DateTimeValue))
+            if (DateTime.TryParse(DateString, out DateTime DateTimeValue))
             {
                 OADate = DateTimeValue.ToOADate().ToString();
                 RetVal = true;
@@ -1135,11 +1131,10 @@ namespace Developers.NpoiWrapper
         {
             OATime = null;
             bool RetVal = false;
-            DateTime DateTimeValue;
             CultureInfo Culture = CultureInfo.CurrentCulture;
             DateTimeStyles Styles = DateTimeStyles.NoCurrentDateDefault;
             string[] TimeParts = TimeString.Split(':');
-            if (DateTime.TryParseExact(TimeString, (TimeParts.Length >= 3 ? "H:m:s" : "H:m"), Culture, Styles, out DateTimeValue))
+            if (DateTime.TryParseExact(TimeString, (TimeParts.Length >= 3 ? "H:m:s" : "H:m"), Culture, Styles, out DateTime DateTimeValue))
             {
                 OATime = DateTimeValue.ToOADate().ToString();
                 RetVal = true;

@@ -98,7 +98,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     internal static class XlPatternParser
     {
-        private static Dictionary<XlPattern, FillPattern> _Map = new Dictionary<XlPattern, FillPattern>()
+        private static readonly Dictionary<XlPattern, FillPattern> _Map = new Dictionary<XlPattern, FillPattern>()
         {
             { XlPattern.xlPatternAutomatic,             FillPattern.SolidForeground         },  //未サポート
             { XlPattern.xlPatternChecker,               FillPattern.BigSpots                },

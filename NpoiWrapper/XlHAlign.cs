@@ -55,7 +55,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     internal static class XlHAlignParser
     {
-        private static Dictionary<XlHAlign, HorizontalAlignment> _Map = new Dictionary<XlHAlign, HorizontalAlignment>()
+        private static readonly Dictionary<XlHAlign, HorizontalAlignment> _Map = new Dictionary<XlHAlign, HorizontalAlignment>()
         {
             { XlHAlign.xlHAlignCenter,                  HorizontalAlignment.Center          },
             { XlHAlign.xlHAlignCenterAcrossSelection,   HorizontalAlignment.CenterSelection },

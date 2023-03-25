@@ -66,7 +66,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     internal static class XlIMEModeParser
     {
-        private static Dictionary<XlIMEMode, ST_DataValidationImeMode> _Map = new Dictionary<XlIMEMode, ST_DataValidationImeMode>()
+        private static readonly Dictionary<XlIMEMode, ST_DataValidationImeMode> _Map = new Dictionary<XlIMEMode, ST_DataValidationImeMode>()
         {
             { XlIMEMode.xlIMEModeNoControl,     ST_DataValidationImeMode.noControl      },
             { XlIMEMode.xlIMEModeOn,            ST_DataValidationImeMode.on             },

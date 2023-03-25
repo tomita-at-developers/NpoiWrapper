@@ -56,7 +56,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     internal static class XlFormatConditionOperatorParser
     {
-        private static Dictionary<XlFormatConditionOperator, int> _Map = new Dictionary<XlFormatConditionOperator, int>()
+        private static readonly Dictionary<XlFormatConditionOperator, int> _Map = new Dictionary<XlFormatConditionOperator, int>()
         {
             { XlFormatConditionOperator.xlBetween,      OperatorType.BETWEEN            },
             { XlFormatConditionOperator.xlNotBetween,   OperatorType.NOT_BETWEEN        },

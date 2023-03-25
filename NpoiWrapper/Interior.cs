@@ -96,9 +96,8 @@ namespace Developers.NpoiWrapper
             get
             {
                 XlPattern? RetVal = null;
-                FillPattern PoiValue;
                 object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.Pattern));
-                if (XlPatternParser.Try(RawVal, out PoiValue))
+                if (XlPatternParser.Try(RawVal, out FillPattern PoiValue))
                 {
                     RetVal = XlPatternParser.GetXlValue(PoiValue);
                 }
@@ -106,8 +105,7 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                XlPattern XlValue;
-                if (XlPatternParser.Try(value, out XlValue))
+                if (XlPatternParser.Try(value, out XlPattern XlValue))
                 {
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     { { new CellStyleParam(StyleName.Interior.Pattern, XlPatternParser.GetPoiValue(XlValue)) } };

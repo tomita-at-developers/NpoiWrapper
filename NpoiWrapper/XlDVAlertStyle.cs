@@ -41,7 +41,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     internal static class XlDVAlertStyleParser
     {
-        private static Dictionary<XlDVAlertStyle, int> _Map = new Dictionary<XlDVAlertStyle, int>()
+        private static readonly Dictionary<XlDVAlertStyle, int> _Map = new Dictionary<XlDVAlertStyle, int>()
         {
             { XlDVAlertStyle.xlValidAlertStop,          NPOI.SS.UserModel.ERRORSTYLE.STOP       },
             { XlDVAlertStyle.xlValidAlertWarning,        NPOI.SS.UserModel.ERRORSTYLE.WARNING    },

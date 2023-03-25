@@ -58,7 +58,7 @@ namespace Developers.NpoiWrapper
     /// </summary>
     internal static class XlDVTypeParser
     {
-        private static Dictionary<XlDVType, int> _Map = new Dictionary<XlDVType, int>()
+        private static readonly Dictionary<XlDVType, int> _Map = new Dictionary<XlDVType, int>()
         {
             { XlDVType.xlValidateInputOnly,     ValidationType.ANY          },
             { XlDVType.xlValidateWholeNumber,   ValidationType.INTEGER      },
