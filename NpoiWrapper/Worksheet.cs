@@ -5,6 +5,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
+using NPOI.HSSF.UserModel;
 
 namespace Developers.NpoiWrapper
 {
@@ -234,6 +235,15 @@ namespace Developers.NpoiWrapper
         /// POIのシートIndex(0開始)
         /// </summary>
         internal int PoiIndex { get { return Parent.PoiBook.GetSheetIndex(PoiSheet.SheetName); } }
+
+        /// <summary>
+        /// このシートがHSSFSheetかどうか
+        /// </summary>
+        internal bool IsHSSF { get { return (PoiSheet is HSSFSheet); } }
+        /// <summary>
+        /// このシートがXSSFSheetかどうか
+        /// </summary>
+        internal bool IsXSSF { get { return (PoiSheet is XSSFSheet); } }
 
         #endregion
 

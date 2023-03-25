@@ -40,6 +40,11 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         private RangeComment _RangeComment = null;
 
+        /// <summary>
+        /// Validationクラスインスタンス
+        /// </summary>
+        private Validation _Validation = null;
+
         #endregion
 
         #region "constructors"
@@ -59,6 +64,9 @@ namespace Developers.NpoiWrapper.Styles
 
         #region "properties"
 
+        /// <summary>
+        /// 文字フォント
+        /// </summary>
         public Font Font
         {
             get
@@ -69,6 +77,9 @@ namespace Developers.NpoiWrapper.Styles
             }
         }
 
+        /// <summary>
+        /// 罫線
+        /// </summary>
         public Borders Borders
         {
             get
@@ -79,6 +90,9 @@ namespace Developers.NpoiWrapper.Styles
             }
         }
 
+        /// <summary>
+        /// 塗りつぶし
+        /// </summary>
         public Interior Interior
         {
             get
@@ -89,11 +103,27 @@ namespace Developers.NpoiWrapper.Styles
             }
         }
 
+        /// <summary>
+        /// コメント
+        /// </summary>
         public Comment Comment
         {
             get
             {
                 return RangeComment.Comment;
+            }
+        }
+
+        /// <summary>
+        /// 入力規則
+        /// </summary>
+        public Validation Validation
+        {
+            get
+            {
+                //最初にアクセスされたときにインスタンス化する
+                if (_Validation == null) { _Validation = new Validation(base.ParentRange); }
+                return _Validation;
             }
         }
 

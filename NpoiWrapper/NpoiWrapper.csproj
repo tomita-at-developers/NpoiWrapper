@@ -52,6 +52,7 @@
     <Compile Include="XlDVAlertStyle.cs" />
     <Compile Include="XlDVType.cs" />
     <Compile Include="XlFormatConditionOperator.cs" />
+    <Compile Include="XlIMEMode.cs" />
     <Compile Include="_Application.cs" />
     <Compile Include="Areas.cs" />
     <Compile Include="Border.cs" />

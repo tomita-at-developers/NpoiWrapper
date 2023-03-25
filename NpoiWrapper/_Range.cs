@@ -1041,6 +1041,16 @@ namespace Developers.NpoiWrapper
             get { return StyleManager.Comment; }
         }
 
+        /// <summary>
+        /// 入力規則
+        /// </summary>
+        public Validation Validation
+        {
+            get { return StyleManager.Validation; }
+        }
+
+
+
         #endregion
 
         #region "internal properties"
