@@ -9,20 +9,6 @@ using NPOI.SS.UserModel;
 
 namespace Developers.NpoiWrapper
 {
-    /// <summary>
-    /// データバリデーションの種類
-    /// </summary>
-    public enum XlDVType : int
-    {
-        xlValidateInputOnly = 0,
-        xlValidateWholeNumber = 1,
-        xlValidateDecimal = 2,
-        xlValidateList = 3,
-        xlValidateDate = 4,
-        xlValidateTime = 5,
-        xlValidateTextLength = 6,
-        xlValidateCustom = 7,
-    }
     //----------------------------------------------------------------------------------------------
     //  XlDVType in Interop.Excel is shown below...
     //  https://learn.microsoft.com/en-us/office/vba/api/excel.xldvtype
@@ -52,6 +38,21 @@ namespace Developers.NpoiWrapper
     //    public const int TEXT_LENGTH = 6;
     //    public const int FORMULA = 7;
     //}
+
+    /// <summary>
+    /// データバリデーションの種類
+    /// </summary>
+    public enum XlDVType : int
+    {
+        xlValidateInputOnly = 0,
+        xlValidateWholeNumber = 1,
+        xlValidateDecimal = 2,
+        xlValidateList = 3,
+        xlValidateDate = 4,
+        xlValidateTime = 5,
+        xlValidateTextLength = 6,
+        xlValidateCustom = 7,
+    }
     /// <summary>
     /// XlDVTypeとNPOI.SS.UserModel.ValidationTypeの相互変換
     /// </summary>

@@ -1,14 +1,8 @@
 ﻿namespace Developers.NpoiWrapper
 {
-    /// <summary>
-    /// Cellのタイプ。SpecialCellsで使用。
-    /// </summary>
-    public enum XlCellType
-    {
-        xlCellTypeLastCell = 11
-    }
     //----------------------------------------------------------------------------------------------
     //  XlCellType of Interop.Excel is shown below....
+    //  https://learn.microsoft.com/en-us/office/vba/api/excel.xlcelltype
     //----------------------------------------------------------------------------------------------
     //public enum XlCellType
     //{
@@ -23,5 +17,22 @@
     //    xlCellTypeAllValidation = -4174,
     //    xlCellTypeSameValidation = -4175
     //}
+
+    /// <summary>
+    /// Cellのタイプ。SpecialCellsで使用。
+    /// </summary>
+    public enum XlCellType : int
+    {
+        xlCellTypeBlanks = 4,
+        xlCellTypeConstants = 2,
+        xlCellTypeFormulas = -4123,
+        xlCellTypeLastCell = 11,
+        xlCellTypeComments = -4144,
+        xlCellTypeVisible = 12,
+        xlCellTypeAllFormatConditions = -4172,
+        xlCellTypeSameFormatConditions = -4173,
+        xlCellTypeAllValidation = -4174,
+        xlCellTypeSameValidation = -4175
+    }
 
 }

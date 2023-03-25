@@ -67,9 +67,10 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                if (value is XlLineStyle SafeValue)
+                XlLineStyle XlValue;
+                if (XlLineStyleParser.Try(value, out XlValue))
                 {
-                    BorderStyle.UpdateProperty(new BorderStyleParam(StyleName.XlsBorder.LineStyle, SafeValue));
+                    BorderStyle.UpdateProperty(new BorderStyleParam(StyleName.XlsBorder.LineStyle, XlValue));
                 }
                 else
                 {

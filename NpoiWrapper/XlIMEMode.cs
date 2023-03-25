@@ -8,23 +8,6 @@ using NPOI.OpenXmlFormats.Spreadsheet;
 
 namespace Developers.NpoiWrapper
 {
-    /// <summary>
-    /// IMEモード
-    /// </summary>
-    public enum  XlIMEMode : int
-    {
-        xlIMEModeNoControl = 0,
-        xlIMEModeOn = 1,
-        xlIMEModeOff = 2,
-        xlIMEModeDisable = 3,
-        xlIMEModeHiragana = 4,
-        xlIMEModeKatakana = 5,
-        xlIMEModeKatakanaHalf = 6,
-        xlIMEModeAlphaFull = 7,
-        xlIMEModeAlpha = 8,
-        xlIMEModeHangulFull = 9,
-        xlIMEModeHangul = 10
-    }
     //----------------------------------------------------------------------------------------------
     //  XlIMEMode in Interop.Excel is shown below...
     //  https://learn.microsoft.com/en-us/dotnet/api/microsoft.office.interop.excel.xlimemode?view=excel-pia
@@ -60,6 +43,24 @@ namespace Developers.NpoiWrapper
     //    fullHangul,
     //    halfHangul
     //}
+
+    /// <summary>
+    /// IMEモード
+    /// </summary>
+    public enum XlIMEMode : int
+    {
+        xlIMEModeNoControl = 0,
+        xlIMEModeOn = 1,
+        xlIMEModeOff = 2,
+        xlIMEModeDisable = 3,
+        xlIMEModeHiragana = 4,
+        xlIMEModeKatakana = 5,
+        xlIMEModeKatakanaHalf = 6,
+        xlIMEModeAlphaFull = 7,
+        xlIMEModeAlpha = 8,
+        xlIMEModeHangulFull = 9,
+        xlIMEModeHangul = 10
+    }
     /// <summary>
     /// XlIMETypeとST_DataValidationImeModeの相互変換
     /// </summary>

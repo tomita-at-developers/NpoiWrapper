@@ -7,17 +7,9 @@ using System.Threading.Tasks;
 
 namespace Developers.NpoiWrapper
 {
-    /// <summary>
-    /// データバリデーションエラーのスタイル
-    /// </summary>
-    public enum XlDVAlertStyle : int
-    {
-        xlValidAlertStop = 1,
-        xlValidAlertWarning = 2,
-        xlValidAlertInformation = 3
-    }
     //----------------------------------------------------------------------------------------------
     //  XlDVAlertStyle in Interop.Excel is shown below...
+    //  https://learn.microsoft.com/en-us/office/vba/api/excel.xldvalertstyle
     //----------------------------------------------------------------------------------------------
     //public enum XlDVAlertStyle
     //{
@@ -34,6 +26,16 @@ namespace Developers.NpoiWrapper
     //    public const int WARNING = 1;
     //    public const int INFO = 2;
     //}
+
+    /// <summary>
+    /// データバリデーションエラーのスタイル
+    /// </summary>
+    public enum XlDVAlertStyle : int
+    {
+        xlValidAlertStop = 1,
+        xlValidAlertWarning = 2,
+        xlValidAlertInformation = 3
+    }
     /// <summary>
     /// XlDVAlertStyleとNPOI.SS.UserModel.ERRORSTYLEの相互変換
     /// </summary>

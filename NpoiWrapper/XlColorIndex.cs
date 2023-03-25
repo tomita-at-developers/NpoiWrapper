@@ -1,13 +1,5 @@
 ﻿namespace Developers.NpoiWrapper
 {
-    /// <summary>
-    /// カラーパレット上のインデックス
-    /// </summary>
-    public enum XlColorIndex
-    {
-        xlColorIndexAutomatic = -4105,
-        xlColorIndexNone = -4142
-    }
     //----------------------------------------------------------------------------------------------
     //  XlColorIndex of Interop.Excel is shown below....
     //----------------------------------------------------------------------------------------------
@@ -16,4 +8,13 @@
     //    xlColorIndexAutomatic = -4105,
     //    xlColorIndexNone = -4142
     //}
+
+    /// <summary>
+    /// カラーパレット上のインデックス
+    /// </summary>
+    public enum XlColorIndex : int
+    {
+        xlColorIndexAutomatic = -4105,
+        xlColorIndexNone = -4142
+    }
 }

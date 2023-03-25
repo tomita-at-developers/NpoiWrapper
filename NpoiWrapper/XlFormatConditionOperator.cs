@@ -2,26 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI;
 
 namespace Developers.NpoiWrapper
 {
-    /// <summary>
-    /// 評価条件。ValidationのOperationに指定できる。
-    /// </summary>
-    public enum XlFormatConditionOperator : int
-    {
-        xlBetween = 1,
-        xlNotBetween = 2,
-        xlEqual = 3,
-        xlNotEqual = 4,
-        xlGreater = 5,
-        xlLess = 6,
-        xlGreaterEqual = 7,
-        xlLessEqual = 8,
-    }
     //----------------------------------------------------------------------------------------------
     //  XlFormatConditionOperator in Interop.Excel is shown below...
     //  https://learn.microsoft.com/en-us/office/vba/api/excel.xlformatconditionoperator
@@ -52,6 +35,22 @@ namespace Developers.NpoiWrapper
     //    public const int LESS_OR_EQUAL = 7;
     //    public const int IGNORED = 0;
     //}
+
+    /// <summary>
+    /// 評価条件。ValidationのOperationに指定できる。
+    /// </summary>
+    public enum XlFormatConditionOperator : int
+    {
+        xlBetween = 1,
+        xlNotBetween = 2,
+        xlEqual = 3,
+        xlNotEqual = 4,
+        xlGreater = 5,
+        xlLess = 6,
+        xlGreaterEqual = 7,
+        xlLessEqual = 8,
+    }
+
     /// <summary>
     /// XlFormatConditionOperatorParserとNPOI.SS.UserModel.OperatorTypeの相互変換
     /// </summary>
@@ -113,4 +112,3 @@ namespace Developers.NpoiWrapper
         }
     }
 }
-

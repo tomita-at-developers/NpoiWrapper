@@ -2,6 +2,7 @@
 using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using static Developers.NpoiWrapper.Styles.Properties.StyleName;
 
 namespace Developers.NpoiWrapper.Styles
@@ -135,14 +136,22 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (XlHAlign?)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.HorizontaiAlignment));
+                XlHAlign? RetVal = null;
+                HorizontalAlignment PoiValue;
+                object RawVal = GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.HorizontaiAlignment));
+                if (XlHAlignParser.Try(RawVal, out PoiValue))
+                {
+                    RetVal = XlHAlignParser.GetXlValue(PoiValue);
+                }
+                return RetVal;
             }
             set
             {
-                if (value is XlHAlign SafeValue)
+                XlHAlign XlValue;
+                if (XlHAlignParser.Try(value, out XlValue))
                 {
                     List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                    { { new Properties.CellStyleParam(Properties.StyleName.HorizontaiAlignment, (HorizontalAlignment)SafeValue) } };
+                    { { new Properties.CellStyleParam(Properties.StyleName.HorizontaiAlignment, XlHAlignParser.GetPoiValue(XlValue)) } };
                     UpdateProperties(Params);
                 }
                 else
@@ -159,14 +168,22 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (XlVAlign?)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.VerticalAlignment));
+                XlVAlign? RetVal = null;
+                VerticalAlignment PoiValue;
+                object RawVal = GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.VerticalAlignment));
+                if (XlVAlignParser.Try(RawVal, out PoiValue))
+                {
+                    RetVal = XlVAlignParser.GetXlValue(PoiValue);
+                }
+                return RetVal;
             }
             set
             {
-                if (value is XlVAlign SafeValue)
+                XlVAlign XlValue;
+                if (XlVAlignParser.Try(value, out XlValue))
                 {
                     List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                    { { new Properties.CellStyleParam(Properties.StyleName.VerticalAlignment, (VerticalAlignment)SafeValue) } };
+                    { { new Properties.CellStyleParam(Properties.StyleName.VerticalAlignment, XlVAlignParser.GetPoiValue(XlValue)) } };
                     UpdateProperties(Params);
                 }
                 else
