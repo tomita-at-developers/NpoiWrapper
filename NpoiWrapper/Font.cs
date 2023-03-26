@@ -1,9 +1,9 @@
-﻿using Developers.NpoiWrapper.Styles;
-using Developers.NpoiWrapper.Styles.Properties;
-using Developers.NpoiWrapper.Styles.Models;
+﻿using Developers.NpoiWrapper.Model;
+using Developers.NpoiWrapper.Model.Param;
+using Developers.NpoiWrapper.Model.Utils;
+using Developers.NpoiWrapper.Model.Wrapper;
 using Developers.NpoiWrapper.Utils;
 using NPOI.SS.UserModel;
-using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
 

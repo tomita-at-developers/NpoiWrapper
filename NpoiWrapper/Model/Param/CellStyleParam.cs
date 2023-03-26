@@ -1,4 +1,4 @@
-﻿namespace Developers.NpoiWrapper.Styles.Properties
+﻿namespace Developers.NpoiWrapper.Model.Param
 {
     /// <summary>
     /// PoiCellStyle参照/更新パラメータ

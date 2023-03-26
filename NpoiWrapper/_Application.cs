@@ -1,13 +1,5 @@
-﻿using MathNet.Numerics;
-using NPOI.SS.Format;
-using static NPOI.HSSF.Util.HSSFColor;
-using static System.Net.Mime.MediaTypeNames;
-using System.Data.Odbc;
-using System.Data.OleDb;
-using System.Runtime.InteropServices;
-using System.Web.UI.WebControls;
+﻿using System;
 using System.Collections.Generic;
-using System;
 
 namespace Developers.NpoiWrapper
 {

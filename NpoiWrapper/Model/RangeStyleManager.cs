@@ -1,11 +1,9 @@
-﻿using NPOI.SS.UserModel;
-using NPOI.SS.Util;
+﻿using Developers.NpoiWrapper.Model.Param;
+using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using static Developers.NpoiWrapper.Styles.Properties.StyleName;
 
-namespace Developers.NpoiWrapper.Styles
+namespace Developers.NpoiWrapper.Model
 {
     /// <summary>
     /// RangeStyleManger
@@ -137,7 +135,7 @@ namespace Developers.NpoiWrapper.Styles
             get
             {
                 XlHAlign? RetVal = null;
-                object RawVal = GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.HorizontaiAlignment));
+                object RawVal = GetCommonProperty(new CellStyleParam(Utils.StyleName.HorizontaiAlignment));
                 if (XlHAlignParser.Try(RawVal, out HorizontalAlignment PoiValue))
                 {
                     RetVal = XlHAlignParser.GetXlValue(PoiValue);
@@ -148,8 +146,8 @@ namespace Developers.NpoiWrapper.Styles
             {
                 if (XlHAlignParser.Try(value, out XlHAlign XlValue))
                 {
-                    List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                    { { new Properties.CellStyleParam(Properties.StyleName.HorizontaiAlignment, XlHAlignParser.GetPoiValue(XlValue)) } };
+                    List<CellStyleParam> Params = new List<CellStyleParam>
+                    { { new CellStyleParam(Utils.StyleName.HorizontaiAlignment, XlHAlignParser.GetPoiValue(XlValue)) } };
                     UpdateProperties(Params);
                 }
                 else
@@ -167,7 +165,7 @@ namespace Developers.NpoiWrapper.Styles
             get
             {
                 XlVAlign? RetVal = null;
-                object RawVal = GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.VerticalAlignment));
+                object RawVal = GetCommonProperty(new CellStyleParam(Utils.StyleName.VerticalAlignment));
                 if (XlVAlignParser.Try(RawVal, out VerticalAlignment PoiValue))
                 {
                     RetVal = XlVAlignParser.GetXlValue(PoiValue);
@@ -178,8 +176,8 @@ namespace Developers.NpoiWrapper.Styles
             {
                 if (XlVAlignParser.Try(value, out XlVAlign XlValue))
                 {
-                    List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                    { { new Properties.CellStyleParam(Properties.StyleName.VerticalAlignment, XlVAlignParser.GetPoiValue(XlValue)) } };
+                    List<CellStyleParam> Params = new List<CellStyleParam>
+                    { { new CellStyleParam(Utils.StyleName.VerticalAlignment, XlVAlignParser.GetPoiValue(XlValue)) } };
                     UpdateProperties(Params);
                 }
                 else
@@ -197,13 +195,13 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (string)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.NumberFormat));
+                return (string)GetCommonProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
             }
             set
             {
                 //nullでも書きにいく
-                List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                { { new Properties.CellStyleParam(Properties.StyleName.NumberFormat, value) } };
+                List<CellStyleParam> Params = new List<CellStyleParam>
+                { { new CellStyleParam(Utils.StyleName.NumberFormat, value) } };
                 UpdateProperties(Params);
             }
         }
@@ -216,13 +214,13 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (string)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.NumberFormat));
+                return (string)GetCommonProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
             }
             set
             {
                 //nullでも書きにいく
-                List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                { { new Properties.CellStyleParam(Styles.Properties.StyleName.NumberFormat, value) } };
+                List<CellStyleParam> Params = new List<CellStyleParam>
+                { { new CellStyleParam(Model.Utils.StyleName.NumberFormat, value) } };
                 UpdateProperties(Params);
             }
         }
@@ -234,14 +232,14 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (bool?)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.Locked));
+                return (bool?)GetCommonProperty(new CellStyleParam(Utils.StyleName.Locked));
             }
             set
             {
                 if (value is bool SafeValue)
                 {
-                    List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                    { { new Properties.CellStyleParam(Styles.Properties.StyleName.Locked, SafeValue) } };
+                    List<CellStyleParam> Params = new List<CellStyleParam>
+                    { { new CellStyleParam(Model.Utils.StyleName.Locked, SafeValue) } };
                     UpdateProperties(Params);
                 }
                 else
@@ -258,14 +256,14 @@ namespace Developers.NpoiWrapper.Styles
         {
             get
             {
-                return (bool?)GetCommonProperty(new Properties.CellStyleParam(Properties.StyleName.WrapText));
+                return (bool?)GetCommonProperty(new CellStyleParam(Utils.StyleName.WrapText));
             }
             set
             {
                 if (value is bool SafeValue)
                 {
-                    List<Properties.CellStyleParam> Params = new List<Properties.CellStyleParam>
-                    { { new Properties.CellStyleParam(Properties.StyleName.WrapText, SafeValue) } };
+                    List<CellStyleParam> Params = new List<CellStyleParam>
+                    { { new CellStyleParam(Utils.StyleName.WrapText, SafeValue) } };
                     UpdateProperties(Params);
                 }
                 else

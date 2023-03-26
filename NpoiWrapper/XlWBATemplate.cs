@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Developers.NpoiWrapper
+﻿namespace Developers.NpoiWrapper
 {
     //----------------------------------------------------------------------------------------------
     //  XlWBATemplate  of Interop.Excel is shown below....

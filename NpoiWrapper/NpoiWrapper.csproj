@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Comment.cs" />
-    <Compile Include="Styles\RangeComment.cs" />
+    <Compile Include="Model\RangeComment.cs" />
     <Compile Include="Utils\CellRangeAddressListOperator.cs" />
     <Compile Include="Utils\CellUtil.cs" />
     <Compile Include="Utils\XlCellAddress.cs" />
@@ -71,18 +71,18 @@
     <Compile Include="_Range.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="Sheets.cs" />
-    <Compile Include="Styles\Models\PoiCellStyle.cs" />
-    <Compile Include="Styles\Models\PoiFont.cs" />
-    <Compile Include="Styles\Properties\BorderStyleParam.cs" />
-    <Compile Include="Styles\Properties\CellStyleParam.cs" />
-    <Compile Include="Styles\Properties\PoiBorderStyle.cs" />
-    <Compile Include="Styles\Properties\StyleName.cs" />
-    <Compile Include="Styles\Properties\XlsBorderStyle.cs" />
-    <Compile Include="Styles\RangeBorderStyle.cs" />
-    <Compile Include="Styles\RangeStyle.cs" />
-    <Compile Include="Styles\RangeStyleManager.cs" />
-    <Compile Include="Styles\Utils\CellStyleUpdateHistory.cs" />
-    <Compile Include="Styles\Utils\ColorPallet.cs" />
+    <Compile Include="Model\Wrapper\PoiCellStyle.cs" />
+    <Compile Include="Model\Wrapper\PoiFont.cs" />
+    <Compile Include="Model\Param\BorderStyleParam.cs" />
+    <Compile Include="Model\Param\CellStyleParam.cs" />
+    <Compile Include="Model\Utils\PoiBorderStyle.cs" />
+    <Compile Include="Model\Utils\StyleName.cs" />
+    <Compile Include="Model\Utils\XlsBorderStyle.cs" />
+    <Compile Include="Model\RangeBorder.cs" />
+    <Compile Include="Model\RangeStyle.cs" />
+    <Compile Include="Model\RangeStyleManager.cs" />
+    <Compile Include="Model\Utils\CellStyleUpdateHistory.cs" />
+    <Compile Include="Model\Utils\ColorPallet.cs" />
     <Compile Include="Utils\Attributes.cs" />
     <Compile Include="Utils\BorderCellRangeAddress.cs" />
     <Compile Include="Utils\CellValue.cs" />
@@ -118,5 +118,6 @@
       <Version>2.6.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,11 +1,12 @@
-﻿using NPOI.SS.UserModel;
+﻿using Developers.NpoiWrapper.Model.Param;
+using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Developers.NpoiWrapper.Styles
+namespace Developers.NpoiWrapper.Model
 {
     /// <summary>
     /// RangeStyleManger
@@ -70,9 +71,9 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         /// <param name="Param">取得指示</param>
         /// <returns></returns>
-        public object GetCommonProperty(Properties.CellStyleParam Param)
+        public object GetCommonProperty(CellStyleParam Param)
         {
-            Dictionary<string, object> Properties = GetCommonProperties(new List<Properties.CellStyleParam> { Param });
+            Dictionary<string, object> Properties = GetCommonProperties(new List<CellStyleParam> { Param });
             return Properties[Param.Name];
         }
 
@@ -83,20 +84,20 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         /// <param name="Params">取得指示リスト</param>
         /// <returns></returns>
-        public Dictionary<string, object> GetCommonProperties(List<Properties.CellStyleParam> Params)
+        public Dictionary<string, object> GetCommonProperties(List<CellStyleParam> Params)
         {
             //デバッグログ用情報
             var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
             StopwatchForDebugLog.Start();
             int CellCountForDebugLog = 0;
             string ParamsForDebugLog = string.Empty;
-            foreach (Properties.CellStyleParam Param in Params) { ParamsForDebugLog += Param.GetParamsString() + ","; }
+            foreach (CellStyleParam Param in Params) { ParamsForDebugLog += Param.GetParamsString() + ","; }
             ParamsForDebugLog = ParamsForDebugLog.TrimEnd(',');
             Logger.Debug("Start processing for Params[" + ParamsForDebugLog + "]");
             //リターン値、集積エリアの生成と初期化
             Dictionary<string, object> RetVal = new Dictionary<string, object>();
             Dictionary<string, List<object>> Values = new Dictionary<string, List<object>>();
-            foreach (Properties.CellStyleParam Param in Params)
+            foreach (CellStyleParam Param in Params)
             {
                 RetVal.Add(Param.Name, null);
                 Values.Add(Param.Name, new List<object>());
@@ -119,10 +120,10 @@ namespace Developers.NpoiWrapper.Styles
                         //デバッグログ用処理カウンタ加算
                         CellCountForDebugLog += 1;
                         //PoiCellStyleの生成
-                        Models.PoiCellStyle Style = new Models.PoiCellStyle(
+                        Wrapper.PoiCellStyle Style = new Wrapper.PoiCellStyle(
                                 this.PoiSheet, GetCellStyle(RowIndex, ColumnIndex, DefaultStyle).Index);
                         ///プロパティ取得ループ
-                        foreach (Properties.CellStyleParam p in Params)
+                        foreach (CellStyleParam p in Params)
                         {
                             //プロパティ情報
                             PropertyInfo CurrentProp;
@@ -196,16 +197,16 @@ namespace Developers.NpoiWrapper.Styles
         /// Paramで指定された１つのUpdateを実行
         /// </summary>
         /// <param name="Param">Uupdate指示</param>
-        public void UpdateProperty(Properties.CellStyleParam Param)
+        public void UpdateProperty(CellStyleParam Param)
         {
-            UpdateProperties(new List<Properties.CellStyleParam> { Param });
+            UpdateProperties(new List<CellStyleParam> { Param });
         }
 
         /// <summary>
         /// Paramsで指定されたUpdateを実行
         /// </summary>
         /// <param name="Params">Uupdate指示リスト</param>
-        public void UpdateProperties(List<Properties.CellStyleParam> Params)
+        public void UpdateProperties(List<CellStyleParam> Params)
         {
             //デバッグログ用情報
             var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
@@ -213,7 +214,7 @@ namespace Developers.NpoiWrapper.Styles
             int CellCountForDebugLog = 0;
             string DebugLogString;
             string ParamsForDebugLog = string.Empty;
-            foreach (Properties.CellStyleParam Param in Params) { ParamsForDebugLog += Param.GetParamsString() + ","; }
+            foreach (CellStyleParam Param in Params) { ParamsForDebugLog += Param.GetParamsString() + ","; }
             ParamsForDebugLog = ParamsForDebugLog.TrimEnd(',');
             Logger.Debug("Start processing for Params[" + ParamsForDebugLog + "]");
             //更新履歴管理クラス生成
@@ -240,9 +241,9 @@ namespace Developers.NpoiWrapper.Styles
                         if (IndexToApply == Utils.CellStyleUpdateHistory.None)
                         {
                             //PoiCellStyleの生成
-                            Models.PoiCellStyle Style = new Models.PoiCellStyle(this.PoiSheet, CurrentIndex);
+                            Wrapper.PoiCellStyle Style = new Wrapper.PoiCellStyle(this.PoiSheet, CurrentIndex);
                             ///変更処理実行
-                            foreach (Properties.CellStyleParam p in Params)
+                            foreach (CellStyleParam p in Params)
                             {
                                 PropertyInfo CurrentProp;
                                 object CurrentObj = Style;

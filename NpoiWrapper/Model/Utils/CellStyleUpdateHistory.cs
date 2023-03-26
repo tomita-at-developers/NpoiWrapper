@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Developers.NpoiWrapper.Styles.Properties;
+using Developers.NpoiWrapper.Model.Param;
 
-namespace Developers.NpoiWrapper.Styles.Utils
+namespace Developers.NpoiWrapper.Model.Utils
 {
 
     /// <summary>

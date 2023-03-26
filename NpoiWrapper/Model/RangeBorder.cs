@@ -1,4 +1,4 @@
-﻿using Developers.NpoiWrapper.Styles.Models;
+﻿using Developers.NpoiWrapper.Model.Param;
 using Developers.NpoiWrapper.Utils;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -6,11 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
 
-namespace Developers.NpoiWrapper.Styles
+namespace Developers.NpoiWrapper.Model
 {
-    internal class RangeBorderStyle
+    internal class RangeBorder
     {
         #region "fields"
 
@@ -30,7 +29,7 @@ namespace Developers.NpoiWrapper.Styles
         /// <param name="PoiSheet">ISheetインスタンス</param>
         /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
         /// <param name="BordersIndex">XlBordersIndex値</param>
-        public RangeBorderStyle(ISheet PoiSheet, CellRangeAddressList SafeAddressList, XlBordersIndex? BordersIndex)
+        public RangeBorder(ISheet PoiSheet, CellRangeAddressList SafeAddressList, XlBordersIndex? BordersIndex)
         {
             //親Range情報の保存
             this.PoiSheet = PoiSheet;
@@ -49,7 +48,7 @@ namespace Developers.NpoiWrapper.Styles
 
         #endregion
 
-        #region "properties"
+        #region "Utils"
 
         /// <summary>
         /// 親IWorkbook
@@ -106,10 +105,10 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         /// <param name="Param">取得指示</param>
         /// <returns></returns>
-        public object GetCommonProperty(Properties.BorderStyleParam Param)
+        public object GetCommonProperty(BorderStyleParam Param)
         {
-            Dictionary<string, object> Properties = GetCommonProperties(new List<Properties.BorderStyleParam> { Param });
-            return Properties[Param.Name];
+            Dictionary<string, object> Utils = GetCommonUtils(new List<BorderStyleParam> { Param });
+            return Utils[Param.Name];
         }
 
         /// <summary>
@@ -117,25 +116,25 @@ namespace Developers.NpoiWrapper.Styles
         /// </summary>
         /// <param name="Params">取得指示リスト</param>
         /// <returns></returns>
-        public Dictionary<string, object> GetCommonProperties(List<Properties.BorderStyleParam> Params)
+        public Dictionary<string, object> GetCommonUtils(List<BorderStyleParam> Params)
         {
             //RangeからBoder情報を読み取る
             GetPoiBorders();
             //リターン値初期化
             Dictionary<string, object> RetVal = new Dictionary<string, object>();
             //要求にしたがいリターン値セット
-            foreach (Properties.BorderStyleParam Param in Params)
+            foreach (BorderStyleParam Param in Params)
             {
                 //BordersIndex別の処理
-                if (Param.Name == Properties.StyleName.XlsBorder.LineStyle)
+                if (Param.Name == Utils.StyleName.XlsBorder.LineStyle)
                 {
                     RetVal.Add(Param.Name, CommonXlsStyle);
                 }
-                else if (Param.Name == Properties.StyleName.XlsBorder.Weight)
+                else if (Param.Name == Utils.StyleName.XlsBorder.Weight)
                 {
                     RetVal.Add(Param.Name, CommonXlsWeight);
                 }
-                else if (Param.Name == Properties.StyleName.XlsBorder.ColorIndex)
+                else if (Param.Name == Utils.StyleName.XlsBorder.ColorIndex)
                 {
                     RetVal.Add(Param.Name, CommonColorIndex);
                 }
@@ -147,9 +146,9 @@ namespace Developers.NpoiWrapper.Styles
         /// Paramで指定された１つのUpdateを実行
         /// </summary>
         /// <param name="Param">Uupdate指示</param>
-        public void UpdateProperty(Properties.BorderStyleParam Param)
+        public void UpdateProperty(BorderStyleParam Param)
         {
-            UpdateProperties(new List<Properties.BorderStyleParam>{ Param });
+            UpdateUtils(new List<BorderStyleParam>{ Param });
         }
 
         /// <summary>
@@ -158,7 +157,7 @@ namespace Developers.NpoiWrapper.Styles
         /// なので比較的単純な判断で情報取得できる。
         /// </summary>
         /// <param name="Params">Uupdate指示リスト</param>
-        public void UpdateProperties(List<Properties.BorderStyleParam> Params)
+        public void UpdateUtils(List<BorderStyleParam> Params)
         {
             //デバッグログ用情報
             var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
@@ -166,7 +165,7 @@ namespace Developers.NpoiWrapper.Styles
             int CellCountForDebugLog = 0;
             string DebugLogString;
             string ParamsForDebugLog = string.Empty;
-            foreach (Properties.BorderStyleParam Param in Params) { ParamsForDebugLog += Param.GetParamsString() + ","; }
+            foreach (BorderStyleParam Param in Params) { ParamsForDebugLog += Param.GetParamsString() + ","; }
             ParamsForDebugLog = ParamsForDebugLog.TrimEnd(',');
             Logger.Debug("Start processing for Params[" + ParamsForDebugLog + "]");
             //更新履歴管理クラス生成
@@ -187,15 +186,15 @@ namespace Developers.NpoiWrapper.Styles
                         ICellStyle CurrentStyle = GetCellStyle(RowIndex, ColumnIndex, DefaultStyle);
                         short CurrentIndex = CurrentStyle.Index;
                         //Excel語のパラメータをPOI語に翻訳する。
-                        List<Properties.CellStyleParam> CellParams = GetParams(Address, RowIndex, ColumnIndex, Params, CurrentStyle);
+                        List<CellStyleParam> CellParams = GetParams(Address, RowIndex, ColumnIndex, Params, CurrentStyle);
                         //同じIndexとパラメータの実施履歴がなければ変更処理を実施
                         short IndexToApply = History.Query(CurrentIndex, CellParams);
                         if (IndexToApply == Utils.CellStyleUpdateHistory.None)
                         {
                             //PoiCellStyleの生成
-                            Models.PoiCellStyle Style = new Models.PoiCellStyle(this.PoiSheet, CurrentIndex);
+                            Wrapper.PoiCellStyle Style = new Wrapper.PoiCellStyle(this.PoiSheet, CurrentIndex);
                             ///変更処理実行
-                            foreach (Properties.CellStyleParam p in CellParams)
+                            foreach (CellStyleParam p in CellParams)
                             {
                                 PropertyInfo CurrentProp;
                                 object CurrentObj = Style;
@@ -402,7 +401,7 @@ namespace Developers.NpoiWrapper.Styles
             //PoiStylesからXlsStylesを生成
             foreach (object PoiStyle in PoiStyles)
             {
-                Properties.XlsBorderStyle Xls = new Properties.XlsBorderStyle((BorderStyle)PoiStyle);
+                Utils.XlsBorderStyle Xls = new Utils.XlsBorderStyle((BorderStyle)PoiStyle);
                 XlsStyles.Add(Xls.LineStyle);
                 XlsWeights.Add(Xls.Weight);
             }
@@ -467,15 +466,15 @@ namespace Developers.NpoiWrapper.Styles
         /// <param name="Params">BorderStyleItemリスト</param>
         /// <param name="CurrentStyle">このCellが現在持っているCellStyle</param>
         /// <returns>変換結果(CellStyleItemのリスト)</returns>
-        private List<Properties.CellStyleParam> GetParams(
-                    BorderCellRangeAddress Address, int RowIndex, int ColumnIndex, List<Properties.BorderStyleParam> Params, ICellStyle CurrentStyle)
+        private List<CellStyleParam> GetParams(
+                    BorderCellRangeAddress Address, int RowIndex, int ColumnIndex, List<BorderStyleParam> Params, ICellStyle CurrentStyle)
         {
-            List<Properties.CellStyleParam> RetVal = new List<Properties.CellStyleParam>();
+            List<CellStyleParam> RetVal = new List<CellStyleParam>();
             //Paramsループ
-            foreach (Properties.BorderStyleParam Param in Params)
+            foreach (BorderStyleParam Param in Params)
             {
                 //LineStyle指定
-                if (Param.Name == Properties.StyleName.XlsBorder.LineStyle)
+                if (Param.Name == Utils.StyleName.XlsBorder.LineStyle)
                 {
                     //特定のBordersIndex指定がある場合
                     if (BordersIndex != null)
@@ -483,22 +482,22 @@ namespace Developers.NpoiWrapper.Styles
                         //xlEdgeTop指定：Top
                         if (BordersIndex == XlBordersIndex.xlEdgeTop)
                         {
-                            RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
                         }
                         //xlEdgeBottom指定：Bottom
                         else if (BordersIndex == XlBordersIndex.xlEdgeBottom)
                         {
-                            RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
                         }
                         //xlEdgeLeft指定：Left
                         else if (BordersIndex == XlBordersIndex.xlEdgeLeft)
                         {
-                            RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
                         }
                         //xlEdgeRight指定：Right
                         else if (BordersIndex == XlBordersIndex.xlEdgeRight)
                         {
-                            RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
                         }
                         //xlInsideHorizontal指定
                         else if (BordersIndex == XlBordersIndex.xlInsideHorizontal)
@@ -506,12 +505,12 @@ namespace Developers.NpoiWrapper.Styles
                             //前に行があればTop
                             if (Address.HasPreviousRow(RowIndex))
                             {
-                                RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
                             }
                             //後に行があればBottom
                             if(Address.HasNextRow(RowIndex))
                             {
-                                RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
                             }
                         }
                         //xlInsideVertical指定
@@ -520,40 +519,40 @@ namespace Developers.NpoiWrapper.Styles
                             //前に列があればLeft
                             if (Address.HasPreviousColumn(ColumnIndex))
                             {
-                                RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
                             }
                             //後に列があればRight
                             if (Address.HasNextColumn(ColumnIndex))
                             {
-                                RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
                             }
                         }
                         //xlDiagonalDown指定
                         else if (BordersIndex == XlBordersIndex.xlDiagonalDown)
                         {
                             //Diagonal系(Type:BorderDiagonal.Backward)
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Backward));
-                            RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Backward));
+                            RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
                         }
                         //xlDiagonalUp指定
                         else if (BordersIndex == XlBordersIndex.xlDiagonalUp)
                         {
                             //Diagonal系(Type:BorderDiagonal.Forward)
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Forward));
-                            RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Forward));
+                            RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
                         }
                     }
                     //BordersIndex指定がなければ全周囲
                     else
                     {
-                        RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
-                        RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
-                        RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
-                        RetVal.Add(GetChangeStyleParam(Properties.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetChangeStyleParam(Utils.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
                     }
                 }
                 //Weight指定
-                else if (Param.Name == Properties.StyleName.XlsBorder.Weight)
+                else if (Param.Name == Utils.StyleName.XlsBorder.Weight)
                 {
                     //特定のBordersIndex指定がある場合
                     if (BordersIndex != null)
@@ -561,22 +560,22 @@ namespace Developers.NpoiWrapper.Styles
                         //xlEdgeTop指定：Top
                         if (BordersIndex == XlBordersIndex.xlEdgeTop)
                         {
-                            RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
                         }
                         //xlEdgeBottom指定：Bottom
                         else if (BordersIndex == XlBordersIndex.xlEdgeBottom)
                         {
-                            RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
                         }
                         //xlEdgeLeft指定：Left
                         else if (BordersIndex == XlBordersIndex.xlEdgeLeft)
                         {
-                            RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
                         }
                         //xlEdgeRight指定：Right
                         else if (BordersIndex == XlBordersIndex.xlEdgeRight)
                         {
-                            RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
                         }
                         //xlInsideHorizontal指定
                         else if (BordersIndex == XlBordersIndex.xlInsideHorizontal)
@@ -584,12 +583,12 @@ namespace Developers.NpoiWrapper.Styles
                             //前に行があればTop
                             if (Address.HasPreviousRow(RowIndex))
                             {
-                                RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
                             }
                             //後に行があればBottom
                             if (Address.HasNextRow(RowIndex))
                             {
-                                RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
                             }
                         }
                         //xlInsideVertical指定
@@ -598,40 +597,40 @@ namespace Developers.NpoiWrapper.Styles
                             //前に列があればLeft
                             if (Address.HasPreviousColumn(ColumnIndex))
                             {
-                                RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
                             }
                             //後に列があればRight
                             if (Address.HasNextColumn(ColumnIndex))
                             {
-                                RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
+                                RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
                             }
                         }
                         //xlDiagonalDown指定
                         else if (BordersIndex == XlBordersIndex.xlDiagonalDown)
                         {
                             //Diagonal系(Type:BorderDiagonal.Backward)
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Backward));
-                            RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Backward));
+                            RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
                         }
                         //xlDiagonalUp指定
                         else if (BordersIndex == XlBordersIndex.xlDiagonalUp)
                         {
                             //Diagonal系(Type:BorderDiagonal.Forward)
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Forward));
-                            RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Forward));
+                            RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Diagonal.Style, CurrentStyle, Param.Value));
                         }
                     }
                     //BordersIndex指定がなければ全周囲
                     else
                     {
-                        RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
-                        RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
-                        RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
-                        RetVal.Add(GetAlterWeightParam(Properties.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Top.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Bottom.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Left.Style, CurrentStyle, Param.Value));
+                        RetVal.Add(GetAlterWeightParam(Utils.StyleName.PoiBorder.Right.Style, CurrentStyle, Param.Value));
                     }
                 }
                 //ColorIndex指定
-                else if (Param.Name == Properties.StyleName.XlsBorder.ColorIndex)
+                else if (Param.Name == Utils.StyleName.XlsBorder.ColorIndex)
                 {
                     //特定のBordersIndex指定がある場合
                     if (BordersIndex != null)
@@ -639,22 +638,22 @@ namespace Developers.NpoiWrapper.Styles
                         //xlEdgeTop指定：Top
                         if (BordersIndex == XlBordersIndex.xlEdgeTop)
                         {
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Top.Color, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Top.Color, Param.Value));
                         }
                         //xlEdgeBottom指定：Bottom
                         else if (BordersIndex == XlBordersIndex.xlEdgeBottom)
                         {
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Top.Color, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Top.Color, Param.Value));
                         }
                         //xlEdgeLeft指定：Left
                         else if (BordersIndex == XlBordersIndex.xlEdgeLeft)
                         {
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Left.Color, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Left.Color, Param.Value));
                         }
                         //xlEdgeRight指定：Right
                         else if (BordersIndex == XlBordersIndex.xlEdgeRight)
                         {
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Right.Color, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Right.Color, Param.Value));
                         }
                         //xlInsideHorizontal指定
                         else if (BordersIndex == XlBordersIndex.xlInsideHorizontal)
@@ -662,12 +661,12 @@ namespace Developers.NpoiWrapper.Styles
                             //前に行があればTop
                             if (Address.HasPreviousRow(RowIndex))
                             {
-                                RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Top.Color, Param.Value));
+                                RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Top.Color, Param.Value));
                             }
                             //後に行があればBottom
                             if (Address.HasNextRow(RowIndex))
                             {
-                                RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Bottom.Color, Param.Value));
+                                RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Bottom.Color, Param.Value));
                             }
                         }
                         //xlInsideVertical指定
@@ -676,36 +675,36 @@ namespace Developers.NpoiWrapper.Styles
                             //前に列があればLeft
                             if (Address.HasPreviousColumn(ColumnIndex))
                             {
-                                RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Left.Color, Param.Value));
+                                RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Left.Color, Param.Value));
                             }
                             //後に列があればRight
                             if (Address.HasNextColumn(ColumnIndex))
                             {
-                                RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Right.Color, Param.Value));
+                                RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Right.Color, Param.Value));
                             }
                         }
                         //xlDiagonalDown指定
                         else if (BordersIndex == XlBordersIndex.xlDiagonalDown)
                         {
                             //Diagonal系(Type:BorderDiagonal.Backward)
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Backward));
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Color, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Backward));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Color, Param.Value));
                         }
                         //xlDiagonalUp指定
                         else if (BordersIndex == XlBordersIndex.xlDiagonalUp)
                         {
                             //Diagonal系(Type:BorderDiagonal.Forward)
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Forward));
-                            RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Diagonal.Color, Param.Value));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Type, BorderDiagonal.Forward));
+                            RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Diagonal.Color, Param.Value));
                         }
                     }
                     //BordersIndex指定がなければ全周囲
                     else
                     {
-                        RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Top.Color, Param.Value));
-                        RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Bottom.Color, Param.Value));
-                        RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Left.Color, Param.Value));
-                        RetVal.Add(new Properties.CellStyleParam(Properties.StyleName.PoiBorder.Right.Color, Param.Value));
+                        RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Top.Color, Param.Value));
+                        RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Bottom.Color, Param.Value));
+                        RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Left.Color, Param.Value));
+                        RetVal.Add(new CellStyleParam(Utils.StyleName.PoiBorder.Right.Color, Param.Value));
                     }
                 }
             }
@@ -718,30 +717,30 @@ namespace Developers.NpoiWrapper.Styles
         /// <param name="CurrentStyle"></param>
         /// <param name="NewStyle"></param>
         /// <returns></returns>
-        private Properties.CellStyleParam GetChangeStyleParam(string TargetName, ICellStyle CurrentStyle, object Value)
+        private CellStyleParam GetChangeStyleParam(string TargetName, ICellStyle CurrentStyle, object Value)
         {
             BorderStyle CurrentBorderStyle = BorderStyle.None;
-            if (TargetName == Properties.StyleName.PoiBorder.Top.Style)
+            if (TargetName == Utils.StyleName.PoiBorder.Top.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderTop;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Bottom.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Bottom.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderBottom;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Left.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Left.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderLeft;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Right.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Right.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderRight;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Diagonal.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Diagonal.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderDiagonalLineStyle;
             }
-            return new Properties.CellStyleParam(TargetName, ChangeStyle(CurrentBorderStyle, (XlLineStyle)Value));
+            return new CellStyleParam(TargetName, ChangeStyle(CurrentBorderStyle, (XlLineStyle)Value));
         }
 
         /// <summary>
@@ -751,30 +750,30 @@ namespace Developers.NpoiWrapper.Styles
         /// <param name="CurrentStyle"></param>
         /// <param name="Value"></param>
         /// <returns></returns>
-        private Properties.CellStyleParam GetAlterWeightParam(string TargetName, ICellStyle CurrentStyle, object Value)
+        private CellStyleParam GetAlterWeightParam(string TargetName, ICellStyle CurrentStyle, object Value)
         {
             BorderStyle CurrentBorderStyle = BorderStyle.None;
-            if (TargetName == Properties.StyleName.PoiBorder.Top.Style)
+            if (TargetName == Utils.StyleName.PoiBorder.Top.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderTop;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Bottom.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Bottom.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderBottom;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Left.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Left.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderLeft;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Right.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Right.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderRight;
             }
-            else if (TargetName == Properties.StyleName.PoiBorder.Diagonal.Style)
+            else if (TargetName == Utils.StyleName.PoiBorder.Diagonal.Style)
             {
                 CurrentBorderStyle = CurrentStyle.BorderDiagonalLineStyle;
             }
-            return new Properties.CellStyleParam(TargetName, AlterWeight(CurrentBorderStyle, (XlBorderWeight)Value));
+            return new CellStyleParam(TargetName, AlterWeight(CurrentBorderStyle, (XlBorderWeight)Value));
         }
 
         /// <summary>
@@ -786,9 +785,9 @@ namespace Developers.NpoiWrapper.Styles
         private BorderStyle ChangeStyle(BorderStyle CurrentStyle, XlLineStyle NewStyle)
         {
             //現在のBorderStyleをXlLineStyleとXlBorderWeightに分解
-            Properties.XlsBorderStyle XlsStyle = new Properties.XlsBorderStyle(CurrentStyle);
+            Utils.XlsBorderStyle XlsStyle = new Utils.XlsBorderStyle(CurrentStyle);
             //新しいXlLineStyleと現在のXlBorderWeightで新しいBorderStyleを生成
-            Properties.PoiBorderStyle PoiStyle = new Properties.PoiBorderStyle(NewStyle, XlsStyle.Weight);
+            Utils.PoiBorderStyle PoiStyle = new Utils.PoiBorderStyle(NewStyle, XlsStyle.Weight);
             return PoiStyle.BorderStyle;
         }
 
@@ -801,9 +800,9 @@ namespace Developers.NpoiWrapper.Styles
         private BorderStyle AlterWeight(BorderStyle CurrentStyle, XlBorderWeight NewWeight)
         {
             //現在のBorderStyleをXlLineStyleとXlBorderWeightに分解
-            Properties.XlsBorderStyle XlsStyle = new Properties.XlsBorderStyle(CurrentStyle);
+            Utils.XlsBorderStyle XlsStyle = new Utils.XlsBorderStyle(CurrentStyle);
             //新しいXlLineStyleと現在のXlBorderWeightで新しいBorderStyleを生成
-            Properties.PoiBorderStyle PoiStyle = new Properties.PoiBorderStyle(XlsStyle.LineStyle, NewWeight);
+            Utils.PoiBorderStyle PoiStyle = new Utils.PoiBorderStyle(XlsStyle.LineStyle, NewWeight);
             return PoiStyle.BorderStyle;
         }
 

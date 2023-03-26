@@ -1,10 +1,9 @@
-﻿using Developers.NpoiWrapper.Configurations.Models;
-using Developers.NpoiWrapper.Utils;
+﻿using Developers.NpoiWrapper.Utils;
 using NPOI.SS.UserModel;
 using System;
 using System.Reflection;
 
-namespace Developers.NpoiWrapper.Styles.Models
+namespace Developers.NpoiWrapper.Model.Wrapper
 {
     //----------------------------------------------------------------------------------------------
     // IFont interface  is shown below...

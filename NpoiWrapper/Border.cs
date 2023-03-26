@@ -1,5 +1,6 @@
-﻿using Developers.NpoiWrapper.Styles;
-using Developers.NpoiWrapper.Styles.Properties;
+﻿using Developers.NpoiWrapper.Model;
+using Developers.NpoiWrapper.Model.Param;
+using Developers.NpoiWrapper.Model.Utils;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
@@ -42,7 +43,7 @@ namespace Developers.NpoiWrapper
             //Border情報の保存
             this.BordersIndex = BordersIndex;
             //RangeBorderStyle生成
-            BorderStyle = new RangeBorderStyle(this.PoiSheet, this.SafeAddressList, this.BordersIndex);
+            BorderStyle = new RangeBorder(this.PoiSheet, this.SafeAddressList, this.BordersIndex);
         }
 
         #endregion
@@ -146,7 +147,7 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Range情報読み取り書込み
         /// </summary>
-        private RangeBorderStyle BorderStyle { get; }
+        private RangeBorder BorderStyle { get; }
 
         #endregion
 

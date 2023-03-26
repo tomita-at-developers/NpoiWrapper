@@ -1,14 +1,7 @@
-﻿using MathNet.Numerics;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
+﻿using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static System.Net.Mime.MediaTypeNames;
-using System.Runtime.InteropServices;
-using System.Web.UI.WebControls;
-using log4net.Repository.Hierarchy;
 
 namespace Developers.NpoiWrapper
 {

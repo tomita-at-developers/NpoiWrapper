@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NPOI.SS.UserModel;
+﻿using NPOI.SS.UserModel;
 
-namespace Developers.NpoiWrapper.Styles.Utils
+namespace Developers.NpoiWrapper.Model.Utils
 {
     /// <summary>
     /// objectで指定されたColorIndexをshort?にキャストする。

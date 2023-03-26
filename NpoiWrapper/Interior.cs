@@ -1,10 +1,7 @@
-﻿using Developers.NpoiWrapper.Styles;
-using Developers.NpoiWrapper.Styles.Properties;
-using Developers.NpoiWrapper.Styles.Utils;
+﻿using Developers.NpoiWrapper.Model;
+using Developers.NpoiWrapper.Model.Param;
+using Developers.NpoiWrapper.Model.Utils;
 using NPOI.SS.UserModel;
-using NPOI.SS.Util;
-using NPOI.Util.Collections;
-using SixLabors.ImageSharp.Metadata.Profiles.Iptc;
 using System;
 using System.Collections.Generic;
 

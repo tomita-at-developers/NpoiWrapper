@@ -1,15 +1,6 @@
-﻿using NPOI.SS.Formula.Functions;
-using NPOI.Util;
-using Org.BouncyCastle.Cms;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Management;
 
 namespace Developers.NpoiWrapper
 {

@@ -1,4 +1,4 @@
-﻿namespace Developers.NpoiWrapper.Styles.Properties
+﻿namespace Developers.NpoiWrapper.Model.Param
 {
     /// <summary>
     /// 罫線情報の参照/更新パラメータ

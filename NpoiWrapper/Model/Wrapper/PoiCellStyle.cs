@@ -1,12 +1,10 @@
-﻿using Developers.NpoiWrapper.Configurations.Models;
-using Developers.NpoiWrapper.Utils;
+﻿using Developers.NpoiWrapper.Utils;
 using NPOI.SS.UserModel;
-using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Developers.NpoiWrapper.Styles.Models
+namespace Developers.NpoiWrapper.Model.Wrapper
 {
     internal class PoiCellStyle : ICellStyle
     {

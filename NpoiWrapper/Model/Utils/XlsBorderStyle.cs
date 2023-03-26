@@ -1,6 +1,6 @@
 ﻿using NPOI.SS.UserModel;
 
-namespace Developers.NpoiWrapper.Styles.Properties
+namespace Developers.NpoiWrapper.Model.Utils
 {
     /// <summary>
     /// Excel名前のLineStyleを取得する(PoiのBorderStyleから)

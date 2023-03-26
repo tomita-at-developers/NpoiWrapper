@@ -1,17 +1,13 @@
-﻿using Developers.NpoiWrapper.Styles;
+﻿using Developers.NpoiWrapper.Model;
 using Developers.NpoiWrapper.Utils;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
-using NPOI.Util;
-using NPOI.XSSF.UserModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Developers.NpoiWrapper
 {

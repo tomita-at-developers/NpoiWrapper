@@ -1,7 +1,7 @@
-﻿using Developers.NpoiWrapper.Styles.Models;
+﻿using Developers.NpoiWrapper.Model.Wrapper;
 using Developers.NpoiWrapper.Utils;
 
-namespace Developers.NpoiWrapper.Styles.Properties
+namespace Developers.NpoiWrapper.Model.Utils
 {
     /// <summary>
     /// PoiCellStyle更新対象プロパティ名

@@ -1,9 +1,8 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
-using Developers.NpoiWrapper.Utils;
 
-namespace Developers.NpoiWrapper.Styles
+namespace Developers.NpoiWrapper.Model
 {
     internal class RangeComment
     {
