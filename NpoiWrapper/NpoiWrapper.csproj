@@ -52,8 +52,11 @@
     <Compile Include="Validation.cs" />
     <Compile Include="XlDVAlertStyle.cs" />
     <Compile Include="XlDVType.cs" />
+    <Compile Include="XlFileFormat.cs" />
     <Compile Include="XlFormatConditionOperator.cs" />
     <Compile Include="XlIMEMode.cs" />
+    <Compile Include="XlPageOrientation.cs" />
+    <Compile Include="XlPaperSize.cs" />
     <Compile Include="_Application.cs" />
     <Compile Include="Areas.cs" />
     <Compile Include="Border.cs" />

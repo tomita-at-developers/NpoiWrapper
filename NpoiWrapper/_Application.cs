@@ -383,11 +383,11 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// Visible(ダミー実装)
         /// </summary>
-        public bool Visible { get; internal set; } = false;
+        public bool Visible { get; set; } = false;
         /// <summary>
         /// DisplayAlerts(ダミー実装)
         /// </summary>
-        public bool DisplayAlerts { get; internal set; } = false;
+        public bool DisplayAlerts { get; set; } = false;
 
         /// <summary>
         /// Selectionプロパティ(getterのみ)

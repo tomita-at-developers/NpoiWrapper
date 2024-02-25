@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Developers.NpoiWrapper
 {
@@ -185,11 +186,14 @@ namespace Developers.NpoiWrapper
         #region "emulated public methods"
 
         /// <summary>
-        /// シートの追加
-        /// ★常に末尾に追加される。追加位置の指定はできない。
+        /// シートの追加(常に末尾に追加)
         /// </summary>
+        /// <param name="Before">このシートの前に追加(無視されます)</param>
+        /// <param name="After">このシートの後に追加(無視されます)</param>
+        /// <param name="Count">追加するシートの数(無視されます)</param>
+        /// <param name="Type">ワークシートの種類(無視されます)</param>
         /// <returns></returns>
-        public Worksheet Add()
+        public Worksheet Add(object Before = null, object After = null, object Count = null, object Type = null)
         {
             return new Worksheet(Parent, Parent.PoiBook.CreateSheet());
         }
