@@ -149,7 +149,9 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             }
             set
             {
+                //上位からの値を保存し、現在のIndexをクリア
                 _DataFormatString = value;
+                DataFormat = -1;
             }
         }
 
@@ -204,9 +206,8 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                     }
                 }
             }
-            //DataFormatを文字列に展開。展開したらDataFormatは無効化
-            DataFormatString = CellStyle.GetDataFormatString();
-            DataFormat = -1;
+            //DataFormatを文字列に展開(プロパティではなく元のFieldに展開)。Indexは保持。
+            _DataFormatString = CellStyle.GetDataFormatString();
             //フォント情報を展開。展開したらFontIndexは無効化
             PoiFont = new PoiFont(PoiBook, CellStyle.FontIndex);
             FontIndex = -1;
@@ -332,16 +333,6 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                 this.ApplyTo(CellStyle);
                 Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style.[Index:" + CellStyle.Index + "] is newly created.");
             }
-            //★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-            // NPOIのバグ対応
-            // Fill系のColorを指すると予期しないColorColorがセットされてしまう。
-            // なのでコンパイラのアクセス制限を強引に乗り越えてnullをセットする。
-            //BindingFlags Flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty;
-            //PropertyInfo BGColor = CellStyle.GetType().GetProperty("FillBackgroundColorColor", Flag);
-            //BGColor?.SetValue(CellStyle, null);
-            //PropertyInfo FGColor = CellStyle.GetType().GetProperty("FillForegroundColorColor", Flag);
-            //FGColor?.SetValue(CellStyle, null);
-            //★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
             //Indexを新しい値に更新する
             this.Index = CellStyle.Index;
             this.FontIndex = PoiFont.Index;
@@ -378,18 +369,38 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             CellStyle.SetFont(PoiFont.Font);
         }
 
+        /// <summary>
+        /// DataFormatのコミット
+        /// </summary>
         private void CommitDataFormat()
         {
-            this.DataFormat = -1;
-            //マスター上に存在するかチェックしあればそれを使う
-            SortedDictionary<short, string> formats = StyleUtil.GetNumberFormats(PoiBook);
-            foreach (KeyValuePair<short, string> format in formats)
+            //フォーマットが更新されている場合はマスター上に利用可能なものがあるかチェック
+            if (this.DataFormat == -1)
             {
-                //プロパティにセットされた値がマスター上にある場合はそのIndexを利用
-                if (format.Value == this.DataFormatString)
+                //ビルトインフォーマットに一致するものがあるかチェック
+                string[] Builtin = BuiltinFormats.GetAll();
+                for (short index = 0; index < Builtin.Length; index++)
                 {
-                    this.DataFormat = format.Key;
-                    break;
+                    if (Builtin[index] == this.DataFormatString)
+                    {
+                        this.DataFormat = index;
+                        break;
+                    }
+                }
+                //ビルトインになければユーザ設定をチェック
+                if (this.DataFormat == -1)
+                {
+                    //ユーザ設定のフォーマットマスター上に一致するものがあるチェック
+                    SortedDictionary<short, string> formats = StyleUtil.GetNumberFormats(PoiBook);
+                    foreach (KeyValuePair<short, string> format in formats)
+                    {
+                        //プロパティにセットされた値がマスター上にある場合はそのIndexを利用
+                        if (format.Value == this.DataFormatString)
+                        {
+                            this.DataFormat = format.Key;
+                            break;
+                        }
+                    }
                 }
             }
             //マスター上になければ新規作成する

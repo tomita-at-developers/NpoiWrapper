@@ -1047,7 +1047,6 @@ namespace Developers.NpoiWrapper
                     break;
                 default:
                     throw new ArgumentException("Validation.Type");
-                    break;
             }
             //バリデーションの作成
             IDataValidation Val

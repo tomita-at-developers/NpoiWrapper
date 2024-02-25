@@ -1,4 +1,5 @@
 ﻿using NPOI.SS.UserModel;
+using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -435,7 +436,7 @@ namespace Developers.NpoiWrapper
             object AddToMru =null, object TextCodepage = null, object TextVisualLayout = null, object Local = null)
         {
             //Filenameが指定されていれば採用
-            if(Filename is string SafeName)
+            if (Filename is string SafeName)
             {
                 this.FullName = SafeName;
             }
@@ -456,7 +457,7 @@ namespace Developers.NpoiWrapper
             try
             {
                 //ファイル保存
-                using (FileStream Stream = new FileStream(this.FullName, FileMode.Create, FileAccess.Write))
+                using (FileStream Stream = new FileStream(this.FullName, FileMode.Create, FileAccess.ReadWrite))
                 {
                     PoiBook.Write(Stream, false);
                 }

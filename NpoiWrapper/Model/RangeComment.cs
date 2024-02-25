@@ -39,7 +39,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 Comment RetVal = null;
-                //行が実在すること
+                //セルが実在すること
                 ICell Cell = NpoiWrapper.Utils.CellUtil.GetCell(Parent.Parent.PoiSheet, FirstCellAddress);
                 if (Cell != null)
                 {

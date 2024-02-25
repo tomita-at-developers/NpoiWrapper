@@ -9,7 +9,7 @@ namespace Developers.NpoiWrapper.Model
     /// RangeStyleManger
     /// Excel名前体系(Range)とPOI名前体系(ICellSttyle)の間で、読み書きを仲介する。
     /// </summary>
-    internal class RangeStyleManager : RangeStyle
+    internal class RangeManager : RangeStyle
     {
         #region "fields"
 
@@ -44,6 +44,11 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         private Validation _Validation = null;
 
+        /// <summary>
+        /// RangeValueクラスインスタンス
+        /// </summary>
+        private RangeValue _RangeValue = null;
+
         #endregion
 
         #region "constructors"
@@ -53,7 +58,7 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         /// <param name="PoiSheet">ISheetインスタンス</param>
         /// <param name="SafeAddressList">CellRangeAddressListクラスインスタンス</param>
-        public RangeStyleManager(Range ParentRange)
+        public RangeManager(Range ParentRange)
             : base(ParentRange)
         {
             //何もしない
@@ -124,6 +129,41 @@ namespace Developers.NpoiWrapper.Model
                 if (_Validation == null) { _Validation = new Validation(base.ParentRange); }
                 return _Validation;
             }
+        }
+
+        /// <summary>
+        /// セルの値Value
+        /// </summary>
+        public object Value
+        {
+            get { return RangeValue.Value; }
+            set { RangeValue.Value = value; }   
+        }
+
+        /// <summary>
+        /// セルの値Value2
+        /// </summary>
+        public object Value2
+        {
+            get { return RangeValue.Value2; }
+            set { RangeValue.Value2 = value; }
+        }
+
+        /// <summary>
+        /// セルの値Text
+        /// </summary>
+        public object Text
+        {
+            get { return RangeValue.Text; }
+        }
+
+        /// <summary>
+        /// セルの式
+        /// </summary>
+        public object Formula
+        {
+            get { return RangeValue.Formula; }
+            set { RangeValue.Formula = value; }
         }
 
         /// <summary>
@@ -273,6 +313,22 @@ namespace Developers.NpoiWrapper.Model
             }
         }
 
+        /// <summary>
+        /// Cellの値
+        /// </summary>
+        public RangeValue RangeValue
+        {
+            get
+            {
+                //最初にアクセスされたときにインスタンス化する
+                if (_RangeValue == null) { _RangeValue = new RangeValue(base.ParentRange); }
+                return _RangeValue;
+            }
+        }
+
+        /// <summary>
+        /// Cellのコメント
+        /// </summary>
         private RangeComment RangeComment
         {
             get

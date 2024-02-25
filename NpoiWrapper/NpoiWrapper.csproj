@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Comment.cs" />
     <Compile Include="Model\RangeComment.cs" />
+    <Compile Include="Model\RangeValue.cs" />
     <Compile Include="Utils\CellRangeAddressListOperator.cs" />
     <Compile Include="Utils\CellUtil.cs" />
     <Compile Include="Utils\XlCellAddress.cs" />
@@ -80,7 +81,7 @@
     <Compile Include="Model\Utils\XlsBorderStyle.cs" />
     <Compile Include="Model\RangeBorder.cs" />
     <Compile Include="Model\RangeStyle.cs" />
-    <Compile Include="Model\RangeStyleManager.cs" />
+    <Compile Include="Model\RangeManager.cs" />
     <Compile Include="Model\Utils\CellStyleUpdateHistory.cs" />
     <Compile Include="Model\Utils\ColorPallet.cs" />
     <Compile Include="Utils\Attributes.cs" />
@@ -115,7 +116,7 @@
       <Version>2.0.15</Version>
     </PackageReference>
     <PackageReference Include="NPOI">
-      <Version>2.6.0</Version>
+      <Version>2.6.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

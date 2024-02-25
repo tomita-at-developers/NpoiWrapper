@@ -398,7 +398,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                dynamic RetVal = null;
+                object RetVal = null;
                 //ActiveSheetが存在すること
                 if (ActiveSheet != null)
                 {
