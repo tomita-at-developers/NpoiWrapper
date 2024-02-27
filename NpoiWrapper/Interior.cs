@@ -67,15 +67,20 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return (short?)RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.ColorIndex));
+                int? RetVal = null;
+                object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.ColorIndex));
+                if (XlColorIndexParser.Try(RawVal, out int XlValue))
+                {
+                    RetVal = XlValue;
+                }
+                return RetVal;
             }
             set
             {
-                ColorPallet Pallet = new ColorPallet(value);
-                if (Pallet.Index != null)
+                if (PoiColorIndexParser.Try(value, out short PoiValue))
                 {
                     List<CellStyleParam> Params = new List<CellStyleParam>
-                    { { new CellStyleParam(StyleName.Interior.ColorIndex, Pallet.Index) } };
+                    { { new CellStyleParam(StyleName.Interior.ColorIndex, PoiValue) } };
                     RangeStyle.UpdateProperties(Params);
                 }
                 else
@@ -122,15 +127,20 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return (short?)RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.PatternColorIndex));
+                int? RetVal = null;
+                object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.PatternColorIndex));
+                if (XlColorIndexParser.Try(RawVal, out int XlValue))
+                {
+                    RetVal = XlValue;
+                }
+                return RetVal;
             }
             set
             {
-                ColorPallet Pallet = new ColorPallet(value);
-                if (Pallet.Index != null)
+                if (PoiColorIndexParser.Try(value, out short PoiValue))
                 {
                     List<CellStyleParam> Params = new List<CellStyleParam>
-                    { { new CellStyleParam(StyleName.Interior.PatternColorIndex, Pallet.Index) } };
+                    { { new CellStyleParam(StyleName.Interior.PatternColorIndex, PoiValue) } };
                     RangeStyle.UpdateProperties(Params);
                 }
                 else

@@ -86,7 +86,6 @@
     <Compile Include="Model\RangeStyle.cs" />
     <Compile Include="Model\RangeManager.cs" />
     <Compile Include="Model\Utils\CellStyleUpdateHistory.cs" />
-    <Compile Include="Model\Utils\ColorPallet.cs" />
     <Compile Include="Utils\Attributes.cs" />
     <Compile Include="Utils\BorderCellRangeAddress.cs" />
     <Compile Include="Utils\CellValue.cs" />
