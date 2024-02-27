@@ -115,8 +115,20 @@ namespace Developers.NpoiWrapper.Model
                 int ColumnIndex = this.FirstCellAddress.Column;
                 //セルの取得
                 //列の取得(なければ生成)
-                IRow Row = Parent.Parent.PoiSheet.GetRow(RowIndex) ?? Parent.Parent.PoiSheet.CreateRow(RowIndex);
-                ICell Cell = Row.GetCell(ColumnIndex) ?? Row.CreateCell(ColumnIndex);
+                IRow Row = Parent.Parent.PoiSheet.GetRow(RowIndex);
+                if (Row == null)
+                {
+                    Row = Parent.Parent.PoiSheet.CreateRow(RowIndex);
+                    Logger.Debug(
+                        "Sheet[" + Parent.Parent.PoiSheet.SheetName + "]:Row[" + RowIndex + "] *** Row Created. ***");
+                }
+                ICell Cell = Row.GetCell(ColumnIndex);
+                if (Cell == null)
+                {
+                    Cell = Row.CreateCell(ColumnIndex);
+                    Logger.Debug(
+                        "Sheet[" + Parent.Parent.PoiSheet.SheetName + "]:Cell[" + RowIndex + "][" + ColumnIndex + "] *** Column Created. ***");
+                }
                 //コメント文字列の解析
                 string CommentText = string.Empty;
                 if (Text is string SafeText)

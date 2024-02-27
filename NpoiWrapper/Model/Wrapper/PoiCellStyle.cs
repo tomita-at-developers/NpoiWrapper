@@ -35,7 +35,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             this.PoiSheet = PoiSheet;
             //指定されたスタイルをインポート
             this.CellStyle = this.PoiBook.GetCellStyleAt(StyleIndex);
-            ApplyStyleFrom(this.CellStyle);
+            ImportFrom(this.CellStyle);
         }
 
         #endregion
@@ -184,7 +184,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// 　(3) FontIndexからその内容をPoiFontに展開する
         /// </summary>
         /// <param name="CellStyle">インポート対象スタイル</param>
-        public void ApplyStyleFrom(ICellStyle CellStyle)
+        public void ImportFrom(ICellStyle CellStyle)
         {
             //基点CellTyleを保存
             this.CellStyle = CellStyle;
@@ -214,10 +214,10 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         }
 
         /// <summary>
-        /// 指定スタイルががこのスタイルと同じスタイルかどうかを判断する
+        /// 指定スタイルが自クラスプロパティと同じスタイルかどうかを判断する
         /// </summary>
-        /// <param name="TagetCellStyle"></param>
-        /// <returns></returns>
+        /// <param name="TagetCellStyle">自クラスを同じか判定する対象スタイル</param>
+        /// <returns>一致時true</returns>
         public bool StyleEquals(ICellStyle CellStyle)
         {
             bool RetVal = true;
@@ -321,7 +321,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                     //未使用スタイルの取得
                     CellStyle = PoiBook.GetCellStyleAt(AvalableIndex);
                     //今回の内容を反映
-                    this.ApplyTo(CellStyle);
+                    this.ExportTo(CellStyle);
                 }
             }
             //マスターになく、未使用スタイルにもなければ新規にCreateする
@@ -330,7 +330,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                 //新規スタイルを生成し今回の内容を反映
                 CellStyle = PoiBook.CreateCellStyle();
                 //今回の内容を反映
-                this.ApplyTo(CellStyle);
+                this.ExportTo(CellStyle);
                 Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style.[Index:" + CellStyle.Index + "] is newly created.");
             }
             //Indexを新しい値に更新する
@@ -347,7 +347,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// 　(3) Font情報はPoiFont.FontをSetFont()する
         /// </summary>
         /// <param name="CellStyle">エクスポート対象スタイル</param>
-        public void ApplyTo(ICellStyle CellStyle)
+        public void ExportTo(ICellStyle CellStyle)
         {
             PropertyInfo[] MyProps = this.GetType().GetProperties();
             //自プロパティを指定されたCellStyleのプロパティ値にセット
@@ -361,12 +361,32 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                     //ただしICellStyeから拡張された独自プロパティは無視
                     PropertyInfo TargetProp = CellStyle.GetType().GetProperty(MyProp.Name);
                     TargetProp?.SetValue(CellStyle, MyProp.GetValue(this));
-
                     Logger.Debug(TargetProp.Name + "=" + (MyProp.GetValue(this) ?? "null"));
                 }
             }
             //FontからFontをセットする
             CellStyle.SetFont(PoiFont.Font);
+            //★★★要検討(その１)★★★
+            //FillForegroundColorColor, FillBackfroundColorColorにはSetterがないので直接更新ができない。
+            //FillForegroundColor, FillBackfroundColor更新時に、自動更新される模様なので、ここで個別に
+            //明示的な更新を行う。念のためFillPatternも更新しておく。
+            CellStyle.FillPattern = this.FillPattern;
+            CellStyle.FillForegroundColor = this.FillForegroundColor;
+            CellStyle.FillBackgroundColor = this.FillBackgroundColor;
+            //★★★要検討(その２)★★★
+            //Excelでファイルを開き、FillPatternがNoFillのセルに入ると背景色がおかしくなってしまう。
+            //どうやらFillBackgroundColorColorに問題がある模様。
+            //Excelで編集した場合はFillBackgroundColorColorがNULLなのでそれに倣う。
+            //ただしsetterがないのでリフレクションで強制的に実施する。
+            if (this.FillPattern == FillPattern.NoFill)
+            {
+                PropertyInfo PInf = CellStyle.GetType().GetProperty("FillBackgroundColorColor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (PInf != null)
+                {
+                    PInf.SetValue(CellStyle, null);
+                    Logger.Debug("FillBackgroundColorColor null-cleared.");
+                }
+            }
         }
 
         /// <summary>

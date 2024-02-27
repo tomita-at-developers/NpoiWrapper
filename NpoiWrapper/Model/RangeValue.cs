@@ -1,6 +1,7 @@
 ﻿using Developers.NpoiWrapper.Utils;
 using MathNet.Numerics;
 using NPOI.SS.Formula;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -485,11 +486,15 @@ namespace Developers.NpoiWrapper.Model
                 {
                     row = Sheet.CreateRow(RowIndex);
                     RetVal = true;
+                    Logger.Debug(
+                        "Shhet[" + Sheet.SheetName + "]:Row[" + RowIndex + "] *** Row Created. ***");
                 }
                 ICell cell = row.GetCell(ColumnIndex);
                 if (cell == null)
                 {
                     cell = row.CreateCell(ColumnIndex);
+                    Logger.Debug(
+                        "Shhet[" + Sheet.SheetName + "]:Cell[" + RowIndex + "][" + ColumnIndex + "] *** Column Created. ***");
                     RetVal = true;
                 }
                 //DateTimeの場合
@@ -896,12 +901,16 @@ namespace Developers.NpoiWrapper.Model
                 {
                     row = Sheet.CreateRow(RowIndex);
                     RetVal = true;
+                    Logger.Debug(
+                        "Sheet[" + Sheet.SheetName + "]:Row[" + RowIndex + "] *** Row Created. ***");
                 }
                 ICell cell = row.GetCell(ColumnIndex);
                 if (cell == null)
                 {
                     cell = row.CreateCell(ColumnIndex);
                     RetVal = true;
+                    Logger.Debug(
+                        "Sheet[" + Sheet.SheetName + "]:Cell[" + RowIndex + "][" + ColumnIndex  + "] *** Column Created. ***");
                 }
                 //Formulaのセット
                 cell.SetCellType(CellType.Formula);

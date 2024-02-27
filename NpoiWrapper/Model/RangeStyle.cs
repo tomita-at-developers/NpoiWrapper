@@ -1,4 +1,5 @@
 ﻿using Developers.NpoiWrapper.Model.Param;
+using NPOI.POIFS.Properties;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
@@ -334,8 +335,21 @@ namespace Developers.NpoiWrapper.Model
         /// <returns></returns>
         private ICell GetOrCreateCell(int RowIndex, int ColumnIndex)
         {
-            IRow Row = this.PoiSheet.GetRow(RowIndex) ?? this.PoiSheet.CreateRow(RowIndex);
-            return Row.GetCell(ColumnIndex) ?? Row.CreateCell(ColumnIndex);
+            IRow Row = this.PoiSheet.GetRow(RowIndex);
+            if (Row == null)
+            {
+                Row = this.PoiSheet.CreateRow(RowIndex);
+                Logger.Debug(
+                    "Sheet[" + this.PoiSheet.SheetName + "]:Row[" + RowIndex + "] *** Row Created. ***");
+            }
+            ICell Cell = Row.GetCell(ColumnIndex);
+            if (Cell == null)
+            {
+                Cell = Row.CreateCell(ColumnIndex);
+                Logger.Debug(
+                    "Sheet[" + this.PoiSheet.SheetName + "]:Cell[" + RowIndex + "][" + ColumnIndex + "] *** Column Created. ***");
+            }
+            return Cell;
         }
 
         #endregion

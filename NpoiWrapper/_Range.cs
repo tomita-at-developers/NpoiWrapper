@@ -1,6 +1,7 @@
 ﻿using Developers.NpoiWrapper.Model;
 using Developers.NpoiWrapper.Utils;
 using NPOI.HSSF.UserModel;
+using NPOI.POIFS.Properties;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
@@ -8,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Developers.NpoiWrapper
 {
@@ -504,7 +506,7 @@ namespace Developers.NpoiWrapper
                         new CellRangeAddress(RawAddress.FirstRow, RawAddress.LastRow, -1, -1));
                 }
                 //Rangeクラスインスタンス生成
-                return new Range(Parent, AddressList);
+                return new Range(Parent, AddressList, null, CountType.Rows);
             }
         }
 
@@ -913,7 +915,13 @@ namespace Developers.NpoiWrapper
                     for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
                     {
                         //行の取得(なければ生成)
-                        IRow row = Parent.PoiSheet.GetRow(RIdx) ?? Parent.PoiSheet.CreateRow(RIdx);
+                        IRow row = Parent.PoiSheet.GetRow(RIdx);
+                        if (row == null)
+                        {
+                            row = Parent.PoiSheet.CreateRow(RIdx);
+                            Logger.Debug(
+                                "Sheet[" + Parent.PoiSheet.SheetName + "]:Row[" + RIdx + "] *** Row Created. ***");
+                        }
                         //高さを設定
                         row.HeightInPoints = (float)value;
                     }
@@ -1248,23 +1256,62 @@ namespace Developers.NpoiWrapper
         /// </summary>
         public void AutoFit()
         {
-            //Office.Interop.Excelにならい非連続Rangeの全てに適用
-            for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
+            //デバッグログ用情報
+            int FitCount = 0;
+            var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
+            StopwatchForDebugLog.Start();
+            //行モード
+            if (this.CountAs == CountType.Rows)
             {
-                //アドレス取得
-                CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
-                //列幅自動調整ループ
-                for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
+                //Office.Interop.Excelにならい非連続Rangeの全てに適用
+                for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
                 {
-                    //スッピンのAutoSizeでは独自書式(例えば通貨)の幅が少し足りない。
-                    //"\"や"､"の増分が考慮されていないような感じ。
-                    //ある程度救済するため、一律28%増の処理を行う
-                    Parent.PoiSheet.AutoSizeColumn(CIdx);
-                    Parent.PoiSheet.SetColumnWidth(
-                        CIdx, Parent.PoiSheet.GetColumnWidth(CIdx) * 128 / 100);
-                    //処理対象の行が大量の場合に効果があるらしいが、弊害もありそうなのでやめておく。
-                    //GC.Collect();
+                    //アドレス取得
+                    CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
+                    //行高自動調整ループ
+                    for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
+                    {
+                        //処理数インクリメント
+                        FitCount++;
+                        IRow Row = Parent.PoiSheet.GetRow(RIdx);
+                        if(Row != null)
+                        {
+                            Row.Height = -1;
+                        }
+                    }
                 }
+                //処理時間測定タイマー停止＆ログ出力
+                StopwatchForDebugLog.Stop();
+                TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
+                Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + FitCount + "]Rows");
+            }
+            //列モード
+            else
+            {
+                //Office.Interop.Excelにならい非連続Rangeの全てに適用
+                for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
+                {
+                    //アドレス取得
+                    CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
+                    //列幅自動調整ループ
+                    for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
+                    {
+                        //処理数インクリメント
+                        FitCount++;
+                        //スッピンのAutoSizeでは独自書式(例えば通貨)の幅が少し足りない。
+                        //"\"や"､"の増分が考慮されていないような感じ。
+                        //ある程度救済するため、一律28%増の処理を行う
+                        Parent.PoiSheet.AutoSizeColumn(CIdx);
+                        Parent.PoiSheet.SetColumnWidth(
+                            CIdx, Parent.PoiSheet.GetColumnWidth(CIdx) * 128 / 100);
+                        //処理対象の行が大量の場合に効果があるらしいが、弊害もありそうなのでやめておく。
+                        //GC.Collect();
+                    }
+                }
+                //処理時間測定タイマー停止＆ログ出力
+                StopwatchForDebugLog.Stop();
+                TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
+                Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + FitCount + "]Columns");
             }
         }
 
@@ -1394,12 +1441,24 @@ namespace Developers.NpoiWrapper
                     for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
                     {
                         //行の取得(なければ生成)
-                        IRow row = Parent.PoiSheet.GetRow(RIdx) ?? Parent.PoiSheet.CreateRow(RIdx);
+                        IRow row = Parent.PoiSheet.GetRow(RIdx);
+                        if (row == null)
+                        {
+                            row = Parent.PoiSheet.CreateRow(RIdx);
+                            Logger.Debug(
+                                "Sheet[" + Parent.PoiSheet.SheetName + "]:Row[" + RIdx + "] *** Row Created. ***");
+                        }
                         //列ループ
                         for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
                         {
                             //列の取得(なければ生成)
-                            ICell cell = row.GetCell(CIdx) ?? row.CreateCell(CIdx);
+                            ICell cell = row.GetCell(CIdx);
+                            if(cell == null)
+                            {
+                                cell = row.CreateCell(CIdx);
+                                Logger.Debug(
+                                    "Sheet[" + Parent.PoiSheet.SheetName + "]:Cell[" + RIdx + "][" + CIdx + "] *** Column Created. ***");
+                            }
                             //スタイルの適用
                             cell.CellStyle = Style;
                         }

@@ -15,9 +15,9 @@ namespace Developers.NpoiWrapper.Model.Utils
         public static readonly string NumberFormat = NameOf<PoiCellStyle>.FullName(n => n.DataFormatString);
         public static class Interior
         {
-            public static readonly string ColorIndex = NameOf<PoiCellStyle>.FullName(n => n.FillBackgroundColor);
+            public static readonly string ColorIndex = NameOf<PoiCellStyle>.FullName(n => n.FillForegroundColor);
             public static readonly string Pattern = NameOf<PoiCellStyle>.FullName(n => n.FillPattern);
-            public static readonly string PatternColorIndex = NameOf<PoiCellStyle>.FullName(n => n.FillForegroundColor);
+            public static readonly string PatternColorIndex = NameOf<PoiCellStyle>.FullName(n => n.FillBackgroundColor);
         }
         /// <summary>
         /// 罫線関連はPoiCellStyleプロパティ名ではなく、Excel風の仮想プロパティ名を定義している

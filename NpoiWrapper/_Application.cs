@@ -420,6 +420,18 @@ namespace Developers.NpoiWrapper
 
         #region "methods"
 
+        #region "public methods"
+
+        /// <summary>
+        /// Quit(ダミー)
+        /// </summary>
+        public void Quit()
+        {
+
+        }
+
+        #endregion
+
         #region "internal methods"
 
         /// <summary>
