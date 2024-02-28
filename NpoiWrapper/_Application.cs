@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Developers.NpoiWrapper
 {
@@ -241,7 +242,7 @@ namespace Developers.NpoiWrapper
     //    void ActivateMicrosoftApp(XlMSApplication Index);
     //    void AddChartAutoFormat(object Chart, string Name, [Optional] object Description);
     //    void AddCustomList(object ListArray, [Optional] object ByRow);
-    //    double CentimetersToPoints(double Centimeters);
+    // +  double CentimetersToPoints(double Centimeters);
     //    bool CheckSpelling(string Word, [Optional] object CustomDictionary, [Optional] object IgnoreUppercase);
     //    object ConvertFormula(object Formula, XlReferenceStyle FromReferenceStyle, [Optional] object ToReferenceStyle, [Optional] object ToAbsolute, [Optional] object RelativeTo);
     //    object Dummy1([Optional] object Arg1, [Optional] object Arg2, [Optional] object Arg3, [Optional] object Arg4);
@@ -265,7 +266,7 @@ namespace Developers.NpoiWrapper
     //    object GetSaveAsFilename([Optional] object InitialFilename, [Optional] object FileFilter, [Optional] object FilterIndex, [Optional] object Title, [Optional] object ButtonText);
     //    void Goto([Optional] object Reference, [Optional] object Scroll);
     //    void Help([Optional] object HelpFile, [Optional] object HelpContextID);
-    //    double InchesToPoints(double Inches);
+    // +  double InchesToPoints(double Inches);
     //    object InputBox(string Prompt, [Optional] object Title, [Optional] object Default, [Optional] object Left, [Optional] object Top, [Optional] object HelpFile, [Optional] object HelpContextID, [Optional] object Type);
     //    void MacroOptions([Optional] object Macro, [Optional] object Description, [Optional] object HasMenu, [Optional] object MenuText, [Optional] object HasShortcutKey, [Optional] object ShortcutKey, [Optional] object Category, [Optional] object StatusBar, [Optional] object HelpContextID, [Optional] object HelpFile);
     //    void MailLogoff();
@@ -275,7 +276,7 @@ namespace Developers.NpoiWrapper
     //    void OnRepeat(string Text, string Procedure);
     //    void OnTime(object EarliestTime, string Procedure, [Optional] object LatestTime, [Optional] object Schedule);
     //    void OnUndo(string Text, string Procedure);
-    //    void Quit();
+    // +  void Quit();
     //    void RecordMacro([Optional] object BasicCode, [Optional] object XlmCode);
     //    bool RegisterXLL(string Filename);
     //    void Repeat();
@@ -423,6 +424,26 @@ namespace Developers.NpoiWrapper
         #region "public methods"
 
         /// <summary>
+        /// センチメートルをポイントに変換する
+        /// </summary>
+        /// <param name="Centimeters"></param>
+        /// <returns></returns>
+        public double CentimetersToPoints(double Centimeters)
+        {
+            return (Centimeters / Configurations.Models.Constants.CentimeterPerInch) * Configurations.Models.Constants.PointPerInch;
+        }
+
+        /// <summary>
+        /// インチをポイントに変換する
+        /// </summary>
+        /// <param name="Inches"></param>
+        /// <returns></returns>
+        public double InchesToPoints(double Inches)
+        {
+            return Inches * Configurations.Models.Constants.PointPerInch;
+        }
+
+        /// <summary>
         /// Quit(ダミー)
         /// </summary>
         public void Quit()
@@ -433,6 +454,16 @@ namespace Developers.NpoiWrapper
         #endregion
 
         #region "internal methods"
+
+        /// <summary>
+        /// ポイントをインチに変換する
+        /// </summary>
+        /// <param name="Points"></param>
+        /// <returns></returns>
+        public double PointsToInches(double Points)
+        {
+            return Points / Configurations.Models.Constants.PointPerInch;
+        }
 
         /// <summary>
         /// Selectionセッター

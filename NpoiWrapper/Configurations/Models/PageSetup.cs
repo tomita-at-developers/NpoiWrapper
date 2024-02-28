@@ -65,7 +65,7 @@ namespace Developers.NpoiWrapper.Configurations.Models
         [XmlAttribute("value")]  public double ValueInCentimeter { get; set; } = 1.2;
         public double ValueInInch
         {
-            get { return ValueInCentimeter / Constants.InchInCentimeter; }
+            get { return ValueInCentimeter / Constants.CentimeterPerInch; }
         }
     }
     /// <summary>
@@ -76,7 +76,7 @@ namespace Developers.NpoiWrapper.Configurations.Models
         [XmlAttribute("value")] public double ValueInCentimeter { get; set; } = 0.5;
         public double ValueInInch
         {
-            get { return ValueInCentimeter / Constants.InchInCentimeter; }
+            get { return ValueInCentimeter / Constants.CentimeterPerInch; }
         }
     }
     /// <summary>
@@ -90,19 +90,19 @@ namespace Developers.NpoiWrapper.Configurations.Models
         [XmlAttribute("left")] public double LeftInCentimeter { get; set; } = 0.5;
         public double TopInInch
         {
-            get { return TopInCentimeter / Constants.InchInCentimeter; }
+            get { return TopInCentimeter / Constants.CentimeterPerInch; }
         }
         public double RightInInch
         {
-            get { return RightInCentimeter / Constants.InchInCentimeter; }
+            get { return RightInCentimeter / Constants.CentimeterPerInch; }
         }
         public double BottomInInch
         {
-            get { return BottomInCentimeter / Constants.InchInCentimeter; }
+            get { return BottomInCentimeter / Constants.CentimeterPerInch; }
         }
         public double LeftInInch
         {
-            get { return LeftInCentimeter / Constants.InchInCentimeter; }
+            get { return LeftInCentimeter / Constants.CentimeterPerInch; }
         }
     }
     /// <summary>

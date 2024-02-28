@@ -414,65 +414,98 @@ namespace Developers.NpoiWrapper
     /// <summary>
     /// XlPaperSizeとNPOI.SS.UserModel.papseSizeの相互変換
     /// </summary>
-    internal static class XlPaperSizeParser
+    internal static class PaperSizeParser
     {
-        private static readonly Dictionary<XlPaperSize, PaperSize> _Map = new Dictionary<XlPaperSize, PaperSize>()
+        private static readonly Dictionary<XlPaperSize, short> _Map = new Dictionary<XlPaperSize, short>()
         {
-            { XlPaperSize.xlPaper10x14,             PaperSize.TEN_BY_FOURTEEN },
-            { XlPaperSize.xlPaper11x17,             PaperSize.ELEVEN_BY_SEVENTEEN },
-            { XlPaperSize.xlPaperA3,                PaperSize.A3 },
-            { XlPaperSize.xlPaperA4,                PaperSize.A4 },
-            { XlPaperSize.xlPaperA4Small,           PaperSize.A4_Small },
-            { XlPaperSize.xlPaperA5,                PaperSize.A5 },
-            { XlPaperSize.xlPaperB4,                PaperSize.B4 },
-            { XlPaperSize.xlPaperB5,                PaperSize.B5 },
-            { XlPaperSize.xlPaperCsheet,            PaperSize.C_Size_Sheet },
-            { XlPaperSize.xlPaperDsheet ,           PaperSize.D_Size_Sheet },
-            { XlPaperSize.xlPaperEnvelope10 ,       PaperSize.US_Envelope_10 },
-            { XlPaperSize.xlPaperEnvelope11,        PaperSize.US_Envelope_11 },
-            { XlPaperSize.xlPaperEnvelope12,        PaperSize.US_Envelope_12 },
-            { XlPaperSize.xlPaperEnvelope14,        PaperSize.US_Envelope_14 },
-            { XlPaperSize.xlPaperEnvelope9,         PaperSize.US_Envelope_9 },
-            { XlPaperSize.xlPaperEnvelopeC3,        PaperSize.Envelope_C3 },
-            { XlPaperSize.xlPaperEnvelopeC4,        PaperSize.Envelope_C4 },
-            { XlPaperSize.xlPaperEnvelopeC5,        PaperSize.Envelope_C5 },
-            { XlPaperSize.xlPaperEnvelopeC6,        PaperSize.Envelope_C6 },
-            { XlPaperSize.xlPaperEnvelopeDL,        PaperSize.Envelope_DL },
-            { XlPaperSize.xlPaperEnvelopeMonarch,   PaperSize.Envelope_MONARCH },
-            { XlPaperSize.xlPaperEsheet,            PaperSize.E_Size_Sheet },
-            { XlPaperSize.xlPaperExecutive,         PaperSize.US_Executive },
-            { XlPaperSize.xlPaperFolio,             PaperSize.Folio },
-            { XlPaperSize.xlPaperLedger,            PaperSize.US_Ledger },
-            { XlPaperSize.xlPaperLegal,             PaperSize.US_Legal },
-            { XlPaperSize.xlPaperLetter,            PaperSize.US_Letter_Small },
-            { XlPaperSize.xlPaperLetterSmall,       PaperSize.US_Letter_Small },
-            { XlPaperSize.xlPaperNote,              PaperSize.US_Note },
-            { XlPaperSize.xlPaperQuarto,            PaperSize.Quarto },
-            { XlPaperSize.xlPaperStatement,         PaperSize.US_Statement },
-            { XlPaperSize.xlPaperTabloid,           PaperSize.US_Tabloid }
+            { XlPaperSize.xlPaper10x14,             (short)PaperSize.TEN_BY_FOURTEEN },
+            { XlPaperSize.xlPaper11x17,             (short)PaperSize.ELEVEN_BY_SEVENTEEN },
+            { XlPaperSize.xlPaperA3,                (short)PaperSize.A3 },
+            { XlPaperSize.xlPaperA4,                (short)PaperSize.A4 },
+            { XlPaperSize.xlPaperA4Small,           (short)PaperSize.A4_Small },
+            { XlPaperSize.xlPaperA5,                (short)PaperSize.A5 },
+            { XlPaperSize.xlPaperB4,                (short)PaperSize.B4 },
+            { XlPaperSize.xlPaperB5,                (short)PaperSize.B5 },
+            { XlPaperSize.xlPaperCsheet,            (short)PaperSize.C_Size_Sheet },
+            { XlPaperSize.xlPaperDsheet ,           (short)PaperSize.D_Size_Sheet },
+            { XlPaperSize.xlPaperEnvelope10 ,       (short)PaperSize.US_Envelope_10 },
+            { XlPaperSize.xlPaperEnvelope11,        (short)PaperSize.US_Envelope_11 },
+            { XlPaperSize.xlPaperEnvelope12,        (short)PaperSize.US_Envelope_12 },
+            { XlPaperSize.xlPaperEnvelope14,        (short)PaperSize.US_Envelope_14 },
+            { XlPaperSize.xlPaperEnvelope9,         (short)PaperSize.US_Envelope_9 },
+            { XlPaperSize.xlPaperEnvelopeC3,        (short)PaperSize.Envelope_C3 },
+            { XlPaperSize.xlPaperEnvelopeC4,        (short)PaperSize.Envelope_C4 },
+            { XlPaperSize.xlPaperEnvelopeC5,        (short)PaperSize.Envelope_C5 },
+            { XlPaperSize.xlPaperEnvelopeC6,        (short)PaperSize.Envelope_C6 },
+            { XlPaperSize.xlPaperEnvelopeDL,        (short)PaperSize.Envelope_DL },
+            { XlPaperSize.xlPaperEnvelopeMonarch,   (short)PaperSize.Envelope_MONARCH },
+            { XlPaperSize.xlPaperEsheet,            (short)PaperSize.E_Size_Sheet },
+            { XlPaperSize.xlPaperExecutive,         (short)PaperSize.US_Executive },
+            { XlPaperSize.xlPaperFolio,             (short)PaperSize.Folio },
+            { XlPaperSize.xlPaperLedger,            (short)PaperSize.US_Ledger },
+            { XlPaperSize.xlPaperLegal,             (short)PaperSize.US_Legal },
+            { XlPaperSize.xlPaperLetter,            (short)PaperSize.US_Letter_Small },
+            { XlPaperSize.xlPaperLetterSmall,       (short)PaperSize.US_Letter_Small },
+            { XlPaperSize.xlPaperNote,              (short)PaperSize.US_Note },
+            { XlPaperSize.xlPaperQuarto,            (short)PaperSize.Quarto },
+            { XlPaperSize.xlPaperStatement,         (short)PaperSize.US_Statement },
+            { XlPaperSize.xlPaperTabloid,           (short)PaperSize.US_Tabloid }
         };
-        /// <summary>
-        /// XlPaperSize値を指定してPaperSize値を取得。
-        /// </summary>
-        /// <param name="XlValue">XlPaperSize</param>
-        /// <returns>PaperSize値</returns>
-        /// <exception cref="SystemException">未定義値検知時</exception>
-        public static PaperSize GetPoiValue(XlPaperSize XlValue)
+        internal static class Poi
         {
-            if (XlValue == 0)
+            /// <summary>
+            /// XlPaperSize値を指定してPaperSize値を取得。
+            /// </summary>
+            /// <param name="XlValue">XlPaperSize</param>
+            /// <returns>PaperSize値</returns>
+            /// <exception cref="SystemException">未定義値検知時</exception>
+            public static bool TryParse(XlPaperSize XlValue, out short PoiSize)
             {
-                return OperatorType.IGNORED;
+                bool RetVal = false;
+                PoiSize = (short)PaperSize.PRINTER_DEFAULT_PAPERSIZE;
+                //変換可能な値の場合
+                if (_Map.ContainsKey(XlValue))
+                {
+                    PoiSize = PaperSizeParser._Map[XlValue];
+                    RetVal = true;
+                }
+                //変換できない値の場合(ユーザ定義用紙の場合、独自に値が振られる模様)
+                else
+                {
+                    PoiSize = (short)XlValue;
+                    RetVal = true;
+                }
+                return RetVal;
             }
-            else if (_Map.ContainsKey(XlValue))
+
+        }
+        internal static class Xl
+        {
+            /// <summary>
+            /// XlPaperSize値を指定してPaperSize値を取得。
+            /// </summary>
+            /// <param name="XlValue">XlPaperSize</param>
+            /// <returns>PaperSize値</returns>
+            /// <exception cref="SystemException">未定義値検知時</exception>
+            public static bool TryParse(short PoiValue, out XlPaperSize XlSize)
             {
-                return _Map[XlValue];
-            }
-            else
-            {
-                throw new SystemException("Invalid or unsupported value is spesified as a member of XlPaperSize.");
+                bool RetVal = false;
+                XlSize = XlPaperSize.xlPaperUser;
+                //変換可能な値の場合
+                if (_Map.ContainsValue(PoiValue))
+                {
+                    XlSize = PaperSizeParser._Map.FirstOrDefault(x => x.Value == PoiValue).Key;
+                    RetVal = true;
+                }
+                //変換できない値の場合(ユーザ定義用紙の場合、独自に値が振られる模様)
+                else
+                {
+                    XlSize = (XlPaperSize)PoiValue;
+                    RetVal = true;
+                }
+                return RetVal;
             }
         }
-
     }
 }
 

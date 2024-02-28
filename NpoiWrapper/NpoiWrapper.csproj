@@ -45,6 +45,7 @@
     <Compile Include="Comment.cs" />
     <Compile Include="Model\RangeComment.cs" />
     <Compile Include="Model\RangeValue.cs" />
+    <Compile Include="PageSetup.cs" />
     <Compile Include="Utils\CellRangeAddressListOperator.cs" />
     <Compile Include="Utils\CellUtil.cs" />
     <Compile Include="Utils\XlCellAddress.cs" />

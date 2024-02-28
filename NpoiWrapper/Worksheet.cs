@@ -221,6 +221,11 @@ namespace Developers.NpoiWrapper
         /// </summary>
         public Range Range { get; }
 
+        public PageSetup PageSetup
+        {
+            get { return new PageSetup(this); } 
+        }
+
         #endregion
 
         #region "internal properties"
@@ -393,7 +398,7 @@ namespace Developers.NpoiWrapper
         /// <param name="FooterLeft">フッター左文字列</param>
         /// <param name="FooterCenter">フッター中央文字列</param>
         /// <param name="FooterRight">フッター右文字列</param>
-        public void PageSetup(
+        public void PageConfiguration(
             string StyleName = "default",
             string HeaderLeft = "",
             string HeaderCenter = "",
