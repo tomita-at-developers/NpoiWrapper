@@ -352,7 +352,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 XlPaperSize RetVal = (XlPaperSize)Parent.PoiSheet.PrintSetup.PaperSize;
-                if (PaperSizeParser.Xl.TryParse(Parent.PoiSheet.PrintSetup.PaperSize, out XlPaperSize XlValue))
+                if (PaperSizeParser.Xls.TryParse(Parent.PoiSheet.PrintSetup.PaperSize, out XlPaperSize XlValue))
                 {
                     RetVal = XlValue;
                 }

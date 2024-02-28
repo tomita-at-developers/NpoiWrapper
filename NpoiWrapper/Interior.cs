@@ -69,7 +69,7 @@ namespace Developers.NpoiWrapper
             {
                 int? RetVal = null;
                 object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.ColorIndex));
-                if (XlColorIndexParser.Try(RawVal, out int XlValue))
+                if (ColorIndexParser.Xls.TryParse(RawVal, out int XlValue))
                 {
                     RetVal = XlValue;
                 }
@@ -77,10 +77,20 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                if (PoiColorIndexParser.Try(value, out short PoiValue))
+                if (ColorIndexParser.Poi.TryParse(value, out short PoiValue))
                 {
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     { { new CellStyleParam(StyleName.Interior.ColorIndex, PoiValue) } };
+                    //実体のある色が指定された場合
+                    if (PoiValue != IndexedColors.Automatic.Index)
+                    {
+                        //FillPatternがNoFillの場合は自動的にSolidForegroundを設定する
+                        object Pattern = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.Pattern));
+                        if((FillPattern)Pattern == FillPattern.NoFill)
+                        {
+                            Params.Add(new CellStyleParam(StyleName.Interior.Pattern, FillPattern.SolidForeground));
+                        }
+                    }
                     RangeStyle.UpdateProperties(Params);
                 }
                 else
@@ -129,7 +139,7 @@ namespace Developers.NpoiWrapper
             {
                 int? RetVal = null;
                 object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.PatternColorIndex));
-                if (XlColorIndexParser.Try(RawVal, out int XlValue))
+                if (ColorIndexParser.Xls.TryParse(RawVal, out int XlValue))
                 {
                     RetVal = XlValue;
                 }
@@ -137,7 +147,7 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                if (PoiColorIndexParser.Try(value, out short PoiValue))
+                if (ColorIndexParser.Poi.TryParse(value, out short PoiValue))
                 {
                     List<CellStyleParam> Params = new List<CellStyleParam>
                     { { new CellStyleParam(StyleName.Interior.PatternColorIndex, PoiValue) } };

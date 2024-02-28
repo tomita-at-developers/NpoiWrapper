@@ -479,7 +479,7 @@ namespace Developers.NpoiWrapper
             }
 
         }
-        internal static class Xl
+        internal static class Xls
         {
             /// <summary>
             /// XlPaperSize値を指定してPaperSize値を取得。
