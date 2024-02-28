@@ -88,5 +88,31 @@ namespace Developers.NpoiWrapper.Utils
             }
             return RetVal;
         }
+
+        /// <summary>
+        /// POIのNumberFormatをExcelのNumberFormatLocalに変換
+        /// </summary>
+        /// <param name="NumberFormat"></param>
+        /// <returns></returns>
+        public static string GetXlNumberFormatLocal(string PoiNumberFormat)
+        {
+            string RetVal = string.Empty;
+            // とりあえずの策として、\前後の"を除去
+            RetVal = PoiNumberFormat.Replace("\"", "");
+            return RetVal;
+        }
+ 
+        /// <summary>
+        /// ExcelのNumberFormatLocalをPOIのNumberFormatに変換
+        /// </summary>
+        /// <param name="NumberFormat"></param>
+        /// <returns></returns>
+        public static string GetPoiNumberFormat(string XlNumberFormatLocal)
+        {
+            string RetVal = string.Empty;
+            // とりあえずの策として、\前後に"を追加
+            RetVal = XlNumberFormatLocal.Replace("\\", "\"\\\"");
+            return RetVal;
+        }
     }
 }

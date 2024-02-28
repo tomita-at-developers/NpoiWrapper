@@ -1,4 +1,5 @@
 ﻿using Developers.NpoiWrapper.Model.Param;
+using Developers.NpoiWrapper.Utils;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
@@ -235,13 +236,15 @@ namespace Developers.NpoiWrapper.Model
         {
             get
             {
-                return (string)GetCommonProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
+                string RawVal = (string)GetCommonProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
+                return StyleUtil.GetXlNumberFormatLocal(RawVal);
             }
             set
             {
+                string PoiNumberFormat = StyleUtil.GetPoiNumberFormat((string)value);
                 //nullでも書きにいく
                 List<CellStyleParam> Params = new List<CellStyleParam>
-                { { new CellStyleParam(Utils.StyleName.NumberFormat, value) } };
+                { { new CellStyleParam(Utils.StyleName.NumberFormat, PoiNumberFormat) } };
                 UpdateProperties(Params);
             }
         }
