@@ -19,6 +19,7 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+        private static readonly log4net.ILog ProcTimeLogger = log4net.LogManager.GetLogger("ProcessingTime");
 
         #endregion
 
@@ -259,6 +260,7 @@ namespace Developers.NpoiWrapper.Model
                 Index = bidx.ToString();
             }
             Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
         }
 
         /// <summary>
@@ -439,6 +441,7 @@ namespace Developers.NpoiWrapper.Model
                 Index = bidx.ToString();
             }
             Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells");
+            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells");
         }
 
         /// <summary>

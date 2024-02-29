@@ -22,6 +22,7 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+        private static readonly log4net.ILog ProcTimeLogger = log4net.LogManager.GetLogger("ProcessingTime");
 
         #endregion
 
@@ -191,6 +192,7 @@ namespace Developers.NpoiWrapper.Model
             StopwatchForDebugLog.Stop();
             TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
             Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
             return RetVal;
         }
 
@@ -303,6 +305,7 @@ namespace Developers.NpoiWrapper.Model
             StopwatchForDebugLog.Stop();
             TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
             Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
         }
 
         /// <summary>

@@ -213,6 +213,7 @@ namespace Developers.NpoiWrapper
         /// </summary>
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+        private static readonly log4net.ILog ProcTimeLogger = log4net.LogManager.GetLogger("ProcessingTime");
         /// <summary>
         /// IEnumerator用行インデクス
         /// </summary>
@@ -1312,6 +1313,7 @@ namespace Developers.NpoiWrapper
                 StopwatchForDebugLog.Stop();
                 TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
                 Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + FitCount + "]Columns");
+                ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + FitCount + "]Columns");
             }
         }
 
