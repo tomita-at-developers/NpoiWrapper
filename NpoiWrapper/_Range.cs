@@ -989,7 +989,15 @@ namespace Developers.NpoiWrapper
                     //列ループ
                     for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
                     {
-                        Parent.PoiSheet.SetColumnWidth(CIdx, (int)value);
+                        if ((int)value == 0)
+                        {
+                            Parent.PoiSheet.SetColumnHidden(CIdx, true);
+                        }
+                        else
+                        {
+                            Parent.PoiSheet.SetColumnHidden(CIdx, false);
+                            Parent.PoiSheet.SetColumnWidth(CIdx, (int)value);
+                        }
                     }
                 }
             }
