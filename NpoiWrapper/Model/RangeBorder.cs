@@ -107,9 +107,9 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         /// <param name="Param">取得指示</param>
         /// <returns></returns>
-        public object GetCommonProperty(BorderStyleParam Param)
+        public object GetProperty(BorderStyleParam Param)
         {
-            Dictionary<string, object> Utils = GetCommonUtils(new List<BorderStyleParam> { Param });
+            Dictionary<string, object> Utils = GetProperties(new List<BorderStyleParam> { Param });
             return Utils[Param.Name];
         }
 
@@ -118,7 +118,7 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         /// <param name="Params">取得指示リスト</param>
         /// <returns></returns>
-        public Dictionary<string, object> GetCommonUtils(List<BorderStyleParam> Params)
+        public Dictionary<string, object> GetProperties(List<BorderStyleParam> Params)
         {
             //RangeからBoder情報を読み取る
             GetPoiBorders();
@@ -150,7 +150,7 @@ namespace Developers.NpoiWrapper.Model
         /// <param name="Param">Uupdate指示</param>
         public void UpdateProperty(BorderStyleParam Param)
         {
-            UpdateUtils(new List<BorderStyleParam>{ Param });
+            UpdateProperties(new List<BorderStyleParam>{ Param });
         }
 
         /// <summary>
@@ -159,11 +159,11 @@ namespace Developers.NpoiWrapper.Model
         /// なので比較的単純な判断で情報取得できる。
         /// </summary>
         /// <param name="Params">Uupdate指示リスト</param>
-        public void UpdateUtils(List<BorderStyleParam> Params)
+        public void UpdateProperties(List<BorderStyleParam> Params)
         {
             //デバッグログ用情報
-            var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
-            StopwatchForDebugLog.Start();
+            DebugTimer ProcTimer = new DebugTimer();
+            ProcTimer.Start();
             int CellCountForDebugLog = 0;
             string DebugLogString;
             string ParamsForDebugLog = string.Empty;
@@ -252,15 +252,14 @@ namespace Developers.NpoiWrapper.Model
                 }
             }
             //処理時間測定タイマー停止＆ログ出力
-            StopwatchForDebugLog.Stop();
-            TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
+            ProcTimer.Stop();
             string Index = "null";
             if (this.BordersIndex is XlBordersIndex bidx)
             {
                 Index = bidx.ToString();
             }
-            Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
-            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            Logger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimeLogger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
         }
 
         /// <summary>
@@ -271,8 +270,8 @@ namespace Developers.NpoiWrapper.Model
         private void GetPoiBorders()
         {
             //デバッグログ用情報
-            var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
-            StopwatchForDebugLog.Start();
+            DebugTimer ProcTimer = new DebugTimer();
+            ProcTimer.Start();
             int CellCountForDebugLog = 0;
             //情報初期化
             Initialize();
@@ -433,15 +432,14 @@ namespace Developers.NpoiWrapper.Model
             }
             CommonColorIndex = CommonValue;
             //処理時間測定タイマー停止＆ログ出力
-            StopwatchForDebugLog.Stop();
-            TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
+            ProcTimer.Stop();
             string Index = "null";
             if (this.BordersIndex is XlBordersIndex bidx)
             {
                 Index = bidx.ToString();
             }
-            Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells");
-            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells");
+            Logger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells");
+            ProcTimeLogger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for BordersIndex[" + Index + "][" + CellCountForDebugLog + "]Cells");
         }
 
         /// <summary>

@@ -68,7 +68,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 int? RetVal = null;
-                object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.ColorIndex));
+                object RawVal = RangeStyle.GetProperty(new CellStyleParam(StyleName.Interior.ColorIndex));
                 if (ColorIndexParser.Xls.TryParse(RawVal, out int XlValue))
                 {
                     RetVal = XlValue;
@@ -85,7 +85,7 @@ namespace Developers.NpoiWrapper
                     if (PoiValue != IndexedColors.Automatic.Index)
                     {
                         //FillPatternがNoFillの場合は自動的にSolidForegroundを設定する
-                        object Pattern = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.Pattern));
+                        object Pattern = RangeStyle.GetProperty(new CellStyleParam(StyleName.Interior.Pattern));
                         if((FillPattern)Pattern == FillPattern.NoFill)
                         {
                             Params.Add(new CellStyleParam(StyleName.Interior.Pattern, FillPattern.SolidForeground));
@@ -108,7 +108,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 XlPattern? RetVal = null;
-                object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.Pattern));
+                object RawVal = RangeStyle.GetProperty(new CellStyleParam(StyleName.Interior.Pattern));
                 if (XlPatternParser.Try(RawVal, out FillPattern PoiValue))
                 {
                     RetVal = XlPatternParser.GetXlValue(PoiValue);
@@ -138,7 +138,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 int? RetVal = null;
-                object RawVal = RangeStyle.GetCommonProperty(new CellStyleParam(StyleName.Interior.PatternColorIndex));
+                object RawVal = RangeStyle.GetProperty(new CellStyleParam(StyleName.Interior.PatternColorIndex));
                 if (ColorIndexParser.Xls.TryParse(RawVal, out int XlValue))
                 {
                     RetVal = XlValue;

@@ -72,7 +72,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
-                return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Bold));
+                return (bool?)StyleManger.GetProperty(new CellStyleParam(StyleName.Font.Bold));
             }
             set
             {
@@ -100,7 +100,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
-                return (short?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.ColorIndex));
+                return (short?)StyleManger.GetProperty(new CellStyleParam(StyleName.Font.ColorIndex));
             }
             set
             {
@@ -129,7 +129,7 @@ namespace Developers.NpoiWrapper
             {
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
                 string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.IsItalic);
-                return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Italic));
+                return (bool?)StyleManger.GetProperty(new CellStyleParam(StyleName.Font.Italic));
             }
             set
             {
@@ -157,7 +157,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
-                return (string)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Name));
+                return (string)StyleManger.GetProperty(new CellStyleParam(StyleName.Font.Name));
             }
             set
             {
@@ -185,7 +185,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
-                return (double?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Size));
+                return (double?)StyleManger.GetProperty(new CellStyleParam(StyleName.Font.Size));
             }
             set
             {
@@ -219,7 +219,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
-                return (bool?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Strikethrough));
+                return (bool?)StyleManger.GetProperty(new CellStyleParam(StyleName.Font.Strikethrough));
             }
             set
             {
@@ -249,7 +249,7 @@ namespace Developers.NpoiWrapper
                 object RetVal = null;
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
                 string PropName = NameOf<PoiCellStyle>.FullName(n => n.PoiFont.TypeOffset);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(PropName));
+                object CommonProp = StyleManger.GetProperty(new CellStyleParam(PropName));
                 if (CommonProp is FontSuperScript)
                 {
                     if (CommonProp.Equals(FontSuperScript.Sub))
@@ -273,7 +273,7 @@ namespace Developers.NpoiWrapper
                     //False指定の場合は現状によって判断
                     if (SafeValue == false)
                     {
-                        object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.TypeOffset));
+                        object CommonProp = StyleManger.GetProperty(new CellStyleParam(StyleName.Font.TypeOffset));
                         //現状が特定できるとき
                         if (CommonProp is FontSuperScript)
                         {
@@ -321,7 +321,7 @@ namespace Developers.NpoiWrapper
             {
                 object RetVal = DBNull.Value;
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
-                object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.TypeOffset));
+                object CommonProp = StyleManger.GetProperty(new CellStyleParam(StyleName.Font.TypeOffset));
                 if (CommonProp is FontSuperScript)
                 {
                     if (CommonProp.Equals(FontSuperScript.Super))
@@ -345,7 +345,7 @@ namespace Developers.NpoiWrapper
                     //False指定の場合は現状によって判断
                     if (SafeValue == false)
                     {
-                        object CommonProp = StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.TypeOffset));
+                        object CommonProp = StyleManger.GetProperty(new CellStyleParam(StyleName.Font.TypeOffset));
                         //現状が特定できるとき
                         if (CommonProp is FontSuperScript)
                         {
@@ -393,7 +393,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 RangeStyle StyleManger = new RangeStyle(this.Parent);
-                return (FontUnderlineType?)StyleManger.GetCommonProperty(new CellStyleParam(StyleName.Font.Underline));
+                return (FontUnderlineType?)StyleManger.GetProperty(new CellStyleParam(StyleName.Font.Underline));
             }
             set
             {

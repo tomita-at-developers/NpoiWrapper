@@ -176,7 +176,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 XlHAlign? RetVal = null;
-                object RawVal = GetCommonProperty(new CellStyleParam(Utils.StyleName.HorizontaiAlignment));
+                object RawVal = GetProperty(new CellStyleParam(Utils.StyleName.HorizontaiAlignment));
                 if (XlHAlignParser.Try(RawVal, out HorizontalAlignment PoiValue))
                 {
                     RetVal = XlHAlignParser.GetXlValue(PoiValue);
@@ -206,7 +206,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 XlVAlign? RetVal = null;
-                object RawVal = GetCommonProperty(new CellStyleParam(Utils.StyleName.VerticalAlignment));
+                object RawVal = GetProperty(new CellStyleParam(Utils.StyleName.VerticalAlignment));
                 if (XlVAlignParser.Try(RawVal, out VerticalAlignment PoiValue))
                 {
                     RetVal = XlVAlignParser.GetXlValue(PoiValue);
@@ -236,7 +236,7 @@ namespace Developers.NpoiWrapper.Model
         {
             get
             {
-                string RawVal = (string)GetCommonProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
+                string RawVal = (string)GetProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
                 return StyleUtil.GetXlNumberFormatLocal(RawVal);
             }
             set
@@ -257,7 +257,7 @@ namespace Developers.NpoiWrapper.Model
         {
             get
             {
-                return (string)GetCommonProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
+                return (string)GetProperty(new CellStyleParam(Utils.StyleName.NumberFormat));
             }
             set
             {
@@ -275,7 +275,7 @@ namespace Developers.NpoiWrapper.Model
         {
             get
             {
-                return (bool?)GetCommonProperty(new CellStyleParam(Utils.StyleName.Locked));
+                return (bool?)GetProperty(new CellStyleParam(Utils.StyleName.Locked));
             }
             set
             {
@@ -299,7 +299,7 @@ namespace Developers.NpoiWrapper.Model
         {
             get
             {
-                return (bool?)GetCommonProperty(new CellStyleParam(Utils.StyleName.WrapText));
+                return (bool?)GetProperty(new CellStyleParam(Utils.StyleName.WrapText));
             }
             set
             {

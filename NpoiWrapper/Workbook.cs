@@ -284,6 +284,8 @@ namespace Developers.NpoiWrapper
             {
                 PoiBook.CreateSheet();
             }
+            //スタイル設定ファイル読取
+            ApplyConfigs();
         }
 
         #endregion

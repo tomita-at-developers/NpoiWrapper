@@ -1,4 +1,5 @@
 ﻿using Developers.NpoiWrapper.Model.Param;
+using Developers.NpoiWrapper.Utils;
 using NPOI.POIFS.Properties;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Web.UI.WebControls;
 
 namespace Developers.NpoiWrapper.Model
 {
@@ -73,9 +75,9 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         /// <param name="Param">取得指示</param>
         /// <returns></returns>
-        public object GetCommonProperty(CellStyleParam Param)
+        public object GetProperty(CellStyleParam Param)
         {
-            Dictionary<string, object> Properties = GetCommonProperties(new List<CellStyleParam> { Param });
+            Dictionary<string, object> Properties = GetProperties(new List<CellStyleParam> { Param });
             return Properties[Param.Name];
         }
 
@@ -86,11 +88,11 @@ namespace Developers.NpoiWrapper.Model
         /// </summary>
         /// <param name="Params">取得指示リスト</param>
         /// <returns></returns>
-        public Dictionary<string, object> GetCommonProperties(List<CellStyleParam> Params)
+        public Dictionary<string, object> GetProperties(List<CellStyleParam> Params)
         {
             //デバッグログ用情報
-            var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
-            StopwatchForDebugLog.Start();
+            NpoiWrapper.Utils.DebugTimer ProcTimer = new NpoiWrapper.Utils.DebugTimer();
+            ProcTimer.Start();
             int CellCountForDebugLog = 0;
             string ParamsForDebugLog = string.Empty;
             foreach (CellStyleParam Param in Params) { ParamsForDebugLog += Param.GetParamsString() + ","; }
@@ -189,10 +191,9 @@ namespace Developers.NpoiWrapper.Model
 
             }
             //処理時間測定タイマー停止＆ログ出力
-            StopwatchForDebugLog.Stop();
-            TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
-            Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
-            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimer.Stop();
+            Logger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimeLogger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
             return RetVal;
         }
 
@@ -212,8 +213,8 @@ namespace Developers.NpoiWrapper.Model
         public void UpdateProperties(List<CellStyleParam> Params)
         {
             //デバッグログ用情報
-            var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
-            StopwatchForDebugLog.Start();
+            DebugTimer ProcTimer = new DebugTimer();
+            ProcTimer.Start();
             int CellCountForDebugLog = 0;
             string DebugLogString;
             string ParamsForDebugLog = string.Empty;
@@ -302,10 +303,9 @@ namespace Developers.NpoiWrapper.Model
                 }
             }
             //処理時間測定タイマー停止＆ログ出力
-            StopwatchForDebugLog.Stop();
-            TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
-            Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
-            ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimer.Stop();
+            Logger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
+            ProcTimeLogger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for [" + CellCountForDebugLog + "]Cells / Params[" + ParamsForDebugLog + "]");
         }
 
         /// <summary>

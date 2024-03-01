@@ -1,5 +1,6 @@
 ﻿using Developers.NpoiWrapper.Model;
 using Developers.NpoiWrapper.Utils;
+using NPOI.HPSF;
 using NPOI.HSSF.UserModel;
 using NPOI.POIFS.Properties;
 using NPOI.SS.UserModel;
@@ -1259,11 +1260,13 @@ namespace Developers.NpoiWrapper
         {
             //デバッグログ用情報
             int FitCount = 0;
-            var StopwatchForDebugLog = new System.Diagnostics.Stopwatch();
-            StopwatchForDebugLog.Start();
+            string CountUnit = string.Empty;
+            Utils.DebugTimer ProcTimer = new Utils.DebugTimer();
+            ProcTimer.Start();
             //行モード
             if (this.CountAs == CountType.Rows)
             {
+                CountUnit = "Rows";
                 //Office.Interop.Excelにならい非連続Rangeの全てに適用
                 for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
                 {
@@ -1281,14 +1284,11 @@ namespace Developers.NpoiWrapper
                         }
                     }
                 }
-                //処理時間測定タイマー停止＆ログ出力
-                StopwatchForDebugLog.Stop();
-                TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
-                Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + FitCount + "]Rows");
             }
             //列モード
             else
             {
+                CountUnit = "Columns";
                 //Office.Interop.Excelにならい非連続Rangeの全てに適用
                 for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
                 {
@@ -1309,12 +1309,11 @@ namespace Developers.NpoiWrapper
                         //GC.Collect();
                     }
                 }
-                //処理時間測定タイマー停止＆ログ出力
-                StopwatchForDebugLog.Stop();
-                TimeSpan TimeSpanForDebugLog = StopwatchForDebugLog.Elapsed;
-                Logger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + FitCount + "]Columns");
-                ProcTimeLogger.Debug("Processing Time[" + TimeSpanForDebugLog.ToString(@"ss\.fff") + "sec] for [" + FitCount + "]Columns");
             }
+            //処理時間測定タイマー停止＆ログ出力
+            ProcTimer.Stop();
+            Logger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for [" + FitCount + "]" + CountUnit);
+            ProcTimeLogger.Debug("Processing Time[" + ProcTimer.ElapsedSeconds.ToString("0.000") + "sec] for [" + FitCount + "]" + CountUnit);
         }
 
         /// <summary>

@@ -64,7 +64,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return BorderStyle.GetCommonProperty(new BorderStyleParam(StyleName.XlsBorder.LineStyle));
+                return BorderStyle.GetProperty(new BorderStyleParam(StyleName.XlsBorder.LineStyle));
             }
             set
             {
@@ -87,7 +87,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return BorderStyle.GetCommonProperty(new BorderStyleParam(StyleName.XlsBorder.Weight));
+                return BorderStyle.GetProperty(new BorderStyleParam(StyleName.XlsBorder.Weight));
             }
             set
             {
@@ -110,7 +110,7 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                return BorderStyle.GetCommonProperty(new BorderStyleParam(StyleName.XlsBorder.ColorIndex));
+                return BorderStyle.GetProperty(new BorderStyleParam(StyleName.XlsBorder.ColorIndex));
             }
             set
             {
