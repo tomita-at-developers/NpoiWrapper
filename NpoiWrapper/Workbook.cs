@@ -455,7 +455,7 @@ namespace Developers.NpoiWrapper
             //現在のWorkbookの既定拡張子を取得
             string DefaultExtension = PoiBook.SpreadsheetVersion.DefaultExtension;
             //拡張子は既定拡張子を適用
-            this.FullName = System.IO.Path.ChangeExtension(this.FullName, DefaultExtension);
+            //this.FullName = System.IO.Path.ChangeExtension(this.FullName, DefaultExtension);
             try
             {
                 //ファイル保存
