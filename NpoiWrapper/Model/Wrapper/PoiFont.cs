@@ -1,4 +1,5 @@
-﻿using Developers.NpoiWrapper.Utils;
+﻿using Developers.NpoiWrapper.Configurations.Models;
+using Developers.NpoiWrapper.Utils;
 using NPOI.SS.UserModel;
 using System;
 using System.Reflection;
@@ -49,7 +50,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         {
             this.PoiBook = PoiBook;
             //指定されたフォントをインポート
-            ApplyStyleFrom(this.PoiBook.GetFontAt(FontIndex));
+            ImportFrom(this.PoiBook.GetFontAt(FontIndex));
         }
 
         #endregion
@@ -218,7 +219,60 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// 指定されたフォント定義を自プロパティにインポート
         /// </summary>
         /// <param name="Font">インポート対象フォント定義</param>
-        public void ApplyStyleFrom(IFont Font)
+        public void ImportFrom(IFont Font)
+        {
+            if (SystemParams.UseReflection)
+            {
+                ImportFromViaReflection(Font);
+            }
+            else
+            {
+                ImportFromViaProperty(Font);
+            }
+        }
+
+        /// <summary>
+        /// 指定フォント定義がこのフォント定義と同じフォント定義かどうかを判断する
+        /// </summary>
+        /// <param name="TagetFontStyle">対象フォント定義</param>
+        /// <returns></returns>
+        public bool Equals(IFont Font)
+        {
+            bool RetVal = false;
+            if (SystemParams.UseReflection)
+            {
+                RetVal = EqualsViaReflection(Font);
+            }
+            else
+            {
+                RetVal = EqualsViaProperty(Font);
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// 指定されたフォント定義に自プロパティをエクスポート
+        /// </summary>
+        /// <param name="Font">エクスポート対象フォント定義</param>
+        public void ExportTo(IFont Font)
+        {
+            if (SystemParams.UseReflection)
+            {
+                ExportToViaReflection(Font);
+            }
+            else
+            {
+                ExportToViaProperty(Font);
+            }
+        }
+
+        #region "Via Relection"
+
+        /// <summary>
+        /// 指定されたフォント定義を自プロパティにインポート
+        /// </summary>
+        /// <param name="Font">インポート対象フォント定義</param>
+        public void ImportFromViaReflection(IFont Font)
         {
             //基点Fontオブジェクトを保存
             this.Font = Font;
@@ -245,53 +299,11 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         }
 
         /// <summary>
-        /// 変更を確定する
-        /// </summary>
-        public short Commit()
-        {
-            //上位からの変更があった場合
-            if (this.Updated)
-            {
-                //Indexをクリア
-                this.Index = -1;
-                //マスター上に同一フォント情報があるかチェックし、あれば採用
-                for (short FIdx = 0; FIdx < PoiBook.NumberOfFonts; FIdx++)
-                {
-                    PoiFont MasterFont = new PoiFont(PoiBook, FIdx);
-                    if (this.StyleEquals(PoiBook.GetFontAt(FIdx)))
-                    {
-                        this.Font = MasterFont;
-                        this.Index = MasterFont.Index;
-                        Logger.Debug("CurrentFont:[Index:" + this.InitialIndex + "] => Font.[Index:" + this.Index + "] is picked up from Font-Master in this Book..");
-                        break;
-                    }
-                }
-                //マスター上になかったら新規に作成(再利用可能のチェックはしていないので、追加のみ)
-                if (this.Index == -1)
-                {
-                    this.Font = PoiBook.CreateFont();
-                    this.Index = Font.Index;
-                    ApplyStyleTo(this.Font);
-                    Logger.Debug("CurrentFont:[Index:" + this.InitialIndex + "] => Font.[Index:" + this.Index + "] is newly created by IWorkbook.CreateFont().");
-                }
-            }
-            //上位からの変更がなかった場合は何もしない。
-            else
-            {
-                Logger.Debug("CurrentFont:[Index:" + this.InitialIndex + "] == Font.[Index:" + this.Index + "] No propertiy was updated.");
-            }
-            //InitialIndexの更新
-            this.InitialIndex = this.Font.Index;
-            //Indexを返す(最新のIndex)
-            return this.Font.Index;
-        }
-
-        /// <summary>
         /// 指定フォント定義がこのフォント定義と同じフォント定義かどうかを判断する
         /// </summary>
         /// <param name="TagetFontStyle">対象フォント定義</param>
         /// <returns></returns>
-        public bool StyleEquals(IFont Font)
+        public bool EqualsViaReflection(IFont Font)
         {
             bool RetVal = true;
             //nullでなくIFontであること
@@ -329,7 +341,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// 指定されたフォント定義に自プロパティをエクスポート
         /// </summary>
         /// <param name="Font">エクスポート対象フォント定義</param>
-        public void ApplyStyleTo(IFont Font)
+        public void ExportToViaReflection(IFont Font)
         {
             //プロパティリスト取得
             PropertyInfo[] Props = this.GetType().GetProperties();
@@ -346,6 +358,129 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                     destination?.SetValue(Font, source.GetValue(this));
                 }
             }
+        }
+
+        #endregion
+
+        #region "Via Property"
+
+        /// <summary>
+        /// 指定されたフォント定義を自プロパティにインポート
+        /// </summary>
+        /// <param name="Font">インポート対象フォント定義</param>
+        public void ImportFromViaProperty(IFont Font)
+        {
+            //基点Fontオブジェクトを保存
+            this.Font = Font;
+            this.InitialIndex = this.Font.Index;
+            //インポート属性のあるプロパティのみインポート
+            this.Index = Font.Index;
+            this.FontName = Font.FontName;
+            //this.FontHeight
+            this.FontHeightInPoints = Font.FontHeightInPoints;
+            this.IsItalic = Font.IsItalic;
+            this.IsStrikeout = Font.IsStrikeout;
+            this.Color = Font.Color;
+            this.TypeOffset = Font.TypeOffset;
+            this.Underline = Font.Underline;
+            this.Charset = Font.Charset;
+            this.Boldweight = Font.Boldweight;
+            this.IsBold = Font.IsBold;
+            //インポート直後のまっさらな状態
+            this.Updated = false;
+        }
+
+        /// <summary>
+        /// 指定フォント定義がこのフォント定義と同じフォント定義かどうかを判断する
+        /// </summary>
+        /// <param name="TagetFontStyle">対象フォント定義</param>
+        /// <returns></returns>
+        public bool EqualsViaProperty(IFont Font)
+        {
+            bool RetVal = true;
+            //nullでなくIFontであること
+            if ((Font != null) && Font is IFont)
+            {
+                //コンペア属性のあるプロパティのみ比較
+                //this.Index
+                if (!Equals(this.FontName = Font.FontName)) RetVal = false;
+                //this.FontHeight
+                if (!Equals(this.FontHeightInPoints = Font.FontHeightInPoints)) RetVal = false;
+                if (!Equals(this.IsItalic = Font.IsItalic)) RetVal = false;
+                if (!Equals(this.IsStrikeout = Font.IsStrikeout)) RetVal = false;
+                if (!Equals(this.Color = Font.Color)) RetVal = false;
+                if (!Equals(this.TypeOffset = Font.TypeOffset)) RetVal = false;
+                if (!Equals(this.Underline = Font.Underline)) RetVal = false;
+                if (!Equals(this.Charset = Font.Charset)) RetVal = false;
+                if (!Equals(this.Boldweight = Font.Boldweight)) RetVal = false;
+                if (!Equals(this.IsBold = Font.IsBold)) RetVal = false;
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// 指定されたフォント定義に自プロパティをエクスポート
+        /// </summary>
+        /// <param name="Font">エクスポート対象フォント定義</param>
+        public void ExportToViaProperty(IFont Font)
+        {
+            //エクスポート属性のあるプロパティのみエクスポート
+            //this.Index
+            Font.FontName = this.FontName;
+            //this.FontHeight
+            Font.FontHeightInPoints = this.FontHeightInPoints;
+            Font.IsItalic = this.IsItalic;
+            Font.IsStrikeout = this.IsStrikeout;
+            Font.Color = this.Color;
+            Font.TypeOffset = this.TypeOffset;
+            Font.Underline = this.Underline;
+            Font.Charset = this.Charset;
+            Font.Boldweight = this.Boldweight;
+            Font.IsBold = this.IsBold;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 変更を確定する
+        /// </summary>
+        public short Commit()
+        {
+            //上位からの変更があった場合
+            if (this.Updated)
+            {
+                //Indexをクリア
+                this.Index = -1;
+                //マスター上に同一フォント情報があるかチェックし、あれば採用
+                for (short FIdx = 0; FIdx < PoiBook.NumberOfFonts; FIdx++)
+                {
+                    PoiFont MasterFont = new PoiFont(PoiBook, FIdx);
+                    if (this.Equals(PoiBook.GetFontAt(FIdx)))
+                    {
+                        this.Font = MasterFont;
+                        this.Index = MasterFont.Index;
+                        Logger.Debug("CurrentFont:[Index:" + this.InitialIndex + "] => Font.[Index:" + this.Index + "] is picked up from Font-Master in this Book..");
+                        break;
+                    }
+                }
+                //マスター上になかったら新規に作成(再利用可能のチェックはしていないので、追加のみ)
+                if (this.Index == -1)
+                {
+                    this.Font = PoiBook.CreateFont();
+                    this.Index = Font.Index;
+                    ExportTo(this.Font);
+                    Logger.Debug("CurrentFont:[Index:" + this.InitialIndex + "] => Font.[Index:" + this.Index + "] is newly created by IWorkbook.CreateFont().");
+                }
+            }
+            //上位からの変更がなかった場合は何もしない。
+            else
+            {
+                Logger.Debug("CurrentFont:[Index:" + this.InitialIndex + "] == Font.[Index:" + this.Index + "] No propertiy was updated.");
+            }
+            //InitialIndexの更新
+            this.InitialIndex = this.Font.Index;
+            //Indexを返す(最新のIndex)
+            return this.Font.Index;
         }
 
         #endregion

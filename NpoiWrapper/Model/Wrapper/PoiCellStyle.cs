@@ -16,6 +16,13 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
+        private static Dictionary<string, PropertyInfo> _ImportMap = null;
+        private static Dictionary<string, PropertyInfo> _CompareMap = null;
+        private static Dictionary<string, PropertyInfo> _ExportMap = null;
+        private static Dictionary<string, PropertyInfo> _PoiCellStyleMap = null;
+        private static Dictionary<string, PropertyInfo> _ICellStyleMap = null;
+        private static PropertyInfo _FillBackgroundColorColorProp = null;
+
         /// <summary>
         /// 書式文字列
         /// </summary>
@@ -33,6 +40,11 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         public PoiCellStyle(ISheet PoiSheet, short StyleIndex)
         {
             this.PoiSheet = PoiSheet;
+            //プロパティマップの生成
+            if(_PoiCellStyleMap == null)
+            {
+                CreateMaps();
+            }
             //指定されたスタイルをインポート
             this.CellStyle = this.PoiBook.GetCellStyleAt(StyleIndex);
             ImportFrom(this.CellStyle);
@@ -68,7 +80,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         [Import(true), Comparison(true), Export(true)] public short FillForegroundColor { get; set; }
         [Import(true), Comparison(true), Export(true)] public short BorderDiagonalColor { get; set; }
         [Import(true), Comparison(true), Export(true)] public BorderStyle BorderDiagonalLineStyle { get; set; }
-        [Import(false), Comparison(true), Export(true)] public BorderDiagonal BorderDiagonal { get; set; }
+        [Import(true), Comparison(true), Export(true)] public BorderDiagonal BorderDiagonal { get; set; }
         /// <summary>
         /// FillBackgroundColorと同義のIColorオブジェクト
         /// NPOIのICellStyle実装クラスでは、一方を更新するともう一方も自動更新される。
@@ -140,7 +152,6 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// <summary>
         /// ICellStyleの拡張:DataFormatをGetDataFormatString()で展開して格納
         /// </summary>
-        [Import(false), Comparison(true), Export(false)]
         public string DataFormatString
         {
             get
@@ -184,7 +195,174 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// 　(3) FontIndexからその内容をPoiFontに展開する
         /// </summary>
         /// <param name="CellStyle">インポート対象スタイル</param>
-        public void ImportFrom(ICellStyle CellStyle)
+        public void ImportFrom(ICellStyle CellStyle) 
+        {
+            if (SystemParams.UseReflection)
+            {
+                if (SystemParams.UseReflectionMap)
+                {
+                    ImportFromViaReflection1(CellStyle);
+                }
+                else
+                {
+                    ImportFromViaReflection0(CellStyle);
+                }
+            }
+            else
+            {
+                ImportFromViaProperty(CellStyle);
+            }
+        }
+
+        /// <summary>
+        /// 指定スタイルが自クラスプロパティと同じスタイルかどうかを判断する
+        /// </summary>
+        /// <param name="TagetCellStyle">自クラスを同じか判定する対象スタイル</param>
+        /// <returns>一致時true</returns>
+        public bool Equals(ICellStyle CellStyle)
+        {
+            bool RetVal = false;
+            if (SystemParams.UseReflection)
+            {
+                if (SystemParams.UseReflectionMap)
+                {
+                    RetVal = EqualsViaReflection1(CellStyle);
+                }
+                else
+                {
+                    RetVal = EqualsViaReflection0(CellStyle);
+                }
+            }
+            else
+            {
+                RetVal = EqualsViaProperty(CellStyle);
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// 指定されたスタイルに自プロパティをエクスポート
+        /// 　(1) ExportAttributeでtrueが指定されているプロパティをコピーする
+        /// 　(2) DataFormatはそのままコピー
+        /// 　(3) Font情報はPoiFont.FontをSetFont()する
+        /// </summary>
+        /// <param name="CellStyle">エクスポート対象スタイル</param>
+        public void ExportTo(ICellStyle CellStyle)
+        {
+            if (SystemParams.UseReflection)
+            {
+                if (SystemParams.UseReflectionMap)
+                {
+                    ExportToViaReflection1(CellStyle);
+                }
+                else
+                {
+                    ExportToViaReflection0(CellStyle);
+                }
+            }
+            else
+            {
+                ExportToViaProperty(CellStyle);
+            }
+        }
+
+        #region "Via Reflection with maps"
+
+        /// <summary>
+        /// 指定されたスタイルを自プロパティにインポート
+        /// </summary>
+        /// <param name="CellStyle">インポート対象スタイル</param>
+        public void ImportFromViaReflection1(ICellStyle CellStyle)
+        {
+            //基点CellTyleを保存
+            this.CellStyle = CellStyle;
+            //インポートマップに従いインポート
+            foreach (var map in _ImportMap)
+            {
+                map.Value.SetValue(this, _ICellStyleMap[map.Key].GetValue(CellStyle));
+            }
+            //DataFormatを文字列に展開(プロパティではなく元のFieldに展開)。Indexは保持。
+            _DataFormatString = CellStyle.GetDataFormatString();
+            //フォント情報を展開。展開したらFontIndexは無効化
+            PoiFont = new PoiFont(PoiBook, CellStyle.FontIndex);
+            FontIndex = -1;
+        }
+
+        /// <summary>
+        /// 指定スタイルが自クラスプロパティと同じスタイルかどうかを判断する
+        /// </summary>
+        /// <param name="TagetCellStyle">自クラスを同じか判定する対象スタイル</param>
+        /// <returns>一致時true</returns>
+        public bool EqualsViaReflection1(ICellStyle CellStyle)
+        {
+            bool RetVal = true;
+            //コンペアマップに従い比較
+            foreach (var map in _CompareMap)
+            {
+                if (!map.Value.GetValue(this).Equals(_ICellStyleMap[map.Key].GetValue(CellStyle)))
+                {
+                    RetVal = false;
+                    break;
+                }
+            }
+            //一致していればFontも比較
+            if (RetVal)
+            {
+                if (!PoiFont.Equals(CellStyle.GetFont(PoiBook)))
+                {
+                    RetVal = false;
+                }
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// 指定されたスタイルに自プロパティをエクスポート
+        /// 　(1) ExportAttributeでtrueが指定されているプロパティをコピーする
+        /// 　(2) DataFormatはそのままコピー
+        /// 　(3) Font情報はPoiFont.FontをSetFont()する
+        /// </summary>
+        /// <param name="CellStyle">エクスポート対象スタイル</param>
+        public void ExportToViaReflection1(ICellStyle CellStyle)
+        {
+            //エクスポートマップに従い比較
+            foreach (var map in _ExportMap)
+            {
+                _ICellStyleMap[map.Key].SetValue(CellStyle, map.Value.GetValue(this));
+            }
+            //FontからFontをセットする
+            CellStyle.SetFont(PoiFont.Font);
+            //★★★要検討(その１)★★★
+            //FillForegroundColorColor, FillBackfroundColorColorにはSetterがないので直接更新ができない。
+            //FillForegroundColor, FillBackfroundColor更新時に、自動更新される模様なので、ここで個別に
+            //明示的な更新を行う。念のためFillPatternも更新しておく。
+            CellStyle.FillPattern = this.FillPattern;
+            CellStyle.FillForegroundColor = this.FillForegroundColor;
+            CellStyle.FillBackgroundColor = this.FillBackgroundColor;
+            //★★★要検討(その２)★★★
+            //Excelでファイルを開き、FillPatternがNoFillのセルに入ると背景色がおかしくなってしまう。
+            //どうやらFillBackgroundColorColorに問題がある模様。
+            //Excelで編集した場合はFillBackgroundColorColorがNULLなのでそれに倣う。
+            //ただしsetterがないのでリフレクションで強制的に実施する。
+            if (this.FillPattern == FillPattern.NoFill)
+            {
+                if (_FillBackgroundColorColorProp != null)
+                {
+                    _FillBackgroundColorColorProp.SetValue(CellStyle, null);
+                    Logger.Debug("FillBackgroundColorColor null-cleared.");
+                }
+            }
+        }
+
+        #endregion
+
+        #region "Via Reflection without maps"
+
+        /// <summary>
+        /// 指定されたスタイルを自プロパティにインポート
+        /// </summary>
+        /// <param name="CellStyle">インポート対象スタイル</param>
+        public void ImportFromViaReflection0(ICellStyle CellStyle)
         {
             //基点CellTyleを保存
             this.CellStyle = CellStyle;
@@ -218,7 +396,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// </summary>
         /// <param name="TagetCellStyle">自クラスを同じか判定する対象スタイル</param>
         /// <returns>一致時true</returns>
-        public bool StyleEquals(ICellStyle CellStyle)
+        public bool EqualsViaReflection0(ICellStyle CellStyle)
         {
             bool RetVal = true;
             //nullでなくICellStyleであること
@@ -250,7 +428,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                 //一致していればFontも比較
                 if (RetVal)
                 {
-                    if (!PoiFont.StyleEquals(CellStyle.GetFont(PoiBook)))
+                    if (!PoiFont.Equals(CellStyle.GetFont(PoiBook)))
                     {
                         RetVal = false;
                     }
@@ -263,6 +441,225 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             }
             return RetVal;
         }
+
+        /// <summary>
+        /// 指定されたスタイルに自プロパティをエクスポート
+        /// 　(1) ExportAttributeでtrueが指定されているプロパティをコピーする
+        /// 　(2) DataFormatはそのままコピー
+        /// 　(3) Font情報はPoiFont.FontをSetFont()する
+        /// </summary>
+        /// <param name="CellStyle">エクスポート対象スタイル</param>
+        public void ExportToViaReflection0(ICellStyle CellStyle)
+        {
+            PropertyInfo[] MyProps = this.GetType().GetProperties();
+            //自プロパティを指定されたCellStyleのプロパティ値にセット
+            foreach (PropertyInfo MyProp in MyProps)
+            {
+                //エクスポート属性のあるプロパティのみエクスポート
+                ExportAttribute Attr = AttributeUtility.GetPropertyAttribute<ExportAttribute>(this, MyProp.Name);
+                if (Attr != null && Attr.Export)
+                {
+                    //プロパティ情報を取得しプロパティに値をセット
+                    //ただしICellStyeから拡張された独自プロパティは無視
+                    PropertyInfo TargetProp = CellStyle.GetType().GetProperty(MyProp.Name);
+                    TargetProp?.SetValue(CellStyle, MyProp.GetValue(this));
+                    Logger.Debug(TargetProp.Name + "=" + (MyProp.GetValue(this) ?? "null"));
+                }
+            }
+            //FontからFontをセットする
+            CellStyle.SetFont(PoiFont.Font);
+            //★★★要検討(その１)★★★
+            //FillForegroundColorColor, FillBackfroundColorColorにはSetterがないので直接更新ができない。
+            //FillForegroundColor, FillBackfroundColor更新時に、自動更新される模様なので、ここで個別に
+            //明示的な更新を行う。念のためFillPatternも更新しておく。
+            CellStyle.FillPattern = this.FillPattern;
+            CellStyle.FillForegroundColor = this.FillForegroundColor;
+            CellStyle.FillBackgroundColor = this.FillBackgroundColor;
+            //★★★要検討(その２)★★★
+            //Excelでファイルを開き、FillPatternがNoFillのセルに入ると背景色がおかしくなってしまう。
+            //どうやらFillBackgroundColorColorに問題がある模様。
+            //Excelで編集した場合はFillBackgroundColorColorがNULLなのでそれに倣う。
+            //ただしsetterがないのでリフレクションで強制的に実施する。
+            if (this.FillPattern == FillPattern.NoFill)
+            {
+                PropertyInfo PInf = CellStyle.GetType().GetProperty("FillBackgroundColorColor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (PInf != null)
+                {
+                    PInf.SetValue(CellStyle, null);
+                    Logger.Debug("FillBackgroundColorColor null-cleared.");
+                }
+            }
+        }
+
+        #endregion
+
+        #region "Via Property"
+
+        /// <summary>
+        /// 指定されたスタイルを自プロパティにインポート
+        /// </summary>
+        /// <param name="CellStyle">インポート対象スタイル</param>
+        public void ImportFromViaProperty(ICellStyle CellStyle)
+        {
+            //基点CellTyleを保存
+            this.CellStyle = CellStyle;
+            //インポート属性のあるプロパティのみインポート
+            this.Index = CellStyle.Index;
+            this.ShrinkToFit = CellStyle.ShrinkToFit;
+            this.DataFormat = CellStyle.DataFormat;
+            this.FontIndex = CellStyle.FontIndex;
+            this.IsHidden = CellStyle.IsHidden;
+            this.IsLocked = CellStyle.IsLocked;
+            this.Alignment = CellStyle.Alignment;
+            this.WrapText = CellStyle.WrapText;
+            this.VerticalAlignment = CellStyle.VerticalAlignment;
+            this.Rotation = CellStyle.Rotation;
+            this.Indention = CellStyle.Indention;
+            this.BorderLeft = CellStyle.BorderLeft;
+            this.BorderRight= CellStyle.BorderRight;
+            this.BorderTop = CellStyle.BorderTop;
+            this.BorderBottom = CellStyle.BorderBottom;
+            this.LeftBorderColor = CellStyle.LeftBorderColor;
+            this.RightBorderColor = CellStyle.RightBorderColor;
+            this.TopBorderColor = CellStyle.TopBorderColor;
+            this.BottomBorderColor = CellStyle.BottomBorderColor;
+            this.FillPattern = CellStyle.FillPattern;
+            this.FillBackgroundColor = CellStyle.FillBackgroundColor;
+            this.FillForegroundColor = CellStyle.FillForegroundColor;
+            this.BorderDiagonalColor = CellStyle.BorderDiagonalColor;
+            this.BorderDiagonalLineStyle = CellStyle.BorderDiagonalLineStyle;
+            this.BorderDiagonal = CellStyle.BorderDiagonal;
+            //this.FillBackgroundColorColor
+            //this.FillForegroundColorColor
+            //DataFormatを文字列に展開(プロパティではなく元のFieldに展開)。Indexは保持。
+            _DataFormatString = CellStyle.GetDataFormatString();
+            //フォント情報を展開。展開したらFontIndexは無効化
+            PoiFont = new PoiFont(PoiBook, CellStyle.FontIndex);
+            FontIndex = -1;
+        }
+
+        /// <summary>
+        /// 指定スタイルが自クラスプロパティと同じスタイルかどうかを判断する
+        /// </summary>
+        /// <param name="TagetCellStyle">自クラスを同じか判定する対象スタイル</param>
+        /// <returns>一致時true</returns>
+        public bool EqualsViaProperty(ICellStyle CellStyle)
+        {
+            bool RetVal = true;
+            //nullでなくICellStyleであること
+            if ((CellStyle != null) && CellStyle is ICellStyle)
+            {
+                //コンペア属性のあるプロパティのみ比較
+                //this.Index
+                if (!this.ShrinkToFit.Equals(CellStyle.ShrinkToFit)) RetVal = false;
+                if (!this.DataFormat.Equals(CellStyle.DataFormat)) RetVal = false;
+                //this.FontIndex
+                if (!this.IsHidden.Equals(CellStyle.IsHidden)) RetVal = false;
+                if (!this.IsLocked.Equals(CellStyle.IsLocked)) RetVal = false;
+                if (!this.Alignment.Equals(CellStyle.Alignment)) RetVal = false;
+                if (!this.WrapText.Equals(CellStyle.WrapText)) RetVal = false;
+                if (!this.VerticalAlignment.Equals(CellStyle.VerticalAlignment)) RetVal = false;
+                if (!this.Rotation.Equals(CellStyle.Rotation)) RetVal = false;
+                if (!this.Indention.Equals(CellStyle.Indention)) RetVal = false;
+                if (!this.BorderLeft.Equals(CellStyle.BorderLeft)) RetVal = false;
+                if (!this.BorderRight.Equals(CellStyle.BorderRight)) RetVal = false;
+                if (!this.BorderTop.Equals(CellStyle.BorderTop)) RetVal = false;
+                if (!this.BorderBottom.Equals(CellStyle.BorderBottom)) RetVal = false;
+                if (!this.LeftBorderColor.Equals(CellStyle.LeftBorderColor)) RetVal = false;
+                if (!this.RightBorderColor.Equals(CellStyle.RightBorderColor)) RetVal = false;
+                if (!this.TopBorderColor.Equals(CellStyle.TopBorderColor)) RetVal = false;
+                if (!this.BottomBorderColor.Equals(CellStyle.BottomBorderColor)) RetVal = false;
+                if (!this.FillPattern.Equals(CellStyle.FillPattern)) RetVal = false;
+                if (!this.FillBackgroundColor.Equals(CellStyle.FillBackgroundColor)) RetVal = false;
+                if (!this.FillForegroundColor.Equals(CellStyle.FillForegroundColor)) RetVal = false;
+                if (!this.BorderDiagonalColor.Equals(CellStyle.BorderDiagonalColor)) RetVal = false;
+                if (!this.BorderDiagonalLineStyle.Equals(CellStyle.BorderDiagonalLineStyle)) RetVal = false;
+                if (!this.BorderDiagonal.Equals(CellStyle.BorderDiagonal)) RetVal = false;
+                //this.FillBackgroundColorColor
+                //this.FillForegroundColorColor
+                //一致していればFontも比較
+                if (RetVal)
+                {
+                    if (!PoiFont.Equals(CellStyle.GetFont(PoiBook)))
+                    {
+                        RetVal = false;
+                    }
+                }
+            }
+            //nullまたは型違い
+            else
+            {
+                RetVal = false;
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// 指定されたスタイルに自プロパティをエクスポート
+        /// </summary>
+        /// <param name="CellStyle">エクスポート対象スタイル</param>
+        public void ExportToViaProperty(ICellStyle CellStyle)
+        {
+            PropertyInfo[] MyProps = this.GetType().GetProperties();
+            //自プロパティを指定されたCellStyleのプロパティ値にセット
+            foreach (PropertyInfo MyProp in MyProps)
+            {
+                //エクスポート属性のあるプロパティのみエクスポート
+                ExportAttribute Attr = AttributeUtility.GetPropertyAttribute<ExportAttribute>(this, MyProp.Name);
+                //CellStyle.Index
+                CellStyle.ShrinkToFit = this.ShrinkToFit;
+                CellStyle.DataFormat = this.DataFormat;
+                //Cell.StyleFontIndex
+                CellStyle.IsHidden = this.IsHidden;
+                CellStyle.IsLocked = this.IsLocked;
+                CellStyle.Alignment = this.Alignment;
+                CellStyle.WrapText = this.WrapText;
+                CellStyle.VerticalAlignment = this.VerticalAlignment;
+                CellStyle.Rotation = this.Rotation;
+                CellStyle.Indention = this.Indention;
+                CellStyle.BorderLeft = this.BorderLeft;
+                CellStyle.BorderRight = this.BorderRight;
+                CellStyle.BorderTop = this.BorderTop;
+                CellStyle.BorderBottom = this.BorderBottom;
+                CellStyle.LeftBorderColor = this.LeftBorderColor;
+                CellStyle.RightBorderColor = this.RightBorderColor;
+                CellStyle.TopBorderColor = this.TopBorderColor;
+                CellStyle.BottomBorderColor = this.BottomBorderColor;
+                CellStyle.FillPattern = this.FillPattern;
+                CellStyle.FillBackgroundColor = this.FillBackgroundColor;
+                CellStyle.FillForegroundColor = this.FillForegroundColor;
+                CellStyle.BorderDiagonalColor = this.BorderDiagonalColor;
+                CellStyle.BorderDiagonalLineStyle = this.BorderDiagonalLineStyle;
+                CellStyle.BorderDiagonal = this.BorderDiagonal;
+                //CellStyle.FillBackgroundColorColor
+                //CellStyle.FillForegroundColorColor
+            }
+            //FontからFontをセットする
+            CellStyle.SetFont(PoiFont.Font);
+            //★★★要検討(その１)★★★
+            //FillForegroundColorColor, FillBackfroundColorColorにはSetterがないので直接更新ができない。
+            //FillForegroundColor, FillBackfroundColor更新時に、自動更新される模様なので、ここで個別に
+            //明示的な更新を行う。念のためFillPatternも更新しておく。
+            CellStyle.FillPattern = this.FillPattern;
+            CellStyle.FillForegroundColor = this.FillForegroundColor;
+            CellStyle.FillBackgroundColor = this.FillBackgroundColor;
+            //★★★要検討(その２)★★★
+            //Excelでファイルを開き、FillPatternがNoFillのセルに入ると背景色がおかしくなってしまう。
+            //どうやらFillBackgroundColorColorに問題がある模様。
+            //Excelで編集した場合はFillBackgroundColorColorがNULLなのでそれに倣う。
+            //ただしsetterがないのでリフレクションで強制的に実施する。
+            if (this.FillPattern == FillPattern.NoFill)
+            {
+                PropertyInfo PInf = CellStyle.GetType().GetProperty("FillBackgroundColorColor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (PInf != null)
+                {
+                    PInf.SetValue(CellStyle, null);
+                    Logger.Debug("FillBackgroundColorColor null-cleared.");
+                }
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 変更を確定する
@@ -278,7 +675,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             //マスター上にあるかチェックしあればそれを使う(ただしIndex=1以上
             for (short i = 1; i < PoiBook.NumCellStyles; i++)
             {
-                if (this.StyleEquals(PoiBook.GetCellStyleAt(i)))
+                if (this.Equals(PoiBook.GetCellStyleAt(i)))
                 {
                     CellStyle = PoiBook.GetCellStyleAt(i);
                     Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style[Index:" + i + "] is found in Book.");
@@ -341,55 +738,6 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         }
 
         /// <summary>
-        /// 指定されたスタイルに自プロパティをエクスポート
-        /// 　(1) ExportAttributeでtrueが指定されているプロパティをコピーする
-        /// 　(2) DataFormatはそのままコピー
-        /// 　(3) Font情報はPoiFont.FontをSetFont()する
-        /// </summary>
-        /// <param name="CellStyle">エクスポート対象スタイル</param>
-        public void ExportTo(ICellStyle CellStyle)
-        {
-            PropertyInfo[] MyProps = this.GetType().GetProperties();
-            //自プロパティを指定されたCellStyleのプロパティ値にセット
-            foreach (PropertyInfo MyProp in MyProps)
-            {
-                //エクスポート属性のあるプロパティのみエクスポート
-                ExportAttribute Attr = AttributeUtility.GetPropertyAttribute<ExportAttribute>(this, MyProp.Name);
-                if (Attr != null && Attr.Export)
-                {
-                    //プロパティ情報を取得しプロパティに値をセット
-                    //ただしICellStyeから拡張された独自プロパティは無視
-                    PropertyInfo TargetProp = CellStyle.GetType().GetProperty(MyProp.Name);
-                    TargetProp?.SetValue(CellStyle, MyProp.GetValue(this));
-                    Logger.Debug(TargetProp.Name + "=" + (MyProp.GetValue(this) ?? "null"));
-                }
-            }
-            //FontからFontをセットする
-            CellStyle.SetFont(PoiFont.Font);
-            //★★★要検討(その１)★★★
-            //FillForegroundColorColor, FillBackfroundColorColorにはSetterがないので直接更新ができない。
-            //FillForegroundColor, FillBackfroundColor更新時に、自動更新される模様なので、ここで個別に
-            //明示的な更新を行う。念のためFillPatternも更新しておく。
-            CellStyle.FillPattern = this.FillPattern;
-            CellStyle.FillForegroundColor = this.FillForegroundColor;
-            CellStyle.FillBackgroundColor = this.FillBackgroundColor;
-            //★★★要検討(その２)★★★
-            //Excelでファイルを開き、FillPatternがNoFillのセルに入ると背景色がおかしくなってしまう。
-            //どうやらFillBackgroundColorColorに問題がある模様。
-            //Excelで編集した場合はFillBackgroundColorColorがNULLなのでそれに倣う。
-            //ただしsetterがないのでリフレクションで強制的に実施する。
-            if (this.FillPattern == FillPattern.NoFill)
-            {
-                PropertyInfo PInf = CellStyle.GetType().GetProperty("FillBackgroundColorColor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                if (PInf != null)
-                {
-                    PInf.SetValue(CellStyle, null);
-                    Logger.Debug("FillBackgroundColorColor null-cleared.");
-                }
-            }
-        }
-
-        /// <summary>
         /// DataFormatのコミット
         /// </summary>
         private void CommitDataFormat()
@@ -428,6 +776,59 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             {
                 this.DataFormat = PoiBook.CreateDataFormat().GetFormat(this.DataFormatString);
             }
+        }
+
+        /// <summary>
+        /// プロパティマップの作成
+        /// </summary>
+        private void CreateMaps()
+        {
+            //初期化
+            _ImportMap = new Dictionary<string, PropertyInfo>();
+            _CompareMap = new Dictionary<string, PropertyInfo>();
+            _ExportMap = new Dictionary<string, PropertyInfo>();
+            _PoiCellStyleMap = new Dictionary<string, PropertyInfo>();
+            _ICellStyleMap = new Dictionary<string, PropertyInfo>();
+            //自クラスのマップ作成
+            PropertyInfo[] Props = this.GetType().GetProperties();
+            foreach (PropertyInfo Prop in Props)
+            {
+                _PoiCellStyleMap.Add(Prop.Name, Prop);
+                //インポート属性
+                ImportAttribute imp = AttributeUtility.GetPropertyAttribute<ImportAttribute>(this, Prop.Name);
+                if (imp != null && imp.Import)
+                {
+                    _ImportMap.Add(Prop.Name, Prop);
+                }
+                //コンペア属性
+                ComparisonAttribute cmp = AttributeUtility.GetPropertyAttribute<ComparisonAttribute>(this, Prop.Name);
+                if (cmp != null && cmp.Compare)
+                {
+                    _CompareMap.Add(Prop.Name, Prop);
+                }
+                //エクスポート属性
+                ExportAttribute exp = AttributeUtility.GetPropertyAttribute<ExportAttribute>(this, Prop.Name);
+                if (exp != null && exp.Export)
+                {
+                    _ExportMap.Add(Prop.Name, Prop);
+                }
+            }
+            //ICellStyleのマップ作成(仮にデフォルトスタイルで作成)
+            ICellStyle CellStyle = this.PoiBook.GetCellStyleAt(0);
+            PropertyInfo[] ICellProps = CellStyle.GetType().GetProperties();
+            foreach (PropertyInfo Prop in ICellProps)
+            {
+                _ICellStyleMap.Add(Prop.Name, Prop);
+            }
+            //FillBackgroundColorColor
+            _FillBackgroundColorColorProp = CellStyle.GetType().GetProperty("FillBackgroundColorColor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            //生成件数のみログ
+            Logger.Debug(
+                "_ImportMap[" + _ImportMap.Count + "] "+
+                "_CompareMap[" + _CompareMap.Count + "] "+
+                "_ExportMap[" + _ExportMap.Count + "] " +
+                "_PoiCellStyleMap[" + _PoiCellStyleMap.Count + "] " +
+                "_ICellStyleMap[" + _ICellStyleMap.Count + "]");
         }
 
         #endregion
