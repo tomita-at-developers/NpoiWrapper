@@ -56,7 +56,7 @@ namespace Developers.NpoiWrapper
             {
                 CellRangeAddressList RangeAddressList = new CellRangeAddressList();
                 //インデックスはintであること
-                if (RowIndex is int row && ColumnIndex is int column)
+                if (base.TryConvertToInt(RowIndex, out int row) && base.TryConvertToInt(ColumnIndex, out int column))
                 {
                     //１から始まるIndexであること
                     if (row > 0 && column > 0)

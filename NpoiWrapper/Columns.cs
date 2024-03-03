@@ -60,7 +60,7 @@ namespace Developers.NpoiWrapper
             {
                 CellRangeAddressList RangeAddressList = new CellRangeAddressList();
                 //インデックスはintであること
-                if (ColumnIndex is int Index)
+                if (base.TryConvertToInt(ColumnIndex, out int Index))
                 {
                     //１から始まるIndexであること
                     if (Index > 0)
@@ -68,12 +68,12 @@ namespace Developers.NpoiWrapper
                         //絶対列インデックス生成
                         int TargetIndex = this.SafeAddressList.GetCellRangeAddress(0).FirstColumn + (Index - 1);
                         //絶対列インデックスがシート範囲内であること
-                        if (TargetIndex <= this.SafeAddressList.GetCellRangeAddress(0).FirstColumn)
+                        if (TargetIndex <= this.Parent.Parent.PoiBook.SpreadsheetVersion.MaxColumns - 1)
                         {
                             //先頭生アドレス取得
                             CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(0).Copy();
                             //指定された１行を選択
-                            RawAddress.FirstColumn = RawAddress.FirstColumn + (Index - 1);
+                            RawAddress.FirstRow = (RawAddress.FirstColumn < 0 ? 0 : RawAddress.FirstColumn) + (Index - 1);
                             RawAddress.LastColumn = RawAddress.FirstColumn;
                             //アドレスリストに追加
                             RangeAddressList.AddCellRangeAddress(RawAddress);

@@ -178,6 +178,8 @@ namespace Developers.NpoiWrapper
             //インデクスを省略した場合はこの値が取得される(シート全域)
             Cells = new Cells(this, new CellRangeAddressList(-1, -1, -1, -1));
             Range = new Range(this, new CellRangeAddressList(-1, -1, -1, -1));
+            Rows = new Rows(this, new CellRangeAddressList(-1, -1, -1, -1));
+            Columns = new Columns(this, new CellRangeAddressList(-1, -1, -1, -1));
         }
 
         #endregion

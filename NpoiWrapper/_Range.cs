@@ -1360,6 +1360,29 @@ namespace Developers.NpoiWrapper
 
         #endregion
 
+
+        /// <summary>
+        /// objectをintに変換する
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <param name="IntValue"></param>
+        /// <returns>true;変換できた　false:変換できなかった</returns>
+        protected bool TryConvertToInt(object Value, out int IntValue)
+        {
+            bool RetVal = false;
+            IntValue = -1;
+            try
+            {
+                IntValue = Convert.ToInt32(Value);
+                RetVal = true;
+            }
+            catch (Exception ex)
+            {
+                RetVal = false;
+            }
+            return RetVal;
+        }
+
         #endregion
     }
 }
