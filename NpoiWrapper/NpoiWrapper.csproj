@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="XlAutoFilterOperator.cs" />
     <Compile Include="Columns.cs" />
     <Compile Include="Rows.cs" />
     <Compile Include="XlPageBreak.cs" />

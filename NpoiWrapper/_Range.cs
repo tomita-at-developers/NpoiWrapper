@@ -1144,6 +1144,23 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
+        /// オートフィルター
+        /// </summary>
+        /// <param name="Field">未使用</param>
+        /// <param name="Criteria1">未使用</param>
+        /// <param name="Operator">未使用</param>
+        /// <param name="Criteria2">未使用</param>
+        /// <param name="VisibleDropDown">未使用</param>
+        /// <returns></returns>
+        public object AutoFilter(
+            object Field = null, object Criteria1 = null, XlAutoFilterOperator Operator = XlAutoFilterOperator.xlAnd,
+            object Criteria2 = null, object VisibleDropDown = null)
+        {
+            this.Parent.PoiSheet.SetAutoFilter(this.SafeAddressList.GetCellRangeAddress(0));
+            return null;
+        }
+
+        /// <summary>
         /// 列幅の自動調整
         /// </summary>
         public void AutoFit()
