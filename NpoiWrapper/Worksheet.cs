@@ -19,18 +19,18 @@ namespace Developers.NpoiWrapper
     //----------------------------------------------------------------------------------------------
     //public interface _Worksheet
     //{
-    //    Application Application { get; }
-    //    XlCreator Creator { get; }
-    //    object Parent { get; }
+    // +  Application Application { get; }
+    // +  XlCreator Creator { get; }
+    // +  object Parent { get; }
     //    string CodeName { get; }
     //    string _CodeName { get; set; }
-    //    int Index { get; }
-    //    string Name { get; set; }
+    // +  int Index { get; }
+    // +  string Name { get; set; }
     //    object Next { get; }
     //    string OnDoubleClick { get; set; }
     //    string OnSheetActivate { get; set; }
     //    string OnSheetDeactivate { get; set; }
-    //    PageSetup PageSetup { get; }
+    // +  PageSetup PageSetup { get; }
     //    object Previous { get; }
     //    bool ProtectContents { get; }
     //    bool ProtectDrawingObjects { get; }
@@ -41,9 +41,9 @@ namespace Developers.NpoiWrapper
     //    bool TransitionExpEval { get; set; }
     //    bool AutoFilterMode { get; set; }
     //    bool EnableCalculation { get; set; }
-    //    Range Cells { get; }
+    // +  Range Cells { get; }
     //    Range CircularReference { get; }
-    //    Range Columns { get; }
+    // +  Range Columns { get; }
     //    XlConsolidationFunction ConsolidationFunction { get; }
     //    object ConsolidationOptions { get; }
     //    object ConsolidationSources { get; }
@@ -58,8 +58,8 @@ namespace Developers.NpoiWrapper
     //    string OnData { get; set; }
     //    string OnEntry { get; set; }
     //    Outline Outline { get; }
-    //    Range Range { get; }
-    //    Range Rows { get; }
+    // +  Range Range { get; }
+    // +  Range Rows { get; }
     //    string ScrollArea { get; set; }
     //    double StandardHeight { get; }
     //    double StandardWidth { get; set; }
@@ -220,6 +220,16 @@ namespace Developers.NpoiWrapper
         /// Rangeオブジェクト
         /// </summary>
         public Range Range { get; }
+
+        /// <summary>
+        /// Rowsオブジェクト
+        /// </summary>
+        public Rows Rows { get; }
+
+        /// <summary>
+        /// Columnsオブジェクト
+        /// </summary>
+        public Columns Columns { get; }
 
         public PageSetup PageSetup
         {

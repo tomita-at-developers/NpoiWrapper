@@ -46,7 +46,9 @@ namespace Developers.NpoiWrapper
         /// </summary>
         /// <param name="RowIndex"></param>
         /// <param name="ColumnIndex"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// 行と列を数字で指定する形式のみサポート
+        /// </returns>
         [IndexerName("_Default")]
         public override Range this[object RowIndex, object ColumnIndex]
         {
