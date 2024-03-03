@@ -172,7 +172,7 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// InCellDropdownの実体
         /// </summary>
-        private bool _InCellDropdown = false;
+        private bool _InCellDropdown = true;
         /// <summary>
         /// ShowInputの実体
         /// </summary>
@@ -782,7 +782,7 @@ namespace Developers.NpoiWrapper
                 this._Formula1 = null;
                 this._Formula2 = null;
                 this._IgnoreBlank = true;
-                this._InCellDropdown = false;
+                this._InCellDropdown = true;
                 this._ShowInput = false;
                 this._InputTitle = string.Empty;
                 this._InputMessage = string.Empty;
