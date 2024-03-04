@@ -77,7 +77,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_Font == null) { _Font = new Font(base.ParentRange); }
+                if (_Font == null) { _Font = new Font(base.Parent); }
                 return _Font;
             }
         }
@@ -90,7 +90,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_Borders == null) { _Borders = new Borders(base.ParentRange); }
+                if (_Borders == null) { _Borders = new Borders(base.Parent); }
                 return _Borders;
             }
         }
@@ -103,7 +103,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_Interior == null) { _Interior = new Interior(base.ParentRange); }
+                if (_Interior == null) { _Interior = new Interior(base.Parent); }
                 return _Interior;
             }
         }
@@ -127,7 +127,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_Validation == null) { _Validation = new Validation(base.ParentRange); }
+                if (_Validation == null) { _Validation = new Validation(base.Parent); }
                 return _Validation;
             }
         }
@@ -324,7 +324,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_RangeValue == null) { _RangeValue = new RangeValue(base.ParentRange); }
+                if (_RangeValue == null) { _RangeValue = new RangeValue(base.Parent); }
                 return _RangeValue;
             }
         }
@@ -337,7 +337,7 @@ namespace Developers.NpoiWrapper.Model
             get
             {
                 //最初にアクセスされたときにインスタンス化する
-                if (_RangeComment == null) { _RangeComment = new RangeComment(base.ParentRange); }
+                if (_RangeComment == null) { _RangeComment = new RangeComment(base.Parent); }
                 return _RangeComment;
             }
         }

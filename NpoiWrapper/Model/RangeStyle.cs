@@ -37,7 +37,7 @@ namespace Developers.NpoiWrapper.Model
         public RangeStyle(Range ParentRange)
         {
             //親Range情報の保存
-            this.ParentRange = ParentRange;
+            this.Parent = ParentRange;
         }
 
         #endregion
@@ -47,22 +47,22 @@ namespace Developers.NpoiWrapper.Model
         /// <summary>
         /// 親Range
         /// </summary>
-        protected Range ParentRange { get; }
+        protected Range Parent { get; }
 
         /// <summary>
         /// 親IWorkbook
         /// </summary>
-        private IWorkbook PoiBook { get { return this.ParentRange.Parent.Parent.PoiBook; } }
+        private IWorkbook PoiBook { get { return this.Parent.Parent.Parent.PoiBook; } }
 
         /// <summary>
         /// 親ISheet
         /// </summary>
-        private ISheet PoiSheet { get { return this.ParentRange.Parent.PoiSheet; } }
+        private ISheet PoiSheet { get { return this.Parent.Parent.PoiSheet; } }
 
         /// <summary>
         /// 絶対表現(RonwIndex,ColumnIndexとして直接利用可能)されたアドレスリスト
         /// </summary>
-        private CellRangeAddressList SafeAddressList { get { return this.ParentRange.SafeAddressList; } }
+        private CellRangeAddressList SafeAddressList { get { return this.Parent.SafeAddressList; } }
 
         #endregion
 
@@ -125,7 +125,7 @@ namespace Developers.NpoiWrapper.Model
                         CellCountForDebugLog += 1;
                         //PoiCellStyleの生成
                         Wrapper.PoiCellStyle Style = new Wrapper.PoiCellStyle(
-                                this.PoiSheet, GetCellStyle(RowIndex, ColumnIndex, DefaultStyle).Index);
+                                this.PoiSheet, GetCellStyle(RowIndex, ColumnIndex, DefaultStyle).Index, this.Parent.CellStyleIndexes);
                         ///プロパティ取得ループ
                         foreach (CellStyleParam p in Params)
                         {
@@ -245,7 +245,7 @@ namespace Developers.NpoiWrapper.Model
                         if (IndexToApply == Utils.CellStyleUpdateHistory.None)
                         {
                             //PoiCellStyleの生成
-                            Wrapper.PoiCellStyle Style = new Wrapper.PoiCellStyle(this.PoiSheet, CurrentIndex);
+                            Wrapper.PoiCellStyle Style = new Wrapper.PoiCellStyle(this.PoiSheet, CurrentIndex, this.Parent.CellStyleIndexes);
                             ///変更処理実行
                             foreach (CellStyleParam p in Params)
                             {

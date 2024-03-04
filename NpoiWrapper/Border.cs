@@ -43,7 +43,7 @@ namespace Developers.NpoiWrapper
             //Border情報の保存
             this.BordersIndex = BordersIndex;
             //RangeBorderStyle生成
-            BorderStyle = new RangeBorder(this.PoiSheet, this.SafeAddressList, this.BordersIndex);
+            BorderStyle = new RangeBorder(this.Parent, this.SafeAddressList, this.BordersIndex);
         }
 
         #endregion

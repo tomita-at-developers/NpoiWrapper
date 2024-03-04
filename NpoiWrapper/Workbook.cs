@@ -356,6 +356,10 @@ namespace Developers.NpoiWrapper
         /// </summary>
         internal Dictionary<string, ICellStyle> CellStyles { get; } = new Dictionary<string, ICellStyle>();
         /// <summary>
+        /// 設定ファイルから読み取ったCellStyle定義のIndexリスト
+        /// </summary>
+        internal List<short> CellStyleIndexes { get; } = new List<short>();
+        /// <summary>
         /// 設定ファイルから読み取った印刷ページ設定
         /// Worksheet.PageSetupが参照。
         /// </summary>
@@ -531,6 +535,7 @@ namespace Developers.NpoiWrapper
                     pcs.SetFont(Font);
                 }
                 CellStyles.Add(cs.Name, pcs);
+                CellStyleIndexes.Add(pcs.Index);
             }
         }
 

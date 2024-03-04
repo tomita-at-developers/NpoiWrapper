@@ -1,4 +1,5 @@
 ﻿using Developers.NpoiWrapper.Utils;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
@@ -37,11 +38,14 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// </summary>
         /// <param name="ParentSheet">Worksheetインスタンス</param>
         /// <param name="StyleIndex">スタイルIndex</param>
-        public PoiCellStyle(ISheet PoiSheet, short StyleIndex)
+        /// <param name="CellStyleIndexes">設定ファイルから生成されたスタイルのIndexリスト</param>
+        public PoiCellStyle(ISheet PoiSheet, short StyleIndex, List<short> CellStyleIndexes)
         {
+            Logger.Debug("Constructed for Index:[" + StyleIndex + "]");
             this.PoiSheet = PoiSheet;
+            this.CellStyleIndexes = CellStyleIndexes;
             //プロパティマップの生成
-            if(_PoiCellStyleMap == null)
+            if (_PoiCellStyleMap == null)
             {
                 CreateMaps();
             }
@@ -145,7 +149,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         #region "properties"
 
         /// <summary>
-        /// 基点とするCellStyle。ApplyStyleFromまはたCommitでセット。
+        /// 基点とするCellStyle。ImportFromまはたCommitでセット。
         /// </summary>
         public ICellStyle CellStyle { get; private set; }
 
@@ -183,6 +187,12 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         {
             get { return PoiSheet.Workbook; }
         }
+
+        /// <summary>
+        /// 設定ファイルから読み取ったユーザ定義スタイルのインデックスリスト
+        /// </summary>
+        private List<short> CellStyleIndexes { get; }
+
 
         #endregion
 
@@ -274,6 +284,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// <param name="CellStyle">インポート対象スタイル</param>
         public void ImportFromViaReflection1(ICellStyle CellStyle)
         {
+            Logger.Debug("import from Style:[Index:" + CellStyle.Index + "]");
             //基点CellTyleを保存
             this.CellStyle = CellStyle;
             //インポートマップに従いインポート
@@ -301,6 +312,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             {
                 if (!map.Value.GetValue(this).Equals(_ICellStyleMap[map.Key].GetValue(CellStyle)))
                 {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[" + _ICellStyleMap[map.Key].Name + "] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
                     RetVal = false;
                     break;
                 }
@@ -310,8 +322,13 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             {
                 if (!PoiFont.Equals(CellStyle.GetFont(PoiBook)))
                 {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[PoiFont] differs from from TargetStyle:[Index:" + CellStyle.Index + "]");
                     RetVal = false;
                 }
+            }
+            if (RetVal)
+            {
+                Logger.Debug("CurrentStyle:[Index:" + this.Index + "] equals to TargetStyle:[Index:" + CellStyle.Index + "]");
             }
             return RetVal;
         }
@@ -325,6 +342,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// <param name="CellStyle">エクスポート対象スタイル</param>
         public void ExportToViaReflection1(ICellStyle CellStyle)
         {
+            Logger.Debug("export to Style:[Index:" + CellStyle.Index + "]");
             //エクスポートマップに従い比較
             foreach (var map in _ExportMap)
             {
@@ -364,6 +382,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// <param name="CellStyle">インポート対象スタイル</param>
         public void ImportFromViaReflection0(ICellStyle CellStyle)
         {
+            Logger.Debug("import from Style:[Index:" + CellStyle.Index + "]");
             //基点CellTyleを保存
             this.CellStyle = CellStyle;
             //指定されたCellStyleのプロパティを一覧
@@ -419,6 +438,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                             //プロパティ値不一致
                             if (!MyProp.GetValue(this).Equals(TargetProp.GetValue(CellStyle)))
                             {
+                                Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[" + TargetProp.Name + "] differs from TargetStyle:[Index:"+ CellStyle.Index + "]");
                                 RetVal = false;
                                 break;
                             }
@@ -430,6 +450,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                 {
                     if (!PoiFont.Equals(CellStyle.GetFont(PoiBook)))
                     {
+                        Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[PoiFont] differs from from TargetStyle:[Index:" + CellStyle.Index + "]");
                         RetVal = false;
                     }
                 }
@@ -438,6 +459,10 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             else
             {
                 RetVal = false;
+            }
+            if (RetVal)
+            {
+                Logger.Debug("CurrentStyle:[Index:" + this.Index + "] equals to TargetStyle:[Index:" + CellStyle.Index + "]");
             }
             return RetVal;
         }
@@ -451,6 +476,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// <param name="CellStyle">エクスポート対象スタイル</param>
         public void ExportToViaReflection0(ICellStyle CellStyle)
         {
+            Logger.Debug("export to Style:[Index:" + CellStyle.Index + "]");
             PropertyInfo[] MyProps = this.GetType().GetProperties();
             //自プロパティを指定されたCellStyleのプロパティ値にセット
             foreach (PropertyInfo MyProp in MyProps)
@@ -501,6 +527,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// <param name="CellStyle">インポート対象スタイル</param>
         public void ImportFromViaProperty(ICellStyle CellStyle)
         {
+            Logger.Debug("import from Style:[Index:" + CellStyle.Index + "]");
             //基点CellTyleを保存
             this.CellStyle = CellStyle;
             //インポート属性のあるプロパティのみインポート
@@ -551,30 +578,122 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             {
                 //コンペア属性のあるプロパティのみ比較
                 //this.Index
-                if (!this.ShrinkToFit.Equals(CellStyle.ShrinkToFit)) RetVal = false;
-                if (!this.DataFormat.Equals(CellStyle.DataFormat)) RetVal = false;
+                if (!this.ShrinkToFit.Equals(CellStyle.ShrinkToFit))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[ShrinkToFit] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.DataFormat.Equals(CellStyle.DataFormat))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[DataFormat] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
                 //this.FontIndex
-                if (!this.IsHidden.Equals(CellStyle.IsHidden)) RetVal = false;
-                if (!this.IsLocked.Equals(CellStyle.IsLocked)) RetVal = false;
-                if (!this.Alignment.Equals(CellStyle.Alignment)) RetVal = false;
-                if (!this.WrapText.Equals(CellStyle.WrapText)) RetVal = false;
-                if (!this.VerticalAlignment.Equals(CellStyle.VerticalAlignment)) RetVal = false;
-                if (!this.Rotation.Equals(CellStyle.Rotation)) RetVal = false;
-                if (!this.Indention.Equals(CellStyle.Indention)) RetVal = false;
-                if (!this.BorderLeft.Equals(CellStyle.BorderLeft)) RetVal = false;
-                if (!this.BorderRight.Equals(CellStyle.BorderRight)) RetVal = false;
-                if (!this.BorderTop.Equals(CellStyle.BorderTop)) RetVal = false;
-                if (!this.BorderBottom.Equals(CellStyle.BorderBottom)) RetVal = false;
-                if (!this.LeftBorderColor.Equals(CellStyle.LeftBorderColor)) RetVal = false;
-                if (!this.RightBorderColor.Equals(CellStyle.RightBorderColor)) RetVal = false;
-                if (!this.TopBorderColor.Equals(CellStyle.TopBorderColor)) RetVal = false;
-                if (!this.BottomBorderColor.Equals(CellStyle.BottomBorderColor)) RetVal = false;
-                if (!this.FillPattern.Equals(CellStyle.FillPattern)) RetVal = false;
-                if (!this.FillBackgroundColor.Equals(CellStyle.FillBackgroundColor)) RetVal = false;
-                if (!this.FillForegroundColor.Equals(CellStyle.FillForegroundColor)) RetVal = false;
-                if (!this.BorderDiagonalColor.Equals(CellStyle.BorderDiagonalColor)) RetVal = false;
-                if (!this.BorderDiagonalLineStyle.Equals(CellStyle.BorderDiagonalLineStyle)) RetVal = false;
-                if (!this.BorderDiagonal.Equals(CellStyle.BorderDiagonal)) RetVal = false;
+                if (!this.IsHidden.Equals(CellStyle.IsHidden))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[IsHidden] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.IsLocked.Equals(CellStyle.IsLocked))
+                {
+                    Logger.Debug("PCurrentStyle:[Index:" + this.Index + "] Property:[IsLocked] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.Alignment.Equals(CellStyle.Alignment))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[Alignment] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.WrapText.Equals(CellStyle.WrapText))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[WrapText] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.VerticalAlignment.Equals(CellStyle.VerticalAlignment))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[VerticalAlignment] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.Rotation.Equals(CellStyle.Rotation))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[Rotation] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.Indention.Equals(CellStyle.Indention))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[Indention] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BorderLeft.Equals(CellStyle.BorderLeft))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BorderLeft] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BorderRight.Equals(CellStyle.BorderRight))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BorderRight] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BorderTop.Equals(CellStyle.BorderTop))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BorderTop] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BorderBottom.Equals(CellStyle.BorderBottom))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BorderBottom] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.LeftBorderColor.Equals(CellStyle.LeftBorderColor))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[LeftBorderColor] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.RightBorderColor.Equals(CellStyle.RightBorderColor))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[RightBorderColor] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.TopBorderColor.Equals(CellStyle.TopBorderColor))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[TopBorderColor] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BottomBorderColor.Equals(CellStyle.BottomBorderColor))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BottomBorderColor] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.FillPattern.Equals(CellStyle.FillPattern))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[FillPattern] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.FillBackgroundColor.Equals(CellStyle.FillBackgroundColor))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[FillBackgroundColor] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.FillForegroundColor.Equals(CellStyle.FillForegroundColor))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[FillForegroundColor] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BorderDiagonalColor.Equals(CellStyle.BorderDiagonalColor))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BorderDiagonalColor] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BorderDiagonalLineStyle.Equals(CellStyle.BorderDiagonalLineStyle))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BorderDiagonalLineStyle] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
+                if (!this.BorderDiagonal.Equals(CellStyle.BorderDiagonal))
+                {
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[BorderDiagonal] differs from TargetStyle:[Index:" + CellStyle.Index + "]");
+                    RetVal = false;
+                }
                 //this.FillBackgroundColorColor
                 //this.FillForegroundColorColor
                 //一致していればFontも比較
@@ -582,6 +701,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                 {
                     if (!PoiFont.Equals(CellStyle.GetFont(PoiBook)))
                     {
+                        Logger.Debug("CurrentStyle:[Index:" + this.Index + "] Property:[PoiFont] differs from from TargetStyle:[Index:" + CellStyle.Index + "]");
                         RetVal = false;
                     }
                 }
@@ -590,6 +710,10 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             else
             {
                 RetVal = false;
+            }
+            if (RetVal)
+            {
+                Logger.Debug("CurrentStyle:[Index:" + this.Index + "] equals to TargetStyle:[Index:" + CellStyle.Index + "]");
             }
             return RetVal;
         }
@@ -600,6 +724,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// <param name="CellStyle">エクスポート対象スタイル</param>
         public void ExportToViaProperty(ICellStyle CellStyle)
         {
+            Logger.Debug("export to Style:[Index:" + CellStyle.Index + "]");
             PropertyInfo[] MyProps = this.GetType().GetProperties();
             //自プロパティを指定されたCellStyleのプロパティ値にセット
             foreach (PropertyInfo MyProp in MyProps)
@@ -666,6 +791,14 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// </summary>
         public short Commit()
         {
+            //現在のスタイルが設定ファイルから読み取ったユーザ定義スタイルかチェック
+            bool IsUserDefined = this.CellStyleIndexes.Contains(Index);
+            string Note = IsUserDefined ? "(User Defined)" : "";
+            if (this.Equals(this.CellStyle))
+            {
+                Logger.Debug("CurrentStyle:[Index:" + this.Index + "]"+ Note + " has no property updated.");
+                return this.Index;
+            }
             //フォントの変更をCommitする
             PoiFont.Commit();
             //DataFormatの変更をCommitする
@@ -675,44 +808,47 @@ namespace Developers.NpoiWrapper.Model.Wrapper
             //マスター上にあるかチェックしあればそれを使う(ただしIndex=1以上
             for (short i = 1; i < PoiBook.NumCellStyles; i++)
             {
-                if (this.Equals(PoiBook.GetCellStyleAt(i)))
+                ICellStyle MasterStyle = PoiBook.GetCellStyleAt(i);
+                //自分自身以外、かつ定義ファイル生成スタイル以外のスタイルを比較
+                if (this.Index != MasterStyle.Index　&& !this.CellStyleIndexes.Contains(MasterStyle.Index))
                 {
-                    CellStyle = PoiBook.GetCellStyleAt(i);
-                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style[Index:" + i + "] is found in Book.");
-                    break;
-                }
-            }
-            //マスターになければ未使用スタイルをチェックしあればそれを使う
-            if (CellStyle == null)
-            {
-                short AvalableIndex = -1;
-                Dictionary<short, int> StyleUsages = StyleUtil.GetCellStyleUsage(PoiBook);
-                //いま保持しているスタイルがこのセルのみで使用している場合
-                if (StyleUsages.ContainsKey(Index) && StyleUsages[Index] == 1)
-                {
-                    //現状がIndex=0でなければそれを使う
-                    if (Index != 0)
+                    //一致するスタイルを発見した場合
+                    if (this.Equals(MasterStyle))
                     {
-                        AvalableIndex = Index;
-                        Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style[Index:" + this.Index + "] Current Style is updatable.");
+                        CellStyle = MasterStyle;
+                        Logger.Debug("CurrentStyle:[Index:" + this.Index + "]" + Note + " => Style[Index:" + i + "] is found in Book.");
+                        break;
                     }
                 }
-                //いま保持しているスタイルがこのセル以外でも使用されている場合
-                else
+            }
+            //マスターになければ占有/未使用スタイルをチェックしあればそれを使う
+            if (CellStyle == null)
+            {
+                //スタイル使用状況の取得
+                short AvalableIndex = -1;
+                Dictionary<short, int> StyleUsages = StyleUtil.GetCellStyleUsage(PoiBook);
+                //いま保持しているスタイルがデフォルトスタイルでなく、設定ファイル定義スタイルでなく、このセルのみで使用している場合
+                if (Index != 0 && !IsUserDefined && (StyleUsages.ContainsKey(Index) && StyleUsages[Index] == 1))
+                {
+                    AvalableIndex = Index;
+                    Logger.Debug("CurrentStyle:[Index:" + this.Index + "]" + Note + " => Style[Index:" + this.Index + "] Current Style is updatable.");
+                }
+                //更新可能スアイルが発見できなかった場合
+                if(AvalableIndex == -1)
                 {
                     //未使用スタイルの検索
                     foreach (KeyValuePair<short, int> Style in StyleUsages)
                     {
-                        //Index=0以外のスタイルで未使用のもの
-                        if (Style.Key != 0 && Style.Value == 0)
+                        //デフォルトスタイルでなく、、設定ファイル定義スタイルでなく、未使用のもの
+                        if (Style.Key != 0 && !this.CellStyleIndexes.Contains(Style.Key) && Style.Value == 0)
                         {
                             AvalableIndex = Style.Key;
-                            Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style[Index:" + Style.Key + "] is unused and available.");
+                            Logger.Debug("CurrentStyle:[Index:" + this.Index + "]" + Note + " => Style[Index:" + Style.Key + "] is unused and available.");
                             break;
                         }
                     }
                 }
-                //再利用可能なスタイルがあったならそれを使う
+                //利用可能なスタイルがあったならそれを使う
                 if (AvalableIndex > 0)
                 {
                     //未使用スタイルの取得
@@ -721,14 +857,14 @@ namespace Developers.NpoiWrapper.Model.Wrapper
                     this.ExportTo(CellStyle);
                 }
             }
-            //マスターになく、未使用スタイルにもなければ新規にCreateする
+            //利用可能なスタイルがなければ新規にCreateする
             if (CellStyle == null)
             {
-                //新規スタイルを生成し今回の内容を反映
+                //新規スタイルを生成
                 CellStyle = PoiBook.CreateCellStyle();
+                Logger.Debug("CurrentStyle:[Index:" + this.Index + "]" + Note + " => Style.[Index:" + CellStyle.Index + "] is newly created.");
                 //今回の内容を反映
                 this.ExportTo(CellStyle);
-                Logger.Debug("CurrentStyle:[Index:" + this.Index + "] => Style.[Index:" + CellStyle.Index + "] is newly created.");
             }
             //Indexを新しい値に更新する
             this.Index = CellStyle.Index;

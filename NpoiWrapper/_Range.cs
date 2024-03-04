@@ -988,6 +988,13 @@ namespace Developers.NpoiWrapper
         /// 相対アドレスの基点アドレス
         /// </summary>
         internal CellRangeAddress RelativeTo { get; }
+        /// <summary>
+        /// ユーザ定義スタイルのインデックスリスト
+        /// </summary>
+        internal List<short> CellStyleIndexes
+        {
+            get { return this.Parent.Parent.CellStyleIndexes; }
+        }
 
         #endregion
 

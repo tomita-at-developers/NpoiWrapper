@@ -509,7 +509,12 @@ namespace Developers.NpoiWrapper.Model
                     {
                         FormatString = "yyyy/mm/dd";
                     }
-                    ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = FormatString;
+                    if (SystemParams.AutoFormatCell)
+                    {
+                        ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = FormatString;
+                        Logger.Debug(
+                            "Shhet[" + Sheet.SheetName + "]:Cell[" + RowIndex + "][" + ColumnIndex + "] Auto format:[" + FormatString + "]");
+                    }
                 }
                 //boolの場合
                 else if (Value is bool SafeBool)
@@ -601,7 +606,12 @@ namespace Developers.NpoiWrapper.Model
                                     FormatString += ":ss";
                                 }
                             }
-                            ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = FormatString;
+                            if (SystemParams.AutoFormatCell)
+                            {
+                                ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = FormatString;
+                                Logger.Debug(
+                                    "Shhet[" + Sheet.SheetName + "]:Cell[" + RowIndex + "][" + ColumnIndex + "] Auto format:[" + FormatString + "]");
+                            }
                         }
                         //数値にキャストできる場合はdouble
                         else if (double.TryParse(StringValue, out double DoubleValue))
