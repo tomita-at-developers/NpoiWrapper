@@ -1026,18 +1026,18 @@ namespace Developers.NpoiWrapper
         /// <summary>
         /// インデクサー
         /// </summary>
-        /// <param name="Cell1"></param>
-        /// <param name="Cell2"></param>
+        /// <param name="RowIndex"></param>
+        /// <param name="ColumnIndex"></param>
         /// <returns></returns>
         [IndexerName("_Default")]
-        public virtual Range this[object Cell1, object Cell2 = null]
+        public virtual Range this[object RowIndex, object ColumnIndex = null]
         {
             get
             {
                 //アドレス計算用リスト初期化
                 CellRangeAddressList AddressList = new CellRangeAddressList();
                 //Cells指定の場合
-                if (Cell1 is Range cell1)
+                if (RowIndex is Range cell1)
                 {
                     //Cell1が単一セルであること
                     if (cell1.Count == 1)
@@ -1050,7 +1050,7 @@ namespace Developers.NpoiWrapper
                         throw new ArgumentException("Cell1 contains multiple cells.");
                     }
                     //Cell2の指定があること
-                    if (Cell2 != null && Cell2 is Range cell2)
+                    if (ColumnIndex != null && ColumnIndex is Range cell2)
                     {
                         //Cell2が単一セルであること
                         if (cell2.Count == 1)
@@ -1072,7 +1072,7 @@ namespace Developers.NpoiWrapper
                     AddressList = RangeUtil.CreateMergedAddressList(AddressList);
                 }
                 //Cell1がStringの場合(A1形式)
-                else if (Cell1 is string adr1)
+                else if (RowIndex is string adr1)
                 {
                     string[] AdrLst1 = adr1.Split(',');
                     //複数アドレスの場合
@@ -1084,7 +1084,7 @@ namespace Developers.NpoiWrapper
                             AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr));
                         }
                         //Cell2があれば例外スロー
-                        if (Cell2 != null)
+                        if (ColumnIndex != null)
                         {
                             throw new ArgumentException("In case Cell1 has multiple cells, Cell2 must be null.");
                         }
@@ -1095,7 +1095,7 @@ namespace Developers.NpoiWrapper
                         //Cell1(A1形式)からアドレス生成しアレイに追記
                         AddressList.AddCellRangeAddress(CellRangeAddress.ValueOf(adr1));
                         //Cell2がStringの場合(A1形式)
-                        if (Cell2 != null && Cell2 is string adr2)
+                        if (ColumnIndex != null && ColumnIndex is string adr2)
                         {
                             string[] AdrLst2 = adr2.Split(',');
                             //単一アドレスなら採用
