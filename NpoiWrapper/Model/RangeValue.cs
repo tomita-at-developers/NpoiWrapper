@@ -938,21 +938,24 @@ namespace Developers.NpoiWrapper.Model
                         //日付とみなせる場合
                         if (DateUtil.IsValidExcelDate(cell.NumericCellValue))
                         {
-                            //TODAY(), NOW()から始まる式であれば書式設定を行う(この２つのみ救済するが他は数値のまま)
-                            if (Formula.ToLower().StartsWith("today"))
+                            //デフォルトスタイルの場合
+                            if (cell.CellStyle.Index == 0)
                             {
-                                ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = "yyyy/mm/dd";
-                            }
-                            else if (Formula.ToLower().StartsWith("now"))
-                            {
-                                ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = "yyyy/mm/dd hh:mm";
-                            }
-                            else
-                            {
-                                //何もしない
+                                //TODAY(), NOW()から始まる式であれば書式設定を行う(この２つのみ救済するが他は数値のまま)
+                                if (Formula.ToLower().StartsWith("today"))
+                                {
+                                    ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = "yyyy/mm/dd";
+                                }
+                                else if (Formula.ToLower().StartsWith("now"))
+                                {
+                                    ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = "yyyy/mm/dd hh:mm";
+                                }
+                                else
+                                {
+                                    //何もしない
+                                }
                             }
                         }
-
                     }
                 }
             }
