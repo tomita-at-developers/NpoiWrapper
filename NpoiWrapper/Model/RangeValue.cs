@@ -509,7 +509,8 @@ namespace Developers.NpoiWrapper.Model
                     {
                         FormatString = "yyyy/mm/dd";
                     }
-                    if (SystemParams.AutoFormatCell)
+                    //デフォルトスタイルの場合はFormat設定(ここでCreateしたCell、またはスタイル未設定のCell)
+                    if (cell.CellStyle.Index == 0)
                     {
                         ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = FormatString;
                         Logger.Debug(
@@ -606,7 +607,8 @@ namespace Developers.NpoiWrapper.Model
                                     FormatString += ":ss";
                                 }
                             }
-                            if (SystemParams.AutoFormatCell)
+                            //デフォルトスタイルの場合はFormat設定(ここでCreateしたCell、またはスタイル未設定のCell)
+                            if (cell.CellStyle.Index == 0)
                             {
                                 ParentRange.Parent.Range[cell.Address.FormatAsString()].NumberFormat = FormatString;
                                 Logger.Debug(

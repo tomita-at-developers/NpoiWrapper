@@ -8,7 +8,6 @@ namespace Developers.NpoiWrapper
 {
     internal static class SystemParams
     {
-        public static readonly bool AutoFormatCell = false;
         public static readonly bool UseReflection = true;
         public static readonly bool UseReflectionMap = true;
     }
