@@ -71,7 +71,7 @@ namespace Developers.NpoiWrapper
                             //先頭生アドレス取得
                             CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(0).Copy();
                             //指定された１行を選択
-                            RawAddress.FirstRow = (RawAddress.FirstRow  < 0 ? 0 : RawAddress.FirstRow) +(Index - 1);
+                            RawAddress.FirstRow = (RawAddress.FirstRow  < 0 ? 0 : RawAddress.FirstRow) + (Index - 1);
                             RawAddress.LastRow = RawAddress.FirstRow;
                             //アドレスリストに追加
                             RangeAddressList.AddCellRangeAddress(RawAddress);

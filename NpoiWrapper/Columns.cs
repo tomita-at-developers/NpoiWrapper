@@ -73,7 +73,7 @@ namespace Developers.NpoiWrapper
                             //先頭生アドレス取得
                             CellRangeAddress RawAddress = RawAddressList.GetCellRangeAddress(0).Copy();
                             //指定された１行を選択
-                            RawAddress.FirstRow = (RawAddress.FirstColumn < 0 ? 0 : RawAddress.FirstColumn) + (Index - 1);
+                            RawAddress.FirstColumn = (RawAddress.FirstColumn < 0 ? 0 : RawAddress.FirstColumn) + (Index - 1);
                             RawAddress.LastColumn = RawAddress.FirstColumn;
                             //アドレスリストに追加
                             RangeAddressList.AddCellRangeAddress(RawAddress);
