@@ -1213,12 +1213,14 @@ namespace Developers.NpoiWrapper
                     {
                         //処理数インクリメント
                         FitCount++;
+                        //自動調整実施
+                        Parent.PoiSheet.AutoSizeColumn(CIdx);
                         //スッピンのAutoSizeでは独自書式(例えば通貨)の幅が少し足りない。
                         //"\"や"､"の増分が考慮されていないような感じ。
-                        //ある程度救済するため、一律28%増の処理を行う
-                        Parent.PoiSheet.AutoSizeColumn(CIdx);
-                        Parent.PoiSheet.SetColumnWidth(
-                            CIdx, Parent.PoiSheet.GetColumnWidth(CIdx) * 128 / 100);
+                        //ある程度救済するため、０文字分足した上で0%増の処理を行う
+                        //Parent.PoiSheet.SetColumnWidth(
+                        //    CIdx,
+                        //    (Parent.PoiSheet.GetColumnWidth(CIdx) + (0 * 256)) * 100 / 100);
                         //処理対象の行が大量の場合に効果があるらしいが、弊害もありそうなのでやめておく。
                         //GC.Collect();
                     }
