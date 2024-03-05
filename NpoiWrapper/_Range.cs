@@ -685,25 +685,41 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                //Office.Interop.Excelにならい非連続Rangeの全てに適用
-                for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
+                if (TryConvertToFloat(value, out float FloatValue))
                 {
-                    //アドレス取得
-                    CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
-                    //行ループ
-                    for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
+                    //Office.Interop.Excelにならい非連続Rangeの全てに適用
+                    for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
                     {
-                        //行の取得(なければ生成)
-                        IRow row = Parent.PoiSheet.GetRow(RIdx);
-                        if (row == null)
+                        //アドレス取得
+                        CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
+                        //行ループ
+                        for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
                         {
-                            row = Parent.PoiSheet.CreateRow(RIdx);
-                            Logger.Debug(
-                                "Sheet[" + Parent.PoiSheet.SheetName + "]:Row[" + RIdx + "] *** Row Created. ***");
+                            //行の取得(なければ生成)
+                            IRow row = Parent.PoiSheet.GetRow(RIdx);
+                            if (row == null)
+                            {
+                                row = Parent.PoiSheet.CreateRow(RIdx);
+                                Logger.Debug(
+                                    "Sheet[" + Parent.PoiSheet.SheetName + "]:Row[" + RIdx + "] *** Row Created. ***");
+                            }
+                            if (FloatValue == 0)
+                            {
+                                //ゼロを設定
+                                row.ZeroHeight = true;
+                            }
+                            else
+                            {
+                                //高さを設定
+                                row.ZeroHeight = false;
+                                row.HeightInPoints = FloatValue;
+                            }
                         }
-                        //高さを設定
-                        row.HeightInPoints = (float)value;
                     }
+                }
+                else
+                {
+                    throw new ArgumentException("Range.RowHeight");
                 }
             }
         }
@@ -1400,6 +1416,28 @@ namespace Developers.NpoiWrapper
             try
             {
                 IntValue = Convert.ToInt32(Value);
+                RetVal = true;
+            }
+            catch (Exception ex)
+            {
+                RetVal = false;
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// objectをintに変換する
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <param name="IntValue"></param>
+        /// <returns>true;変換できた　false:変換できなかった</returns>
+        protected bool TryConvertToFloat(object Value, out float IntValue)
+        {
+            bool RetVal = false;
+            IntValue = -1;
+            try
+            {
+                IntValue = Convert.ToSingle(Value);
                 RetVal = true;
             }
             catch (Exception ex)
