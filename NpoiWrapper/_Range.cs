@@ -3,6 +3,7 @@ using Developers.NpoiWrapper.Utils;
 using NPOI.HPSF;
 using NPOI.HSSF.UserModel;
 using NPOI.POIFS.Properties;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using static Developers.NpoiWrapper.Model.Utils.StyleName.PoiBorder;
 
 namespace Developers.NpoiWrapper
 {
@@ -616,7 +618,9 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// Rangeの行高さ合計(単位はPoint)
+        /// Rangeの行高さ合計(単位はPoint)<br/>
+        /// Excel.Interopは以下の通り<br/>
+        /// Rangeの高さ(セル範囲の合計高さ)をポイント単位で表すDouble値を返します。読み取り専用です。
         /// </summary>
         public object Height
         {
@@ -625,7 +629,7 @@ namespace Developers.NpoiWrapper
             {
                 //Office.Interop.Excelにならい先頭アドレスのみ参照
                 CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
-                float RetVal = 0;
+                double RetVal = 0;
                 //行ループ
                 for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
                 {
@@ -646,46 +650,78 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// Range各行の高さ(単位はPoint)
+        /// Rangeの列幅合計(単位は文字数。Excel.InteropはPoint単位であり互換性はない。)<br/>
+        /// Excel.Interopは以下の通り<br/>
+        /// Rangeの幅をポイント単位で表すDouble値を返 します。 読み取り専用です。
+        /// </summary>
+        public object Width
+        {
+            //Rangeに含まれる列の幅合計値
+            get
+            {
+                object RetVal = null;
+                int RangeWidth = 0;
+                //Office.Interop.Excelにならい先頭アドレスのみ参照
+                CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
+                //列ループ
+                for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
+                {
+                    //GetColumnWidth()の単位；文字幅の1/256を1とする値
+                    RangeWidth += Parent.PoiSheet.GetColumnWidth(CIdx);
+                }
+                RetVal = (double)(RangeWidth/256);
+                return RetVal;
+            }
+        }
+
+        /// <summary>
+        /// Range先頭行の高さ(単位はPoint)<br/>
+        /// Excel.Interopは以下の通り<br/>
+        /// 指定した範囲内の最初の行の高さをポイント単位で設定または返します。読み取り/書き込みが可能なDoubleです。
+        /// RowHeightプロパティは、セル範囲内のすべての行の高さを設定します。
+        /// AutoFitメソッドを使用して、セルの内容に基づいて行の高さを設定します。
+        /// セル範囲内に結合されたセルがある場合、RowHeight は行の高さがさまざまであることを示すNullを返します。
+        /// セル範囲の合計高さを返すには、Heightプロパティを使用します。
+        /// 範囲に異なる高さの行が含まれている場合、RowHeight は最初の行の高さを返すか、Nullを返す可能性があります。
         /// </summary>
         public object RowHeight
         {
             get
             {
                 object RetVal = null;
-                List<float> ht = new List<float>();
+                List<double> ht = new List<double>();
                 //Office.Interop.Excelにならい先頭アドレスのみ参照
                 CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
-                //行ループ
-                for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
+                //先頭行の高さを取得(行がなければデフォルト値を採用)
+                IRow row = Parent.PoiSheet.GetRow(SafeAddress.FirstRow);
+                if (row != null)
                 {
-                    //行の取得(なければデフォルト値を採用)
-                    IRow row = Parent.PoiSheet.GetRow(RIdx);
-                    if (row != null)
-                    {
-                        ht.Add(row.HeightInPoints);
-                    }
-                    else
-                    {
-                        //twipなので20倍してpointに編案
-                        ht.Add(Parent.PoiSheet.DefaultRowHeight * 20);
-                    }
-                    //違う高さが検出されたらbreak
-                    if (ht.Min() != ht.Max())
-                    {
-                        break;
-                    }
+                    RetVal = (double)row.HeightInPoints;
                 }
-                //全行が同じ高さならその高さでリターン
-                if (ht.Min() == ht.Max())
+                else
                 {
-                    RetVal = ht.Min();
+                    //twipなので20倍してpointに変換
+                    RetVal = (double)(Parent.PoiSheet.DefaultRowHeight * 20);
+                }
+                //結合セルのチェック
+                foreach (CellRangeAddress region in Parent.PoiSheet.MergedRegions)
+                {
+                    CellRangeAddress MergedRegion = RangeUtil.CreatetSafeCellRangeAddress(region, Parent.Parent.PoiBook.SpreadsheetVersion);
+                    //行方向の結合を持つ場合
+                    if (MergedRegion.FirstRow != SafeAddress.LastRow)
+                    {
+                        //このRangeを含む場合
+                        if(MergedRegion.IsInRange(new CellReference(SafeAddress.FormatAsString())))
+                        {
+                            RetVal = null;
+                        }
+                    }
                 }
                 return RetVal;
             }
             set
             {
-                if (TryConvertToFloat(value, out float FloatValue))
+                if (TryConvertToDouble(value, out double DoubleValue))
                 {
                     //Office.Interop.Excelにならい非連続Rangeの全てに適用
                     for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
@@ -703,17 +739,9 @@ namespace Developers.NpoiWrapper
                                 Logger.Debug(
                                     "Sheet[" + Parent.PoiSheet.SheetName + "]:Row[" + RIdx + "] *** Row Created. ***");
                             }
-                            if (FloatValue == 0)
-                            {
-                                //ゼロを設定
-                                row.ZeroHeight = true;
-                            }
-                            else
-                            {
-                                //高さを設定
-                                row.ZeroHeight = false;
-                                row.HeightInPoints = FloatValue;
-                            }
+                            //高さを設定
+                            row.ZeroHeight = DoubleValue == 0 ? true : false;
+                            row.HeightInPoints = (float)DoubleValue;
                         }
                     }
                 }
@@ -725,27 +753,14 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// Rangeの列幅合計(単位は文字幅の1/20を1とする値であり、Pointではない)
-        /// </summary>
-        public object Width
-        {
-            //Rangeに含まれる列の幅合計値
-            get
-            {
-                float RetVal = 0;
-                //Office.Interop.Excelにならい先頭アドレスのみ参照
-                CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
-                //列ループ
-                for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
-                {
-                    RetVal += Parent.PoiSheet.GetColumnWidth(CIdx);
-                }
-                return RetVal;
-            }
-        }
-
-        /// <summary>
-        /// Range各列の幅(単位は文字幅の1/20を1とする値であり、Pointではない)
+        /// Range各列の幅(文字数)<br/>
+        /// Excel.Interopは以下の通り<br/>
+        /// 指定した範囲内のすべての列の幅を設定または返します。 読み取り/書き込みが可能なDoubleです。
+        /// 1 単位の列幅は、標準スタイルの 1 文字の幅に等しくなります。 プロポーショナル フォントでは、数字の 0 の幅が列幅の単位になります。
+        /// AutoFitメソッドを使用して、セルの内容に基づいて列の幅を設定します。
+        /// Widthプロパティを使用して、列の幅をポイント単位で返します。
+        /// 対象セル範囲内のすべての列が同じ幅である場合、ColumnWidthプロパティはその値を返します。 対象セル範囲内の各列の幅が異なる場合、
+        /// このプロパティはNull値を返します。
         /// </summary>
         public object ColumnWidth
         {
@@ -758,6 +773,7 @@ namespace Developers.NpoiWrapper
                 //列ループ
                 for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
                 {
+                    //GetColumnWidth()の単位；文字幅の1/256を1とする値
                     wd.Add(Parent.PoiSheet.GetColumnWidth(CIdx));
                     //違う幅さが検出されたらbreak
                     if (wd.Min() != wd.Max())
@@ -768,30 +784,40 @@ namespace Developers.NpoiWrapper
                 //全列が同じ幅ならその幅でリターン
                 if (wd.Min() == wd.Max())
                 {
-                    RetVal = wd.Min();
+                    //文字数に変換(GetColumnWidth()は１文字＝256なので、256で割る)
+                    double Width = wd.Min() / 256;
+                    RetVal = Width;
                 }
                 return RetVal;
             }
             set
             {
-                //Office.Interop.Excelにならい非連続Rangeの全てに適用
-                for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
+                if(TryConvertToDouble(value, out double DoubleValue))
                 {
-                    //アドレス取得
-                    CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
-                    //列ループ
-                    for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
+                    //Office.Interop.Excelにならい非連続Rangeの全てに適用
+                    for (int AIdx = 0; AIdx < SafeAddressList.CountRanges(); AIdx++)
                     {
-                        if ((int)value == 0)
+                        //アドレス取得
+                        CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(AIdx);
+                        //列ループ
+                        for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
                         {
-                            Parent.PoiSheet.SetColumnHidden(CIdx, true);
-                        }
-                        else
-                        {
-                            Parent.PoiSheet.SetColumnHidden(CIdx, false);
-                            Parent.PoiSheet.SetColumnWidth(CIdx, (int)value);
+                            if ((int)value == 0)
+                            {
+                                Parent.PoiSheet.SetColumnHidden(CIdx, true);
+                            }
+                            else
+                            {
+                                Parent.PoiSheet.SetColumnHidden(CIdx, false);
+                                //SetColumnWidth()は文字幅の1/256を1とする値なので、256をかける
+                                Parent.PoiSheet.SetColumnWidth(CIdx, (int)(DoubleValue * 256));
+                            }
                         }
                     }
+                }
+                else
+                {
+                    throw new ArgumentException("Range.ColumnWidth");
                 }
             }
         }
@@ -1418,7 +1444,7 @@ namespace Developers.NpoiWrapper
                 IntValue = Convert.ToInt32(Value);
                 RetVal = true;
             }
-            catch (Exception ex)
+            catch
             {
                 RetVal = false;
             }
@@ -1426,21 +1452,43 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// objectをintに変換する
+        /// objectをfloatに変換する
         /// </summary>
         /// <param name="Value"></param>
-        /// <param name="IntValue"></param>
+        /// <param name="FloatValue"></param>
         /// <returns>true;変換できた　false:変換できなかった</returns>
-        protected bool TryConvertToFloat(object Value, out float IntValue)
+        protected bool TryConvertToFloat(object Value, out float FloatValue)
         {
             bool RetVal = false;
-            IntValue = -1;
+            FloatValue = -1;
             try
             {
-                IntValue = Convert.ToSingle(Value);
+                FloatValue = Convert.ToSingle(Value);
                 RetVal = true;
             }
-            catch (Exception ex)
+            catch
+            {
+                RetVal = false;
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// objectをdoubleに変換する
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <param name="DoubleValue"></param>
+        /// <returns>true;変換できた　false:変換できなかった</returns>
+        protected bool TryConvertToDouble(object Value, out double DoubleValue)
+        {
+            bool RetVal = false;
+            DoubleValue = -1;
+            try
+            {
+                DoubleValue = Convert.ToDouble(Value);
+                RetVal = true;
+            }
+            catch
             {
                 RetVal = false;
             }
