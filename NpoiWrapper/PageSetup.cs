@@ -70,6 +70,12 @@ namespace Developers.NpoiWrapper
         private static readonly log4net.ILog Logger
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
+        /// <summary>
+        /// 以下の情報によれば、NPOIの不具合により＋１しないと正しく動作しないとのこと。<br/>
+        /// https://stackoverflow.com/questions/57486314/c-sharp-application-to-print-excel-npoi-print-setup-to-set-to-legal-pager-size 
+        /// </summary>
+        private const short _PAPER_SIZE_ADJUSTER = 1;
+
         #endregion
 
         #region "constructors"
@@ -351,8 +357,8 @@ namespace Developers.NpoiWrapper
         {
             get
             {
-                XlPaperSize RetVal = (XlPaperSize)Parent.PoiSheet.PrintSetup.PaperSize;
-                if (PaperSizeParser.Xls.TryParse(Parent.PoiSheet.PrintSetup.PaperSize, out XlPaperSize XlValue))
+                XlPaperSize RetVal = XlPaperSize.xlPaperUser;
+                if (PaperSizeParser.Xls.TryParse((short)(Parent.PoiSheet.PrintSetup.PaperSize - _PAPER_SIZE_ADJUSTER), out XlPaperSize XlValue))
                 {
                     RetVal = XlValue;
                 }
@@ -360,12 +366,12 @@ namespace Developers.NpoiWrapper
             }
             set
             {
-                short SetValue = (short)value;
+                short SetValue = (short)NPOI.SS.UserModel.PaperSize.PRINTER_DEFAULT_PAPERSIZE;
                 if (PaperSizeParser.Poi.TryParse(value, out short PoiValue))
                 {
                     SetValue = PoiValue;
                 }
-                Parent.PoiSheet.PrintSetup.PaperSize = SetValue;
+                Parent.PoiSheet.PrintSetup.PaperSize = (short)(SetValue + _PAPER_SIZE_ADJUSTER);
             }
         }
         public string PrintTitleColumns
