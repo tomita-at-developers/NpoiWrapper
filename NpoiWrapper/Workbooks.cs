@@ -211,6 +211,11 @@ namespace Developers.NpoiWrapper
             {
                 ParamReadOnly = SafeReadOnly;
             }
+            string ParamPassword = string.Empty;
+            if (Password is string SafePassword)
+            {
+                ParamPassword = SafePassword;
+            }
             //string ParamPassword = null;
             //if (Password is string SafePassword)
             //{
@@ -221,13 +226,15 @@ namespace Developers.NpoiWrapper
             try
             {
                 IWorkbook PoiBook;
-                //Streamでファイルを開きPOIブックを取得
-                //本実装ではファイルを開きっぱなしにはしないですぐ閉じる。
-                //書き込むときには再度開く。その間、ファイルに直接加えられた変更は上書きにより失われる。
-                using (FileStream Stream = new FileStream(Filename, FileMode.Open, AccessMode, FileShare.ReadWrite))
-                {
-                    PoiBook = WorkbookFactory.Create(Stream);
-                }
+                ////Streamでファイルを開きPOIブックを取得
+                ////本実装ではファイルを開きっぱなしにはしないですぐ閉じる。
+                ////書き込むときには再度開く。その間、ファイルに直接加えられた変更は上書きにより失われる。
+                //using (FileStream Stream = new FileStream(Filename, FileMode.Open, AccessMode, FileShare.ReadWrite))
+                //{
+                //    PoiBook = WorkbookFactory.Create(Stream);
+                //}
+                //POIブックを取得の取得
+                PoiBook = WorkbookFactory.Create(Filename, ParamPassword, ParamReadOnly);
                 //Workbookクラス生成
                 Workbook Book = new Workbook(this.Parent, GetNextBookIndex(), PoiBook, Filename, ParamReadOnly);
                 //_Itemへ追加
