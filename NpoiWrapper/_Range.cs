@@ -1306,18 +1306,17 @@ namespace Developers.NpoiWrapper
             //XlCellType.xlCellTypeLastCellのみ処理
             if (Type == XlCellType.xlCellTypeLastCell)
             {
-                int LastRowIndex = SafeAddress.LastRow;
                 //Range最終行から上に向かって検索
-                for (int RIdx = 0; RIdx <= SafeAddress.FirstRow; RIdx--)
+                for (int RIdx = SafeAddress.LastRow; RIdx >= SafeAddress.FirstRow; RIdx--)
                 {
                     //行が存在すれば列をチェック
-                    IRow row = Parent.PoiSheet.GetRow(LastRowIndex + RIdx);
+                    IRow row = Parent.PoiSheet.GetRow(RIdx);
                     if (row != null)
                     {
                         //列が存在するならその列を採用
                         if (row.PhysicalNumberOfCells > 0)
                         {
-                            RowIndex = LastRowIndex + RIdx;
+                            RowIndex = RIdx;
                             ColumnIndex = row.LastCellNum - 1;
                             break;
                         }
