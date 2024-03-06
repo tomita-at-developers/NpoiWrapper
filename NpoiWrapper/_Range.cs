@@ -1308,16 +1308,16 @@ namespace Developers.NpoiWrapper
             {
                 int LastRowIndex = SafeAddress.LastRow;
                 //Range最終行から上に向かって検索
-                for (int CIdx = 0; CIdx >= 0; CIdx--)
+                for (int RIdx = 0; RIdx <= SafeAddress.FirstRow; RIdx--)
                 {
                     //行が存在すれば列をチェック
-                    IRow row = Parent.PoiSheet.GetRow(LastRowIndex + CIdx);
+                    IRow row = Parent.PoiSheet.GetRow(LastRowIndex + RIdx);
                     if (row != null)
                     {
                         //列が存在するならその列を採用
                         if (row.PhysicalNumberOfCells > 0)
                         {
-                            RowIndex = LastRowIndex + CIdx;
+                            RowIndex = LastRowIndex + RIdx;
                             ColumnIndex = row.LastCellNum - 1;
                             break;
                         }
@@ -1428,6 +1428,7 @@ namespace Developers.NpoiWrapper
 
         #endregion
 
+        #region　"protected methods"
 
         /// <summary>
         /// objectをintに変換する
@@ -1494,6 +1495,8 @@ namespace Developers.NpoiWrapper
             }
             return RetVal;
         }
+
+        #endregion
 
         #endregion
     }
