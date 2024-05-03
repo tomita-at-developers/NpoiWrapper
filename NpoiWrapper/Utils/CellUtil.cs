@@ -10,7 +10,7 @@ namespace Developers.NpoiWrapper.Utils
         /// log4net
         /// </summary>
         private static readonly log4net.ILog Logger
-            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// 指定した位置のセルを取得する(なければ生成)

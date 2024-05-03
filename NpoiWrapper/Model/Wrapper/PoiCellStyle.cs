@@ -15,7 +15,7 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// log4net
         /// </summary>
         private static readonly log4net.ILog Logger
-            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static Dictionary<string, PropertyInfo> _ImportMap = null;
         private static Dictionary<string, PropertyInfo> _CompareMap = null;

@@ -215,7 +215,7 @@ namespace Developers.NpoiWrapper
         /// log4net
         /// </summary>
         private static readonly log4net.ILog Logger
-            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly log4net.ILog ProcTimeLogger = log4net.LogManager.GetLogger("ProcessingTime");
         /// <summary>
         /// IEnumerator用行インデクス
