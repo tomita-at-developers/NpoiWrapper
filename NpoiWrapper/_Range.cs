@@ -660,7 +660,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 object RetVal = null;
-                int RangeWidth = 0;
+                double RangeWidth = 0;
                 //Office.Interop.Excelにならい先頭アドレスのみ参照
                 CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
                 //列ループ
@@ -767,7 +767,7 @@ namespace Developers.NpoiWrapper
             get
             {
                 object RetVal = null;
-                List<int> wd = new List<int>();
+                List<double> wd = new List<double>();
                 //Office.Interop.Excelにならい先頭アドレスのみ参照
                 CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
                 //列ループ
