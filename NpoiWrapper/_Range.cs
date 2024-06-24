@@ -802,7 +802,7 @@ namespace Developers.NpoiWrapper
                         //列ループ
                         for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
                         {
-                            if ((int)value == 0)
+                            if (DoubleValue == 0)
                             {
                                 Parent.PoiSheet.SetColumnHidden(CIdx, true);
                             }
@@ -810,7 +810,7 @@ namespace Developers.NpoiWrapper
                             {
                                 Parent.PoiSheet.SetColumnHidden(CIdx, false);
                                 //SetColumnWidth()は文字幅の1/256を1とする値なので、256をかける
-                                Parent.PoiSheet.SetColumnWidth(CIdx, (int)(DoubleValue * 256));
+                                Parent.PoiSheet.SetColumnWidth(CIdx, (DoubleValue * 256));
                             }
                         }
                     }
