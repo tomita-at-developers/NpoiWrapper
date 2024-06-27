@@ -366,11 +366,24 @@ namespace Developers.NpoiWrapper
         }
 
         /// <summary>
-        /// シートの保護
-        /// HSSFではこの操作によりオートフィルターが無効化される。
+        /// シートの保護(HSSFではパラメータによる制御未サポート(すべてロックされる))
         /// </summary>
-        /// <param name="Password">パスワード</param>
-        /// <param name="...">Password以外はすべて無視</param>
+        /// <param name="Password"></param>
+        /// <param name="DrawingObjects"></param>
+        /// <param name="Contents">未サポート</param>
+        /// <param name="Scenarios"></param>
+        /// <param name="UserInterfaceOnly">未サポート</param>
+        /// <param name="AllowFormattingCells"></param>
+        /// <param name="AllowFormattingColumns"></param>
+        /// <param name="AllowFormattingRows"></param>
+        /// <param name="AllowInsertingColumns"></param>
+        /// <param name="AllowInsertingRows"></param>
+        /// <param name="AllowInsertingHyperlinks"></param>
+        /// <param name="AllowDeletingColumns"></param>
+        /// <param name="AllowDeletingRows"></param>
+        /// <param name="AllowSorting"></param>
+        /// <param name="AllowFiltering"></param>
+        /// <param name="AllowUsingPivotTables"></param>
         public void Protect(
             object Password = null, object DrawingObjects = null, object Contents = null, object Scenarios = null,
             object UserInterfaceOnly = null, object AllowFormattingCells = null, object AllowFormattingColumns = null,
@@ -378,17 +391,125 @@ namespace Developers.NpoiWrapper
             object AllowInsertingHyperlinks = null, object AllowDeletingColumns = null, object AllowDeletingRows = null,
             object AllowSorting = null, object AllowFiltering = null, object AllowUsingPivotTables = null)
         {
-            string Passwd = "";
-            if (Password is string SafePqassword)
+
+            //string Password = null
+            //bool DrawingObjects = false               LockObjects
+            //bool Contents = true                      ???                 //未サポート
+            //bool Scenarios = true                     LockScenarios
+            //bool UserInterfaceOnly = false            ????                //未サポート
+            //bool AllowFormattingCells = false         LockFormatCells
+            //bool AllowFormattingColumns = false       LockFormatColumns
+            //bool AllowFormattingRows = false          LockFormatRows
+            //bool AllowInsertingColumns = false        LockInsertColumns
+            //bool AllowInsertingRows = false           LockInsertRows
+            //bool AllowInsertingHyperlinks = false     LockInsertHyperlinks
+            //bool AllowDeletingColumns = false         LockDeleteColumns
+            //bool AllowDeletingRows = false            LockDeleteRows
+            //bool AllowSorting = false                 LockSort
+            //bool AllowFiltering = false               LockFilter
+            //bool AllowUsingPivotTables = false        LockPivotTables
+
+            string ParamPassword = string.Empty;
+            bool ParamDrawingObjects = false;
+            bool ParamContents = true;                  //未使用
+            bool ParamScenarios = true;
+            bool ParamUserInterfaceOnly = false;        //未使用
+            bool ParamAllowFormattingCells = false;
+            bool ParamAllowFormattingColumns = false;
+            bool ParamAllowFormattingRows = false;
+            bool ParamAllowInsertingColumns = false;
+            bool ParamAllowInsertingRows = false;
+            bool ParamAllowInsertingHyperlinks = false;
+            bool ParamAllowDeletingColumns = false;
+            bool ParamAllowDeletingRows = false;
+            bool ParamAllowSorting = false;
+            bool ParamAllowFiltering = false;
+            bool ParamAllowUsingPivotTables = false;
+
+            if (Password is string SafePassword)
             {
-                Passwd = SafePqassword;
+                ParamPassword = SafePassword;
             }
-            PoiSheet.ProtectSheet(Passwd);
-            //XSSFならロック解除できるのでやっておく
+            if (DrawingObjects is bool SafeDrawingObjects)
+            {
+                ParamDrawingObjects = SafeDrawingObjects;
+            }
+            if (Contents is bool SafeContents)
+            {
+                ParamContents = SafeContents;
+            }
+            if (Scenarios is bool SafeScenarios)
+            {
+                ParamScenarios = SafeScenarios;
+            }
+            if (UserInterfaceOnly is bool SafeUserInterfaceOnly)
+            {
+                ParamUserInterfaceOnly = SafeUserInterfaceOnly;
+            }
+            if (AllowFormattingCells is bool SafeAllowFormattingCells)
+            {
+                ParamAllowFormattingCells = SafeAllowFormattingCells;
+            }
+            if (AllowFormattingColumns is bool SafeAllowFormattingColumns)
+            {
+                ParamAllowFormattingColumns = SafeAllowFormattingColumns;
+            }
+            if (AllowFormattingRows is bool SafeAllowFormattingRows)
+            {
+                ParamAllowFormattingRows = SafeAllowFormattingRows;
+            }
+            if (AllowInsertingColumns is bool SafeAllowInsertingColumns)
+            {
+                ParamAllowInsertingColumns = SafeAllowInsertingColumns;
+            }
+            if (AllowInsertingRows is bool SafeAllowInsertingRows)
+            {
+                ParamAllowInsertingRows = SafeAllowInsertingRows;
+            }
+            if (AllowInsertingHyperlinks is bool SafeAllowInsertingHyperlinks)
+            {
+                ParamAllowInsertingHyperlinks = SafeAllowInsertingHyperlinks;
+            }
+            if (AllowDeletingColumns is bool SafeAllowDeletingColumns)
+            {
+                ParamAllowDeletingColumns = SafeAllowDeletingColumns;
+            }
+            if (AllowDeletingRows is bool SafeAllowDeletingRows)
+            {
+                ParamAllowDeletingRows = SafeAllowDeletingRows;
+            }
+            if (AllowSorting is bool SafeAllowSorting)
+            {
+                ParamAllowSorting = SafeAllowSorting;
+            }
+            if (AllowFiltering is bool SafeAllowFiltering)
+            {
+                ParamAllowFiltering = SafeAllowFiltering;
+            }
+            if (AllowUsingPivotTables is bool SafeAllowUsingPivotTables)
+            {
+                ParamAllowUsingPivotTables = SafeAllowUsingPivotTables;
+            }
+            //シートの保護
+            PoiSheet.ProtectSheet(ParamPassword);
+            //XSSFなら制御できるので入力パラメータの指定を反映する
             if (PoiSheet is XSSFSheet xssfSheet)
             {
-                xssfSheet.LockAutoFilter(false);
-                xssfSheet.LockSort(false);
+                xssfSheet.LockObjects(ParamDrawingObjects);
+                //ParamContents未サポート
+                xssfSheet.LockScenarios(ParamScenarios);
+                //ParamUserInterfaceOnly未サポート
+                xssfSheet.LockFormatCells(!ParamAllowFormattingCells);
+                xssfSheet.LockFormatColumns(!ParamAllowFormattingColumns);
+                xssfSheet.LockFormatRows(!ParamAllowFormattingRows);
+                xssfSheet.LockInsertColumns(!ParamAllowInsertingColumns);
+                xssfSheet.LockInsertRows(!ParamAllowInsertingRows);
+                xssfSheet.LockInsertHyperlinks(!ParamAllowInsertingHyperlinks);
+                xssfSheet.LockDeleteColumns(!ParamAllowDeletingColumns);
+                xssfSheet.LockDeleteRows(!ParamAllowDeletingRows);
+                xssfSheet.LockSort(!ParamAllowSorting);
+                xssfSheet.LockAutoFilter(!ParamAllowFiltering);
+                xssfSheet.LockPivotTables(!ParamAllowUsingPivotTables);
             }
             else
             {
