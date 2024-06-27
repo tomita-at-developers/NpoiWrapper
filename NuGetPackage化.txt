@@ -1,0 +1,119 @@
+https://tsuna-can.hateblo.jp/entry/2019/07/28/014330
+
+プロジェクトのプロパティ「アプリケーション」
+→アセンブリ情報をきちんと設定
+　タイトルは"Developers.NpoiWrapper"とした。
+
+プロジェクトのプロパティ「ビルド」
+→「出力」で「XMLドキュメントファイル」をオン
+
+
+https://www.nuget.org/downloads
+上記から
+Windows x86 Commandline
+nuget.exe - recommended latest v6.10.0
+をダウンロード
+C:\SecureZone\Tools\nuget
+においてパスを環境変数pathに追加。
+以下のコマンドを実行★★★★★★.csprojのあるフォルダで実行する
+c:\SecureZone\DeveloperZone\Nittsu\生保\2024Win10\study\Package\NpoiWrapper\NpoiWrapper>nuget spec
+'NpoiWrapper.nuspec' が正常に作成されました。
+
+ここで直ちに
+c:\SecureZone\DeveloperZone\Nittsu\生保\2024Win10\study\Package\NpoiWrapper\NpoiWrapper>nuget pack -Properties Configuration=Release
+'NpoiWrapper.csproj' からパッケージをビルドしようとしています。
+MSBuild 自動検出: 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\bin' から MSBuild バージョン '17.9.8.16306' を使用します。
+'c:\SecureZone\DeveloperZone\Nittsu\生保\2024Win10\study\Package\NpoiWrapper\NpoiWrapper\bin\Release' からのファイルをパッキングしています。
+メタデータに対して 'NpoiWrapper.nuspec' を使用しています。
+警告: NU5102: The value "http://project_url_here_or_delete_this_line/" for projectUrl is a sample value and should be removed. Replace it with an appropriate value or remove it and rebuild your package.
+警告: NU5102: The value "Tag1 Tag2" for tags is a sample value and should be removed. Replace it with an appropriate value or remove it and rebuild your package.
+警告: NU5102: The value "Summary of changes made in this release of the package." for releaseNotes is a sample value and should be removed. Replace it with an appropriate value or remove it and rebuild your package.
+The package NpoiWrapper.1.0.0 is missing a readme. Go to https://aka.ms/nuget/authoring-best-practices/readme to learn why package readmes are important.
+パッケージ 'c:\SecureZone\DeveloperZone\Nittsu\生保\2024Win10\study\Package\NpoiWrapper\NpoiWrapper\NpoiWrapper.1.0.0.nupkg' が正常に作成されました。
+
+すると、NpoiWrapper.1.0.0.nupkgはできるが以下の通り依存関係が記載されない。
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>NpoiWrapper</id>
+    <version>1.0.0</version>
+    <title>Developers.NpoiWrapper</title>
+    <authors>Developers</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>http://project_url_here_or_delete_this_line/</projectUrl>
+    <description>Emulates Office.Interop.Excel</description>
+    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <copyright>Copyright ©  2024 Developers A. Tomita</copyright>
+    <tags>Tag1 Tag2</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.8" />
+    </dependencies>
+  </metadata>
+</package>
+
+なのでnuget specで生成されたNpoiWrapper.nuspecに修正・追記する。
+・projectUrlをコメントアウト
+・tagsを適当に修正
+・releaseNotesをコメントアウト
+・dependenciesを追記して明示。内容は.csprojのPackageReferenceを転記。
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <!-- <projectUrl>http://project_url_here_or_delete_this_line/</projectUrl> -->
+    <description>$description$</description>
+    <!-- <releaseNotes>Summary of changes made in this release of the package.</releaseNotes> -->
+    <copyright>$copyright$</copyright>
+    <tags>Developers NpoiWrapper</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.8">
+        <dependency id="log4net" version="2.0.17" />
+        <dependency id="NPOI" version="2.7.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+
+再度nuget packする
+c:\SecureZone\DeveloperZone\Nittsu\生保\2024Win10\study\Package\NpoiWrapper\NpoiWrapper>nuget pack -Properties Configuration=Release
+'NpoiWrapper.csproj' からパッケージをビルドしようとしています。
+MSBuild 自動検出: 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\bin' から MSBuild バージョン '17.9.8.16306' を使用します。
+'c:\SecureZone\DeveloperZone\Nittsu\生保\2024Win10\study\Package\NpoiWrapper\NpoiWrapper\bin\Release' からのファイルをパッキングしています。
+メタデータに対して 'NpoiWrapper.nuspec' を使用しています。
+The package NpoiWrapper.1.0.0 is missing a readme. Go to https://aka.ms/nuget/authoring-best-practices/readme to learn why package readmes are important.
+パッケージ 'c:\SecureZone\DeveloperZone\Nittsu\生保\2024Win10\study\Package\NpoiWrapper\NpoiWrapper\NpoiWrapper.1.0.0.nupkg' が正常に作成されました。
+
+生成されたNpoiWrapper.1.0.0.nupkgはzipファイルなのでzip解凍してNpoiWrapper.nuspecを見てみると以下の通り。
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>NpoiWrapper</id>
+    <version>1.0.0</version>
+    <title>Developers.NpoiWrapper</title>
+    <authors>Developers</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <description>Emulates Office.Interop.Excel</description>
+    <copyright>Copyright ©  2024 Developers A. Tomita</copyright>
+    <tags>Developers NpoiWrapper</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.8">
+        <dependency id="log4net" version="2.0.17" />
+        <dependency id="NPOI" version="2.7.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+
+出来上がったNpoiWrapper.1.0.0.nupkgをVisual Studoのパッケージソースに指定するとローカルでNugetできる。
+
+
+★★★ 本番用 ★★★
+c:\SecureZone\DeveloperZone\Developers\NpoiWrapper\NpoiWrapper>nuget pack -Properties Configuration=Release
