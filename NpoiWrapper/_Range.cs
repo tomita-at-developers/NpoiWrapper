@@ -6,6 +6,7 @@ using NPOI.POIFS.Properties;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using NPOI.XSSF.Streaming.Values;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -802,16 +803,18 @@ namespace Developers.NpoiWrapper
                         //列ループ
                         for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
                         {
-                            if (DoubleValue == 0)
-                            {
-                                Parent.PoiSheet.SetColumnHidden(CIdx, true);
-                            }
-                            else
-                            {
-                                Parent.PoiSheet.SetColumnHidden(CIdx, false);
-                                //SetColumnWidth()は文字幅の1/256を1とする値なので、256をかける
-                                Parent.PoiSheet.SetColumnWidth(CIdx, (DoubleValue * 256));
-                            }
+                            //SetColumnWidth()は文字幅の1/256を1とする値なので、256をかける
+                            Parent.PoiSheet.SetColumnWidth(CIdx, (DoubleValue * 256));
+                            //if (DoubleValue < 0)
+                            //{
+                            //    Parent.PoiSheet.SetColumnHidden(CIdx, true);
+                            //}
+                            //else
+                            //{
+                            //    Parent.PoiSheet.SetColumnHidden(CIdx, false);
+                            //    //SetColumnWidth()は文字幅の1/256を1とする値なので、256をかける
+                            //    Parent.PoiSheet.SetColumnWidth(CIdx, (DoubleValue * 256));
+                            //}
                         }
                     }
                 }
@@ -1013,6 +1016,106 @@ namespace Developers.NpoiWrapper
                 }
             }
         }
+
+        public object Hidden
+        {
+            get
+            {
+                bool RetVal = false;
+                //先頭アドレスにのみ適用
+                CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
+                //行モード
+                if (this.CountAs == CountType.Rows)
+                { 
+                    //行ループ
+                    for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
+                    {
+                        bool TempZeroHeight = false;
+                        //行の取得(なければfakse)
+                        IRow row = Parent.PoiSheet.GetRow(RIdx);
+                        if (row != null)
+                        {
+                            TempZeroHeight = row.ZeroHeight;
+                        }
+                        if (RIdx == SafeAddress.FirstRow)
+                        {
+                            RetVal = TempZeroHeight;
+                        }
+                        else
+                        {
+                            if (TempZeroHeight != RetVal)
+                            {
+                                RetVal = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                //列モード
+                else if (this.CountAs == CountType.Columns)
+                {
+                    //列ループ
+                    for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
+                    {
+                        if (CIdx == SafeAddress.FirstColumn)
+                        {
+                            RetVal = Parent.PoiSheet.IsColumnHidden(CIdx);
+                        }
+                        else
+                        {
+                            if (Parent.PoiSheet.IsColumnHidden(CIdx) != RetVal)
+                            {
+                                RetVal = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return RetVal;
+            }
+            set
+            {
+                if (TryConvertToBoolean(value, out bool BooleanValue))
+                {
+                    //先頭アドレスにのみ適用
+                    CellRangeAddress SafeAddress = SafeAddressList.GetCellRangeAddress(0);
+                    //行モード
+                    if (this.CountAs == CountType.Rows)
+                    {
+                        //行ループ
+                        for (int RIdx = SafeAddress.FirstRow; RIdx <= SafeAddress.LastRow; RIdx++)
+                        {
+                            //行の取得(なければ生成)
+                            IRow row = Parent.PoiSheet.GetRow(RIdx);
+                            if (row == null)
+                            {
+                                row = Parent.PoiSheet.CreateRow(RIdx);
+                                Logger.Debug(
+                                    "Sheet[" + Parent.PoiSheet.SheetName + "]:Row[" + RIdx + "] *** Row Created. ***");
+                            }
+                        }
+                    }
+                    //列モード
+                    else if (this.CountAs == CountType.Columns)
+                    {
+                        //列ループ
+                        for (int CIdx = SafeAddress.FirstColumn; CIdx <= SafeAddress.LastColumn; CIdx++)
+                        {
+                            Parent.PoiSheet.SetColumnHidden(CIdx, BooleanValue);
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Range.Hidden");
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Range.Hidden");
+                }
+            }
+        }
+
 
         #endregion
 
@@ -1486,6 +1589,28 @@ namespace Developers.NpoiWrapper
             try
             {
                 DoubleValue = Convert.ToDouble(Value);
+                RetVal = true;
+            }
+            catch
+            {
+                RetVal = false;
+            }
+            return RetVal;
+        }
+
+        /// <summary>
+        /// objectをdoubleに変換する
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <param name="DoubleValue"></param>
+        /// <returns>true;変換できた　false:変換できなかった</returns>
+        protected bool TryConvertToBoolean(object Value, out bool BooleanValue)
+        {
+            bool RetVal = false;
+            BooleanValue = false;
+            try
+            {
+                BooleanValue = Convert.ToBoolean(Value);
                 RetVal = true;
             }
             catch
