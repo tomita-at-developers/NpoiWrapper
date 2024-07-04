@@ -116,4 +116,5 @@ The package NpoiWrapper.1.0.0 is missing a readme. Go to https://aka.ms/nuget/au
 
 
 ★★★ 本番用 ★★★
-c:\SecureZone\DeveloperZone\Developers\NpoiWrapper\NpoiWrapper>nuget pack -Properties Configuration=Release
+cd c:\SecureZone\DeveloperZone\Developers\NpoiWrapper\NpoiWrapper
+nuget pack -Properties Configuration=Release
