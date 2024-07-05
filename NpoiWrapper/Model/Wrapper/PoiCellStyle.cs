@@ -99,6 +99,8 @@ namespace Developers.NpoiWrapper.Model.Wrapper
         /// IColor系の更新はサポートしていないので、Comparison, Exportはfalse指定としている。
         /// </summary>
         [Import(false), Comparison(false), Export(false)] public IColor FillForegroundColorColor { get; }
+        //NPOI2.7,1で追加されたプロパティ(ここでは未使用)
+        [Import(false), Comparison(false), Export(false)] public bool IsQuotePrefixed { get; set; }
 
         #endregion
 
